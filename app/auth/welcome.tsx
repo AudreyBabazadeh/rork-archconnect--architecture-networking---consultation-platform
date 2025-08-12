@@ -15,9 +15,9 @@ export default function WelcomeScreen() {
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
             <Building2 size={60} color={Colors.white} />
-            <Text style={styles.title}>ArchConsult</Text>
+            <Text style={styles.title}>Arcal</Text>
             <Text style={styles.subtitle}>
-              Connect with architecture experts worldwide
+              Connect with experts worldwide
             </Text>
           </View>
 
@@ -62,7 +62,7 @@ export default function WelcomeScreen() {
           </View>
 
           <Text style={styles.footer}>
-            Join thousands of architecture professionals
+            Join thousands of professionals
           </Text>
         </ScrollView>
       </LinearGradient>

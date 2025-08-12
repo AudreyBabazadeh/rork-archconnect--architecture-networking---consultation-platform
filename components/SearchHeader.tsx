@@ -12,7 +12,7 @@ interface SearchHeaderProps {
 export function SearchHeader({ searchQuery, onSearchChange, onFilterPress }: SearchHeaderProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Find Your Architecture Mentor</Text>
+      <Text style={styles.title}>Find Your Mentor</Text>
       <Text style={styles.subtitle}>Connect with experts worldwide</Text>
       
       <View style={styles.searchContainer}>
