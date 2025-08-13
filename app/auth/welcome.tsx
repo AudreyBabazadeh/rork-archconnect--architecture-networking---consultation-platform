@@ -1,29 +1,23 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Building2, Users, Star, ArrowRight, BookOpen, TrendingUp, Heart } from 'lucide-react-native';
+import { ArrowRight, BookOpen, TrendingUp, Heart } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { Colors } from '@/constants/colors';
 
 export default function WelcomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={[Colors.primary, Colors.primaryLight]}
+        colors={['#FF6B35', '#F7931E']}
         style={styles.gradient}
       >
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
           {/* Hero Section */}
           <View style={styles.hero}>
-            <View style={styles.logoContainer}>
-              <Building2 size={48} color={Colors.white} />
-            </View>
-            <Text style={styles.title}>Arcal</Text>
-            <Text style={styles.tagline}>
-              Where Knowledge Meets Opportunity
-            </Text>
+            <Text style={styles.title}>Welcome to Arcal</Text>
             <Text style={styles.subtitle}>
-              Connect with experts, share insights, and grow together in a global professional community
+              Connect, learn, and grow with a community that cares about your success
             </Text>
           </View>
 
@@ -34,9 +28,6 @@ export default function WelcomeScreen() {
                 <TrendingUp size={24} color={Colors.secondary} />
               </View>
               <Text style={styles.messageTitle}>Share your expertise</Text>
-              <Text style={styles.messageText}>
-                Monetize your knowledge and help others succeed
-              </Text>
             </View>
 
             <View style={styles.messageCard}>
@@ -44,9 +35,6 @@ export default function WelcomeScreen() {
                 <Heart size={24} color={Colors.secondary} />
               </View>
               <Text style={styles.messageTitle}>Support the next generation</Text>
-              <Text style={styles.messageText}>
-                Guide emerging professionals on their journey
-              </Text>
             </View>
 
             <View style={styles.messageCard}>
@@ -54,25 +42,6 @@ export default function WelcomeScreen() {
                 <BookOpen size={24} color={Colors.secondary} />
               </View>
               <Text style={styles.messageTitle}>Learn from those ahead of you</Text>
-              <Text style={styles.messageText}>
-                Access insights from industry leaders and experts
-              </Text>
-            </View>
-          </View>
-
-          {/* Features */}
-          <View style={styles.features}>
-            <View style={styles.feature}>
-              <Users size={20} color={Colors.white} />
-              <Text style={styles.featureText}>
-                Global network of professionals
-              </Text>
-            </View>
-            <View style={styles.feature}>
-              <Star size={20} color={Colors.white} />
-              <Text style={styles.featureText}>
-                Expert consultation & mentorship
-              </Text>
             </View>
           </View>
 
@@ -97,9 +66,9 @@ export default function WelcomeScreen() {
           </View>
 
           <Text style={styles.footer}>
-            Join thousands of professionals worldwide
+            Join a supportive community of learners and mentors
           </Text>
-        </ScrollView>
+        </View>
       </LinearGradient>
     </SafeAreaView>
   );
@@ -113,54 +82,43 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    flexGrow: 1,
+    flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 32,
+    paddingTop: 60,
+    paddingBottom: 40,
+    justifyContent: 'space-between',
   },
   hero: {
     alignItems: 'center',
-    marginBottom: 48,
-  },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 40,
   },
   title: {
-    fontSize: 42,
+    fontSize: 36,
     fontWeight: '700',
     color: Colors.white,
-    marginBottom: 8,
-    letterSpacing: -1,
-  },
-  tagline: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: Colors.white,
-    marginBottom: 12,
-    opacity: 0.95,
+    marginBottom: 16,
+    textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: Colors.white,
     textAlign: 'center',
-    opacity: 0.85,
-    lineHeight: 24,
+    opacity: 0.9,
+    lineHeight: 26,
     paddingHorizontal: 20,
   },
   keyMessages: {
-    marginBottom: 40,
+    flex: 1,
+    justifyContent: 'center',
+    marginVertical: 20,
   },
   messageCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -174,42 +132,17 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(245, 101, 0, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 12,
+    marginRight: 16,
   },
   messageTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '600',
     color: Colors.text,
-    marginBottom: 6,
-  },
-  messageText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 20,
-  },
-  features: {
-    marginBottom: 40,
-    paddingHorizontal: 8,
-  },
-  feature: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-  },
-  featureText: {
-    fontSize: 15,
-    color: Colors.white,
-    marginLeft: 12,
     flex: 1,
-    fontWeight: '500',
   },
   buttons: {
-    gap: 12,
-    marginBottom: 32,
+    gap: 16,
+    marginBottom: 20,
   },
   primaryButton: {
     backgroundColor: Colors.white,
@@ -247,7 +180,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.white,
     textAlign: 'center',
-    opacity: 0.7,
+    opacity: 0.8,
     fontWeight: '500',
   },
 });
