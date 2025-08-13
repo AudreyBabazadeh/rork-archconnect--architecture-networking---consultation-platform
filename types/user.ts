@@ -13,7 +13,7 @@ export interface User {
   bio: string;
   portfolio: PortfolioItem[];
   isAvailable: boolean;
-  services?: Service[];
+  topics?: Topic[];
 }
 
 export interface PortfolioItem {
@@ -38,7 +38,7 @@ export interface Session {
   createdAt: Date;
 }
 
-export interface Service {
+export interface Topic {
   id: string;
   name: string;
   description: string;

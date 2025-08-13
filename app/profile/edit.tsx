@@ -18,8 +18,8 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
-import { ServiceManager } from '@/components/ServiceManager';
-import { Service } from '@/types/user';
+import { TopicManager } from '@/components/TopicManager';
+import { Topic } from '@/types/user';
 
 export default function EditProfileScreen() {
   const { user, updateProfile } = useAuth();
@@ -34,7 +34,7 @@ export default function EditProfileScreen() {
     hourlyRate: user?.hourlyRate || 0,
     profileImage: user?.profileImage || '',
   });
-  const [services, setServices] = useState<Service[]>((user as any)?.services || []);
+  const [topics, setTopics] = useState<Topic[]>((user as any)?.topics || []);
 
   const handleSave = async () => {
     if (!formData.name?.trim()) {
@@ -44,7 +44,7 @@ export default function EditProfileScreen() {
 
     setIsLoading(true);
     try {
-      await updateProfile({ ...formData, services });
+      await updateProfile({ ...formData, topics });
       Alert.alert('Success', 'Profile updated successfully', [
         { text: 'OK', onPress: () => router.back() }
       ]);
@@ -280,14 +280,14 @@ export default function EditProfileScreen() {
                 keyboardType="numeric"
                 testID="hourly-rate-input"
               />
-              <Text style={styles.helpText}>This is used as a fallback rate for services without specific pricing.</Text>
+              <Text style={styles.helpText}>This is used as a fallback rate for topics without specific pricing.</Text>
             </View>
           </View>
 
           <View style={styles.section}>
-            <ServiceManager 
-              services={services}
-              onServicesChange={setServices}
+            <TopicManager 
+              topics={topics}
+              onTopicsChange={setTopics}
             />
           </View>
         </View>

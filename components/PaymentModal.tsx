@@ -123,7 +123,7 @@ export function PaymentModal({
               <Text style={styles.summaryValue}>{consultantName}</Text>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Service:</Text>
+              <Text style={styles.summaryLabel}>Topic:</Text>
               <Text style={styles.summaryValue}>{consultationType}</Text>
             </View>
             <View style={[styles.summaryRow, styles.totalRow]}>
