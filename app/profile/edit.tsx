@@ -17,12 +17,14 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from '@/constants/colors';
-import { useAuth, User } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { ServiceManager } from '@/components/ServiceManager';
+import { Service } from '@/types/user';
 
 export default function EditProfileScreen() {
   const { user, updateProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<Partial<User>>({
+  const [formData, setFormData] = useState<any>({
     name: user?.name || '',
     bio: user?.bio || '',
     university: user?.university || '',
@@ -32,6 +34,7 @@ export default function EditProfileScreen() {
     hourlyRate: user?.hourlyRate || 0,
     profileImage: user?.profileImage || '',
   });
+  const [services, setServices] = useState<Service[]>((user as any)?.services || []);
 
   const handleSave = async () => {
     if (!formData.name?.trim()) {
@@ -41,7 +44,7 @@ export default function EditProfileScreen() {
 
     setIsLoading(true);
     try {
-      await updateProfile(formData);
+      await updateProfile({ ...formData, services });
       Alert.alert('Success', 'Profile updated successfully', [
         { text: 'OK', onPress: () => router.back() }
       ]);
@@ -136,8 +139,8 @@ export default function EditProfileScreen() {
     }
   };
 
-  const updateFormData = (key: keyof User, value: string | number) => {
-    setFormData(prev => ({ ...prev, [key]: value }));
+  const updateFormData = (key: string, value: string | number) => {
+    setFormData((prev: any) => ({ ...prev, [key]: value }));
   };
 
   if (!user) {
@@ -265,7 +268,7 @@ export default function EditProfileScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Consultation Settings</Text>
+            <Text style={styles.sectionTitle}>Session Settings</Text>
             
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Hourly Rate (USD)</Text>
@@ -277,7 +280,15 @@ export default function EditProfileScreen() {
                 keyboardType="numeric"
                 testID="hourly-rate-input"
               />
+              <Text style={styles.helpText}>This is used as a fallback rate for services without specific pricing.</Text>
             </View>
+          </View>
+
+          <View style={styles.section}>
+            <ServiceManager 
+              services={services}
+              onServicesChange={setServices}
+            />
           </View>
         </View>
       </ScrollView>
@@ -391,5 +402,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textLight,
     textAlign: 'center',
+  },
+  helpText: {
+    fontSize: 12,
+    color: Colors.textLight,
+    marginTop: 4,
   },
 });

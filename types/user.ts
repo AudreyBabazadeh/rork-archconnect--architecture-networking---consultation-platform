@@ -13,6 +13,7 @@ export interface User {
   bio: string;
   portfolio: PortfolioItem[];
   isAvailable: boolean;
+  services?: Service[];
 }
 
 export interface PortfolioItem {
@@ -24,7 +25,7 @@ export interface PortfolioItem {
   year: number;
 }
 
-export interface Consultation {
+export interface Session {
   id: string;
   consultantId: string;
   clientId: string;
@@ -35,6 +36,15 @@ export interface Consultation {
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   scheduledDate?: Date;
   createdAt: Date;
+}
+
+export interface Service {
+  id: string;
+  name: string;
+  description: string;
+  duration: number;
+  price: number;
+  isActive: boolean;
 }
 
 export interface Message {

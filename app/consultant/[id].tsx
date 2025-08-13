@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMessaging } from '@/contexts/MessagingContext';
 
 const { width } = Dimensions.get('window');
-const USERS_STORAGE_KEY = 'app_users';
+
 
 export default function ConsultantProfile() {
   const { id } = useLocalSearchParams();
@@ -48,10 +48,10 @@ export default function ConsultantProfile() {
                   experience: cloudUser.experience || '1 year',
                   hourlyRate: cloudUser.hourlyRate || 25,
                   rating: cloudUser.rating || 4.5,
-                  reviewCount: cloudUser.totalConsultations || 0,
+                  reviewCount: (cloudUser as any).totalConsultations || 0,
                   bio: cloudUser.bio || 'Architecture professional ready to help with your projects.',
                   isAvailable: true,
-                  portfolio: Array.isArray(cloudUser.portfolio) ? cloudUser.portfolio.map((item: string, index: number) => ({
+                  portfolio: Array.isArray((cloudUser as any).portfolio) ? (cloudUser as any).portfolio.map((item: string, index: number) => ({
                     id: `portfolio-${index}`,
                     title: `Project ${index + 1}`,
                     category: 'Architecture',
@@ -62,7 +62,7 @@ export default function ConsultantProfile() {
                 };
                 console.log('Found consultant in cloud:', foundConsultant.name);
               }
-            } catch (cloudError) {
+            } catch {
               console.log('Cloud search failed, trying local storage');
             }
           }
@@ -291,7 +291,7 @@ export default function ConsultantProfile() {
           disabled={!consultant.isAvailable}
         >
           <Calendar size={20} color={Colors.white} />
-          <Text style={styles.bookButtonText}>Book Consultation</Text>
+          <Text style={styles.bookButtonText}>Book Session</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

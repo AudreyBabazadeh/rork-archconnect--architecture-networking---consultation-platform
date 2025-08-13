@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { DollarSign } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { PaymentModal } from '@/components/PaymentModal';
 import { Colors } from '@/constants/colors';
+import { Service } from '@/types/user';
+import { useAuth } from '@/contexts/AuthContext';
 
-const consultationTypes = [
-  { id: 'portfolio', title: 'Portfolio Review', duration: 60, description: 'Comprehensive review of your work' },
-  { id: 'project', title: 'Project Consultation', duration: 45, description: 'Specific project guidance' },
-  { id: 'career', title: 'Career Advice', duration: 30, description: 'Professional development discussion' },
-  { id: 'technical', title: 'Technical Help', duration: 90, description: 'Software and technical assistance' },
+const defaultServices: Service[] = [
+  { id: 'portfolio', name: 'Portfolio Review', duration: 60, description: 'Comprehensive review of your work', price: 50, isActive: true },
+  { id: 'project', name: 'Project Session', duration: 45, description: 'Specific project guidance', price: 40, isActive: true },
+  { id: 'career', name: 'Career Advice', duration: 30, description: 'Professional development discussion', price: 25, isActive: true },
+  { id: 'technical', name: 'Technical Help', duration: 90, description: 'Software and technical assistance', price: 75, isActive: true },
 ];
 
 const timeSlots = [
@@ -20,29 +23,156 @@ const timeSlots = [
 export default function BookingScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const [selectedType, setSelectedType] = useState(consultationTypes[0]);
+  const { getUserById } = useAuth();
+  const [consultant, setConsultant] = useState<any>(null);
+  const [availableServices, setAvailableServices] = useState<Service[]>([]);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [description, setDescription] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  
-  const consultant = mockUsers.find(user => user.id === id);
-  
-  if (!consultant) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load consultant data and services
+  useEffect(() => {
+    const loadConsultantAndServices = async () => {
+      try {
+        let foundConsultant = null;
+        
+        // First check mock users
+        foundConsultant = mockUsers.find(user => user.id === id);
+        
+        if (!foundConsultant) {
+          // Try to get user from cloud
+          if (getUserById) {
+            try {
+              const cloudUser = await getUserById(id as string);
+              if (cloudUser) {
+                foundConsultant = {
+                  id: cloudUser.id,
+                  name: cloudUser.name,
+                  title: cloudUser.userType === 'professor' ? `Professor at ${cloudUser.university || 'University'}` : `${cloudUser.userType === 'student' ? 'Architecture Student' : 'Architecture Professional'}`,
+                  university: cloudUser.university,
+                  location: cloudUser.location || 'Location not specified',
+                  avatar: cloudUser.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+                  specialties: cloudUser.specialization ? [cloudUser.specialization] : ['General Architecture'],
+                  experience: cloudUser.experience || '1 year',
+                  hourlyRate: cloudUser.hourlyRate || 25,
+                  rating: cloudUser.rating || 4.5,
+                  reviewCount: (cloudUser as any).totalConsultations || 0,
+                  bio: cloudUser.bio || 'Architecture professional ready to help with your projects.',
+                  isAvailable: true,
+                  services: cloudUser.services || defaultServices
+                };
+              }
+            } catch {
+              console.log('Cloud search failed, trying local storage');
+            }
+          }
+        }
+        
+        // Fallback to local storage
+        if (!foundConsultant) {
+          const storedUsers = await AsyncStorage.getItem('app_users_local');
+          if (storedUsers) {
+            const users = JSON.parse(storedUsers);
+            const realUser = users.find((u: any) => u.id === id);
+            
+            if (realUser) {
+              foundConsultant = {
+                id: realUser.id,
+                name: realUser.name,
+                title: realUser.userType === 'professor' ? `Professor at ${realUser.university || 'University'}` : `${realUser.userType === 'student' ? 'Architecture Student' : 'Architecture Professional'}`,
+                university: realUser.university,
+                location: realUser.location || 'Location not specified',
+                avatar: realUser.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+                specialties: realUser.specialization ? [realUser.specialization] : ['General Architecture'],
+                experience: realUser.experience || '1 year',
+                hourlyRate: realUser.hourlyRate || 25,
+                rating: realUser.rating || 4.5,
+                reviewCount: realUser.totalConsultations || 0,
+                bio: realUser.bio || 'Architecture professional ready to help with your projects.',
+                isAvailable: true,
+                services: realUser.services || defaultServices
+              };
+            }
+          }
+        }
+        
+        if (foundConsultant) {
+          setConsultant(foundConsultant);
+          const services = foundConsultant.services || defaultServices;
+          const activeServices = services.filter((s: Service) => s.isActive);
+          setAvailableServices(activeServices);
+          if (activeServices.length > 0) {
+            setSelectedService(activeServices[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading consultant:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadConsultantAndServices();
+  }, [id, getUserById]);
+
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Consultant not found</Text>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
       </SafeAreaView>
     );
   }
 
-  const totalPrice = (consultant.hourlyRate * selectedType.duration) / 60;
+  if (!consultant) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Consultant not found</Text>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (availableServices.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>No services available</Text>
+          <Text style={styles.errorSubtext}>This consultant hasn&apos;t set up any services yet.</Text>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const totalPrice = selectedService?.price || 0;
   const platformFee = totalPrice * 0.05; // 5% platform fee
   const finalPrice = totalPrice + platformFee;
 
   const handleBooking = () => {
     if (!selectedDate || !selectedTime) {
-      Alert.alert('Missing Information', 'Please select a date and time for your consultation.');
+      Alert.alert('Missing Information', 'Please select a date and time for your session.');
+      return;
+    }
+
+    if (!selectedService) {
+      Alert.alert('Missing Information', 'Please select a service.');
       return;
     }
 
@@ -52,7 +182,7 @@ export default function BookingScreen() {
   const handlePaymentSuccess = () => {
     Alert.alert(
       'Booking Confirmed!',
-      `Your ${selectedType.title} with ${consultant.name} has been successfully booked for ${selectedDate} at ${selectedTime}.`,
+      `Your ${selectedService?.name} session with ${consultant.name} has been successfully booked for ${selectedDate} at ${selectedTime}.`,
       [
         { text: 'OK', onPress: () => router.back() }
       ]
@@ -64,7 +194,7 @@ export default function BookingScreen() {
       <Stack.Screen 
         options={{ 
           headerShown: true,
-          title: 'Book Consultation',
+          title: 'Book Session',
           headerBackTitle: 'Back',
         }} 
       />
@@ -76,27 +206,27 @@ export default function BookingScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Consultation Type</Text>
-          {consultationTypes.map((type) => (
+          <Text style={styles.sectionTitle}>Select Service</Text>
+          {availableServices.map((service) => (
             <TouchableOpacity
-              key={type.id}
-              style={[styles.typeOption, selectedType.id === type.id && styles.selectedOption]}
-              onPress={() => setSelectedType(type)}
+              key={service.id}
+              style={[styles.typeOption, selectedService?.id === service.id && styles.selectedOption]}
+              onPress={() => setSelectedService(service)}
             >
               <View style={styles.typeInfo}>
-                <Text style={[styles.typeTitle, selectedType.id === type.id && styles.selectedText]}>
-                  {type.title}
+                <Text style={[styles.typeTitle, selectedService?.id === service.id && styles.selectedText]}>
+                  {service.name}
                 </Text>
-                <Text style={[styles.typeDescription, selectedType.id === type.id && styles.selectedText]}>
-                  {type.description}
+                <Text style={[styles.typeDescription, selectedService?.id === service.id && styles.selectedText]}>
+                  {service.description}
                 </Text>
               </View>
               <View style={styles.typeDetails}>
-                <Text style={[styles.typeDuration, selectedType.id === type.id && styles.selectedText]}>
-                  {type.duration} min
+                <Text style={[styles.typeDuration, selectedService?.id === service.id && styles.selectedText]}>
+                  {service.duration} min
                 </Text>
-                <Text style={[styles.typePrice, selectedType.id === type.id && styles.selectedText]}>
-                  ${((consultant.hourlyRate * type.duration) / 60).toFixed(0)}
+                <Text style={[styles.typePrice, selectedService?.id === service.id && styles.selectedText]}>
+                  ${service.price}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -152,7 +282,7 @@ export default function BookingScreen() {
           <Text style={styles.sectionTitle}>Description (Optional)</Text>
           <TextInput
             style={styles.descriptionInput}
-            placeholder="Describe what you'd like to discuss..."
+            placeholder="Describe what you&apos;d like to discuss..."
             value={description}
             onChangeText={setDescription}
             multiline
@@ -164,7 +294,7 @@ export default function BookingScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Price Breakdown</Text>
           <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>Consultation ({selectedType.duration} min)</Text>
+            <Text style={styles.priceLabel}>Session ({selectedService?.duration || 0} min)</Text>
             <Text style={styles.priceValue}>${totalPrice.toFixed(2)}</Text>
           </View>
           <View style={styles.priceRow}>
@@ -180,9 +310,9 @@ export default function BookingScreen() {
 
       <View style={styles.bottomAction}>
         <TouchableOpacity 
-          style={[styles.bookButton, (!selectedDate || !selectedTime) && styles.disabledButton]}
+          style={[styles.bookButton, (!selectedDate || !selectedTime || !selectedService) && styles.disabledButton]}
           onPress={handleBooking}
-          disabled={!selectedDate || !selectedTime}
+          disabled={!selectedDate || !selectedTime || !selectedService}
         >
           <DollarSign size={20} color={Colors.white} />
           <Text style={styles.bookButtonText}>Book for ${finalPrice.toFixed(2)}</Text>
@@ -195,7 +325,7 @@ export default function BookingScreen() {
         onPaymentSuccess={handlePaymentSuccess}
         amount={finalPrice}
         consultantName={consultant.name}
-        consultationType={selectedType.title}
+        consultationType={selectedService?.name || ''}
       />
     </SafeAreaView>
   );
@@ -208,6 +338,44 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    color: Colors.textSecondary,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  errorSubtext: {
+    fontSize: 14,
+    color: Colors.textLight,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  backButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
   consultantInfo: {
     backgroundColor: Colors.white,
