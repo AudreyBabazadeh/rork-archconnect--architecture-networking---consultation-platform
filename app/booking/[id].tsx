@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { DollarSign, Plus } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -207,14 +207,7 @@ export default function BookingScreen() {
     );
   };
 
-  const renderSuggestionItem = ({ item }: { item: string }) => (
-    <TouchableOpacity
-      style={styles.suggestionItem}
-      onPress={() => selectSuggestion(item)}
-    >
-      <Text style={styles.suggestionText}>{item}</Text>
-    </TouchableOpacity>
-  );
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -304,13 +297,17 @@ export default function BookingScreen() {
               />
               {showTopicSuggestions && (
                 <View style={styles.suggestionsContainer}>
-                  <FlatList
-                    data={topicSuggestions}
-                    renderItem={renderSuggestionItem}
-                    keyExtractor={(item) => item}
-                    style={styles.suggestionsList}
-                    keyboardShouldPersistTaps="handled"
-                  />
+                  <View style={styles.suggestionsList}>
+                    {topicSuggestions.map((item) => (
+                      <TouchableOpacity
+                        key={item}
+                        style={styles.suggestionItem}
+                        onPress={() => selectSuggestion(item)}
+                      >
+                        <Text style={styles.suggestionText}>{item}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
                 </View>
               )}
             </View>
