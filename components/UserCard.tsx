@@ -190,10 +190,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   avatarContainer: {
-    alignItems: 'center',
+    position: 'relative',
     marginRight: 16,
   },
   badgeContainer: {
-    marginTop: 6,
+    position: 'absolute',
+    bottom: -4,
+    right: -4,
+    zIndex: 1,
   },
 });
