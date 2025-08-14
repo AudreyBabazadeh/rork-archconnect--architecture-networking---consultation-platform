@@ -7,7 +7,7 @@ interface LoyaltyBadgeProps {
   size?: number;
 }
 
-export function LoyaltyBadge({ badge, size = 16 }: LoyaltyBadgeProps) {
+export function LoyaltyBadge({ badge, size = 20 }: LoyaltyBadgeProps) {
   const getGradientColors = (badge: LoyaltyBadgeType) => {
     switch (badge) {
       case 'silver':
@@ -47,24 +47,26 @@ export function LoyaltyBadge({ badge, size = 16 }: LoyaltyBadgeProps) {
           <Stop offset="100%" stopColor={colors.shadow} />
         </LinearGradient>
       </Defs>
-      {/* 8-pointed star outer shadow */}
+      {/* Octagram outer shadow */}
       <Path
-        d="M12 1.5 L15.2 7.8 L22.5 8.5 L17.5 13.2 L19 21.5 L12 17.8 L5 21.5 L6.5 13.2 L1.5 8.5 L8.8 7.8 Z"
+        d="M12 1 L14.5 6.5 L20.5 6.5 L16 10.5 L17.5 16.5 L12 13 L6.5 16.5 L8 10.5 L3.5 6.5 L9.5 6.5 Z M12 3 L15.5 8.5 L21.5 8.5 L17 12.5 L18.5 18.5 L12 15 L5.5 18.5 L7 12.5 L2.5 8.5 L8.5 8.5 Z"
         fill={colors.shadow}
         opacity="0.3"
+        fillRule="evenodd"
       />
-      {/* 8-pointed star main body */}
+      {/* Octagram main body */}
       <Path
-        d="M12 2 L15 8 L22 8.7 L17 13 L18.5 21 L12 17.5 L5.5 21 L7 13 L2 8.7 L9 8 Z"
+        d="M12 1.5 L14.2 6.8 L20 6.8 L15.7 10.2 L17.2 16.2 L12 12.7 L6.8 16.2 L8.3 10.2 L4 6.8 L9.8 6.8 Z M12 3.5 L15.2 8.2 L20.5 8.2 L16.5 11.8 L17.8 17.8 L12 14.3 L6.2 17.8 L7.5 11.8 L3.5 8.2 L8.8 8.2 Z"
         fill={`url(#${gradientId})`}
+        fillRule="evenodd"
       />
-      {/* Inner star highlight */}
+      {/* Inner octagram highlight */}
       <Path
-        d="M12 4 L14 9 L19 9.5 L15.5 12.5 L16.5 18 L12 15.5 L7.5 18 L8.5 12.5 L5 9.5 L10 9 Z"
+        d="M12 4 L13.5 8 L18 8 L14.5 11 L15.5 15.5 L12 13 L8.5 15.5 L9.5 11 L6 8 L10.5 8 Z"
         fill="none"
         stroke="#FFFFFF"
-        strokeWidth="0.4"
-        strokeOpacity="0.6"
+        strokeWidth="0.3"
+        strokeOpacity="0.7"
       />
       {/* Checkmark */}
       <Path
