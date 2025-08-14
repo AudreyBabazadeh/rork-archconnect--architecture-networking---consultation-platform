@@ -2,17 +2,21 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { ArrowRight, BookOpen, TrendingUp, Heart } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, StatusBar } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 
 export default function WelcomeScreen() {
+  const insets = useSafeAreaInsets();
+  
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
       <LinearGradient
         colors={['#FF6B35', '#F7931E']}
         style={styles.gradient}
       >
-        <View style={styles.content}>
+        <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 40 }]}>
           {/* Hero Section */}
           <View style={styles.hero}>
             <Image 
@@ -75,7 +79,7 @@ export default function WelcomeScreen() {
           </Text>
         </View>
       </LinearGradient>
-    </SafeAreaView>
+    </View>
   );
 }
 
