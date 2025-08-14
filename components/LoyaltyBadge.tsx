@@ -7,7 +7,7 @@ interface LoyaltyBadgeProps {
   size?: number;
 }
 
-export function LoyaltyBadge({ badge, size = 20 }: LoyaltyBadgeProps) {
+export function LoyaltyBadge({ badge, size = 24 }: LoyaltyBadgeProps) {
   const getGradientColors = (badge: LoyaltyBadgeType) => {
     switch (badge) {
       case 'silver':
