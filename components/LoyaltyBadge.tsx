@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import Svg, { Defs, LinearGradient, Stop, Path } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Stop, Circle, Path } from 'react-native-svg';
 import { LoyaltyBadge as LoyaltyBadgeType } from '@/types/user';
 
 interface LoyaltyBadgeProps {
@@ -48,16 +48,33 @@ export function LoyaltyBadge({ badge, size = 16 }: LoyaltyBadgeProps) {
             <Stop offset="100%" stopColor={colors.end} />
           </LinearGradient>
         </Defs>
-        <Path
-          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        {/* Outer circle */}
+        <Circle
+          cx="12"
+          cy="12"
+          r="11"
           fill={`url(#${gradientId})`}
           stroke={colors.shadow}
           strokeWidth="0.5"
         />
+        {/* Inner highlight circle */}
+        <Circle
+          cx="12"
+          cy="12"
+          r="9"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="0.5"
+          strokeOpacity="0.4"
+        />
+        {/* Checkmark */}
         <Path
-          d="M12 4.5l2.5 5.1 5.6 0.8-4.1 4 0.9 5.6-5-2.6-5 2.6 0.9-5.6-4.1-4 5.6-0.8L12 4.5z"
-          fill="#FFFFFF"
-          fillOpacity="0.3"
+          d="M8.5 12l2.5 2.5 5-5"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </Svg>
     </View>
