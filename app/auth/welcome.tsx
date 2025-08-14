@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   heroIcon: {
     width: 80,
@@ -119,8 +119,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   keyMessages: {
-    marginVertical: 20,
-    marginBottom: 30,
+    marginVertical: 10,
+    marginBottom: 20,
   },
   messageCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
