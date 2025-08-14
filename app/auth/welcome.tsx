@@ -73,10 +73,6 @@ export default function WelcomeScreen() {
               <Text style={styles.secondaryButtonText}>Already have an account?</Text>
             </TouchableOpacity>
           </View>
-
-          <Text style={styles.footer}>
-            Join a supportive community of learners and mentors
-          </Text>
         </View>
       </LinearGradient>
     </View>
