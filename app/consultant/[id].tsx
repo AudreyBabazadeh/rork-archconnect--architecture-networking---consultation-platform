@@ -176,16 +176,14 @@ export default function ConsultantProfile() {
       
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <View style={styles.avatarContainer}>
-            <Image source={{ uri: consultant.avatar }} style={styles.avatar} />
-            {consultant.loyaltyBadge && (
-              <View style={styles.badgeContainer}>
-                <LoyaltyBadge badge={consultant.loyaltyBadge} size="medium" />
-              </View>
-            )}
-          </View>
+          <Image source={{ uri: consultant.avatar }} style={styles.avatar} />
           <View style={styles.headerInfo}>
-            <Text style={styles.name}>{consultant.name}</Text>
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>{consultant.name}</Text>
+              {consultant.loyaltyBadge && (
+                <LoyaltyBadge badge={consultant.loyaltyBadge} size={18} />
+              )}
+            </View>
             <Text style={styles.title}>{consultant.title}</Text>
             {consultant.university && (
               <Text style={styles.university}>{consultant.university}</Text>
@@ -327,11 +325,16 @@ const styles = StyleSheet.create({
   headerInfo: {
     flex: 1,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
   name: {
     fontSize: 20,
     fontWeight: '700',
     color: Colors.text,
-    marginBottom: 4,
   },
   title: {
     fontSize: 16,
@@ -557,11 +560,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  avatarContainer: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  badgeContainer: {
-    marginTop: 12,
-  },
+
 });

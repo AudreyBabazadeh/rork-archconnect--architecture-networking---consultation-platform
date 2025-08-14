@@ -1,4 +1,4 @@
-export type LoyaltyBadge = 'silver' | 'gold' | 'platinum';
+export type LoyaltyBadge = 'silver' | 'gold';
 
 export interface User {
   id: string;

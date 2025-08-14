@@ -1,89 +1,65 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Award } from 'lucide-react-native';
+import { View, StyleSheet } from 'react-native';
+import Svg, { Defs, LinearGradient, Stop, Path } from 'react-native-svg';
 import { LoyaltyBadge as LoyaltyBadgeType } from '@/types/user';
-
 
 interface LoyaltyBadgeProps {
   badge: LoyaltyBadgeType;
-  size?: 'small' | 'medium';
+  size?: number;
 }
 
-export function LoyaltyBadge({ badge, size = 'small' }: LoyaltyBadgeProps) {
-
-
-  const getBadgeColors = (badge: LoyaltyBadgeType) => {
+export function LoyaltyBadge({ badge, size = 16 }: LoyaltyBadgeProps) {
+  const getGradientColors = (badge: LoyaltyBadgeType) => {
     switch (badge) {
       case 'silver':
         return {
-          background: '#C0C0C0',
-          border: '#A8A8A8',
-          icon: '#8E8E8E',
-          text: '#FFFFFF'
+          start: '#F8F8FF',
+          middle: '#E6E6FA', 
+          end: '#C0C0C0',
+          shadow: '#A8A8A8'
         };
       case 'gold':
         return {
-          background: '#FFD700',
-          border: '#E6C200',
-          icon: '#B8860B',
-          text: '#FFFFFF'
-        };
-      case 'platinum':
-        return {
-          background: '#E8E8E8',
-          border: '#D0D0D0',
-          icon: '#B8B8B8',
-          text: '#4A4A4A'
+          start: '#FFF8DC',
+          middle: '#FFD700',
+          end: '#DAA520',
+          shadow: '#B8860B'
         };
       default:
         return {
-          background: '#C0C0C0',
-          border: '#A8A8A8',
-          icon: '#8E8E8E',
-          text: '#FFFFFF'
+          start: '#F8F8FF',
+          middle: '#E6E6FA',
+          end: '#C0C0C0',
+          shadow: '#A8A8A8'
         };
     }
   };
 
-  const getBadgeLetter = (badge: LoyaltyBadgeType) => {
-    switch (badge) {
-      case 'silver':
-        return 'S';
-      case 'gold':
-        return 'G';
-      case 'platinum':
-        return 'P';
-      default:
-        return 'S';
-    }
-  };
-
-  const isSmall = size === 'small';
-  const colors = getBadgeColors(badge);
-  const letter = getBadgeLetter(badge);
+  const colors = getGradientColors(badge);
+  const gradientId = `gradient-${badge}`;
 
   return (
-    <View style={[
-      styles.container,
-      isSmall ? styles.smallContainer : styles.mediumContainer,
-      {
-        backgroundColor: colors.background,
-        borderColor: colors.border,
-      }
-    ]}>
-      <Award 
-        size={isSmall ? 10 : 12} 
-        color={colors.icon} 
-        fill={colors.icon}
-        style={styles.icon}
-      />
-      <Text style={[
-        styles.letter,
-        isSmall ? styles.smallLetter : styles.mediumLetter,
-        { color: colors.text }
-      ]}>
-        {letter}
-      </Text>
+    <View style={[styles.container, { width: size, height: size }]}>
+      <Svg width={size} height={size} viewBox="0 0 24 24">
+        <Defs>
+          <LinearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+            <Stop offset="0%" stopColor={colors.start} />
+            <Stop offset="50%" stopColor={colors.middle} />
+            <Stop offset="100%" stopColor={colors.end} />
+          </LinearGradient>
+        </Defs>
+        <Path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+          fill={`url(#${gradientId})`}
+          stroke={colors.shadow}
+          strokeWidth="0.5"
+        />
+        <Path
+          d="M12 4.5l2.5 5.1 5.6 0.8-4.1 4 0.9 5.6-5-2.6-5 2.6 0.9-5.6-4.1-4 5.6-0.8L12 4.5z"
+          fill="#FFFFFF"
+          fillOpacity="0.3"
+        />
+      </Svg>
     </View>
   );
 }
@@ -92,35 +68,10 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 12,
-    borderWidth: 1.5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 2,
-    elevation: 2,
-  },
-  smallContainer: {
-    width: 24,
-    height: 24,
-  },
-  mediumContainer: {
-    width: 28,
-    height: 28,
-  },
-  icon: {
-    position: 'absolute',
-    top: 2,
-  },
-  letter: {
-    fontWeight: '700',
-    position: 'absolute',
-    bottom: 1,
-  },
-  smallLetter: {
-    fontSize: 8,
-  },
-  mediumLetter: {
-    fontSize: 9,
+    elevation: 3,
   },
 });

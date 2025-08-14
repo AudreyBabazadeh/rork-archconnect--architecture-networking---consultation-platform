@@ -15,7 +15,7 @@ export const mockUsers: User[] = [
     reviewCount: 47,
     bio: 'Passionate about sustainable architecture and urban design. I help students and professionals develop innovative solutions for modern architectural challenges.',
     isAvailable: true,
-    loyaltyBadge: 'platinum',
+    loyaltyBadge: 'gold',
     portfolio: [
       {
         id: '1',
@@ -54,7 +54,6 @@ export const mockUsers: User[] = [
     reviewCount: 23,
     bio: 'Specializing in computational design and digital fabrication. I can help with Rhino, Grasshopper, and architectural visualization.',
     isAvailable: true,
-    loyaltyBadge: 'silver',
     portfolio: [
       {
         id: '3',
@@ -82,7 +81,7 @@ export const mockUsers: User[] = [
     reviewCount: 89,
     bio: 'Expert in architectural history and preservation. I guide students through complex theoretical frameworks and cultural context in design.',
     isAvailable: false,
-    loyaltyBadge: 'platinum',
+    loyaltyBadge: 'gold',
     portfolio: [
       {
         id: '4',
@@ -193,7 +192,7 @@ export const mockUsers: User[] = [
     reviewCount: 28,
     bio: 'Expert in historic building restoration and preservation. Helping maintain architectural heritage for future generations.',
     isAvailable: true,
-    loyaltyBadge: 'platinum',
+    loyaltyBadge: 'gold',
     portfolio: [
       {
         id: '8',

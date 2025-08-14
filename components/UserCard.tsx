@@ -14,16 +14,14 @@ export function UserCard({ user, onPress }: UserCardProps) {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.header}>
-        <View style={styles.avatarContainer}>
-          <Image source={{ uri: user.avatar }} style={styles.avatar} />
-          {user.loyaltyBadge && (
-            <View style={styles.badgeContainer}>
-              <LoyaltyBadge badge={user.loyaltyBadge} size="small" />
-            </View>
-          )}
-        </View>
+        <Image source={{ uri: user.avatar }} style={styles.avatar} />
         <View style={styles.headerInfo}>
-          <Text style={styles.name}>{user.name}</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.name}>{user.name}</Text>
+            {user.loyaltyBadge && (
+              <LoyaltyBadge badge={user.loyaltyBadge} size={16} />
+            )}
+          </View>
           <Text style={styles.title}>{user.title}</Text>
           {user.university && (
             <Text style={styles.university}>{user.university}</Text>
@@ -89,15 +87,21 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
+    marginRight: 16,
   },
   headerInfo: {
     flex: 1,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
   },
   name: {
     fontSize: 18,
     fontWeight: '700',
     color: Colors.text,
-    marginBottom: 4,
   },
   title: {
     fontSize: 14,
@@ -189,14 +193,5 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontWeight: '500',
   },
-  avatarContainer: {
-    position: 'relative',
-    marginRight: 16,
-  },
-  badgeContainer: {
-    position: 'absolute',
-    bottom: -4,
-    right: -4,
-    zIndex: 1,
-  },
+
 });
