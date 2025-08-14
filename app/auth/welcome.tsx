@@ -89,13 +89,12 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 40,
     paddingBottom: 40,
-    justifyContent: 'space-between',
   },
   hero: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
   },
   heroIcon: {
     width: 80,
@@ -115,13 +114,13 @@ const styles = StyleSheet.create({
     color: Colors.white,
     textAlign: 'center',
     opacity: 0.9,
-    lineHeight: 26,
-    paddingHorizontal: 20,
+    lineHeight: 24,
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
   keyMessages: {
-    flex: 1,
-    justifyContent: 'center',
     marginVertical: 20,
+    marginBottom: 30,
   },
   messageCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -153,6 +152,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     gap: 16,
+    marginTop: 20,
     marginBottom: 20,
   },
   primaryButton: {
