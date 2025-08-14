@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttons: {
-    gap: 16,
-    marginTop: 20,
+    gap: 8,
+    marginTop: 10,
     marginBottom: 20,
   },
   primaryButton: {
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   secondaryButton: {
-    paddingVertical: 16,
+    paddingVertical: 8,
     paddingHorizontal: 24,
     borderRadius: 12,
     alignItems: 'center',
