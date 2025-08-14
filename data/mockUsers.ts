@@ -15,6 +15,7 @@ export const mockUsers: User[] = [
     reviewCount: 47,
     bio: 'Passionate about sustainable architecture and urban design. I help students and professionals develop innovative solutions for modern architectural challenges.',
     isAvailable: true,
+    loyaltyBadge: 'platinum',
     portfolio: [
       {
         id: '1',
@@ -53,6 +54,7 @@ export const mockUsers: User[] = [
     reviewCount: 23,
     bio: 'Specializing in computational design and digital fabrication. I can help with Rhino, Grasshopper, and architectural visualization.',
     isAvailable: true,
+    loyaltyBadge: 'silver',
     portfolio: [
       {
         id: '3',
@@ -80,6 +82,7 @@ export const mockUsers: User[] = [
     reviewCount: 89,
     bio: 'Expert in architectural history and preservation. I guide students through complex theoretical frameworks and cultural context in design.',
     isAvailable: false,
+    loyaltyBadge: 'platinum',
     portfolio: [
       {
         id: '4',
@@ -107,6 +110,7 @@ export const mockUsers: User[] = [
     reviewCount: 67,
     bio: 'Experienced in large-scale commercial projects and high-rise buildings. Expert in BIM workflows and project management.',
     isAvailable: true,
+    loyaltyBadge: 'gold',
     portfolio: [
       {
         id: '5',
@@ -134,6 +138,7 @@ export const mockUsers: User[] = [
     reviewCount: 34,
     bio: 'Passionate about creating sustainable outdoor spaces that connect communities with nature.',
     isAvailable: true,
+    loyaltyBadge: 'gold',
     portfolio: [
       {
         id: '6',
@@ -161,6 +166,7 @@ export const mockUsers: User[] = [
     reviewCount: 18,
     bio: 'Specializing in residential interior design and 3D visualization. Passionate about creating functional and beautiful living spaces.',
     isAvailable: false,
+    loyaltyBadge: 'silver',
     portfolio: [
       {
         id: '7',
@@ -187,6 +193,7 @@ export const mockUsers: User[] = [
     reviewCount: 28,
     bio: 'Expert in historic building restoration and preservation. Helping maintain architectural heritage for future generations.',
     isAvailable: true,
+    loyaltyBadge: 'platinum',
     portfolio: [
       {
         id: '8',
@@ -214,6 +221,7 @@ export const mockUsers: User[] = [
     reviewCount: 45,
     bio: 'Bridging the gap between design and construction. Expert in modern building technologies and project delivery.',
     isAvailable: true,
+    loyaltyBadge: 'gold',
     portfolio: [
       {
         id: '9',

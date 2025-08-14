@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Star, MapPin } from 'lucide-react-native';
 import { User } from '@/types/user';
 import { Colors } from '@/constants/colors';
+import { LoyaltyBadge } from './LoyaltyBadge';
 
 interface UserCardProps {
   user: User;
@@ -12,6 +13,11 @@ interface UserCardProps {
 export function UserCard({ user, onPress }: UserCardProps) {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
+      {user.loyaltyBadge && (
+        <View style={styles.badgeContainer}>
+          <LoyaltyBadge badge={user.loyaltyBadge} size="small" />
+        </View>
+      )}
       <View style={styles.header}>
         <Image source={{ uri: user.avatar }} style={styles.avatar} />
         <View style={styles.headerInfo}>
@@ -181,5 +187,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
     fontWeight: '500',
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 1,
   },
 });

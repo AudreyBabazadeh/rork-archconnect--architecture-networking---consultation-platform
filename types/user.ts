@@ -1,3 +1,5 @@
+export type LoyaltyBadge = 'silver' | 'gold' | 'platinum';
+
 export interface User {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ export interface User {
   portfolio: PortfolioItem[];
   isAvailable: boolean;
   topics?: Topic[];
+  loyaltyBadge?: LoyaltyBadge;
 }
 
 export interface PortfolioItem {

@@ -5,6 +5,7 @@ import { Star, MapPin, Clock, MessageCircle, Calendar } from 'lucide-react-nativ
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
+import { LoyaltyBadge } from '@/components/LoyaltyBadge';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMessaging } from '@/contexts/MessagingContext';
@@ -175,6 +176,11 @@ export default function ConsultantProfile() {
       
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
+          {consultant.loyaltyBadge && (
+            <View style={styles.badgeContainer}>
+              <LoyaltyBadge badge={consultant.loyaltyBadge} size="medium" />
+            </View>
+          )}
           <Image source={{ uri: consultant.avatar }} style={styles.avatar} />
           <View style={styles.headerInfo}>
             <Text style={styles.name}>{consultant.name}</Text>
@@ -548,5 +554,11 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 16,
     fontWeight: '600',
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 1,
   },
 });
