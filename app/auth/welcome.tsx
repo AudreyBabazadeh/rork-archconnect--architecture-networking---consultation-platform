@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { ArrowRight, BookOpen, TrendingUp, Heart } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, Image } from 'react-native';
 import { Colors } from '@/constants/colors';
 
 export default function WelcomeScreen() {
@@ -15,6 +15,11 @@ export default function WelcomeScreen() {
         <View style={styles.content}>
           {/* Hero Section */}
           <View style={styles.hero}>
+            <Image 
+              source={{ uri: 'https://r2-pub.rork.com/generated-images/e85d2b63-236d-4cc7-bf94-1ad28d87277a.png' }}
+              style={styles.heroIcon}
+              resizeMode="contain"
+            />
             <Text style={styles.title}>Welcome to Arcal</Text>
             <Text style={styles.subtitle}>
               Connect, learn, and grow with a community that cares about your success
@@ -91,6 +96,12 @@ const styles = StyleSheet.create({
   hero: {
     alignItems: 'center',
     marginBottom: 40,
+  },
+  heroIcon: {
+    width: 80,
+    height: 80,
+    marginBottom: 24,
+    tintColor: Colors.white,
   },
   title: {
     fontSize: 36,
