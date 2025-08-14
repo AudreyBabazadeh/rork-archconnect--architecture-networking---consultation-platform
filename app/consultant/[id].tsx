@@ -176,12 +176,14 @@ export default function ConsultantProfile() {
       
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          {consultant.loyaltyBadge && (
-            <View style={styles.badgeContainer}>
-              <LoyaltyBadge badge={consultant.loyaltyBadge} size="medium" />
-            </View>
-          )}
-          <Image source={{ uri: consultant.avatar }} style={styles.avatar} />
+          <View style={styles.avatarContainer}>
+            <Image source={{ uri: consultant.avatar }} style={styles.avatar} />
+            {consultant.loyaltyBadge && (
+              <View style={styles.badgeContainer}>
+                <LoyaltyBadge badge={consultant.loyaltyBadge} size="medium" />
+              </View>
+            )}
+          </View>
           <View style={styles.headerInfo}>
             <Text style={styles.name}>{consultant.name}</Text>
             <Text style={styles.title}>{consultant.title}</Text>
@@ -555,10 +557,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  avatarContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   badgeContainer: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    zIndex: 1,
+    marginTop: 12,
   },
 });

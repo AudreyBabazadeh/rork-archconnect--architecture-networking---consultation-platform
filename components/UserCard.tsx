@@ -13,13 +13,15 @@ interface UserCardProps {
 export function UserCard({ user, onPress }: UserCardProps) {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
-      {user.loyaltyBadge && (
-        <View style={styles.badgeContainer}>
-          <LoyaltyBadge badge={user.loyaltyBadge} size="small" />
-        </View>
-      )}
       <View style={styles.header}>
-        <Image source={{ uri: user.avatar }} style={styles.avatar} />
+        <View style={styles.avatarContainer}>
+          <Image source={{ uri: user.avatar }} style={styles.avatar} />
+          {user.loyaltyBadge && (
+            <View style={styles.badgeContainer}>
+              <LoyaltyBadge badge={user.loyaltyBadge} size="small" />
+            </View>
+          )}
+        </View>
         <View style={styles.headerInfo}>
           <Text style={styles.name}>{user.name}</Text>
           <Text style={styles.title}>{user.title}</Text>
@@ -87,7 +89,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginRight: 16,
   },
   headerInfo: {
     flex: 1,
@@ -188,10 +189,11 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontWeight: '500',
   },
+  avatarContainer: {
+    alignItems: 'center',
+    marginRight: 16,
+  },
   badgeContainer: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    zIndex: 1,
+    marginTop: 6,
   },
 });

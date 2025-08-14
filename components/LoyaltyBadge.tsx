@@ -17,7 +17,7 @@ export function LoyaltyBadge({ badge, size = 'small' }: LoyaltyBadgeProps) {
       case 'gold':
         return '#FFD700';
       case 'platinum':
-        return '#E5E4E2';
+        return '#B8B8FF';
       default:
         return '#C0C0C0';
     }
@@ -30,7 +30,7 @@ export function LoyaltyBadge({ badge, size = 'small' }: LoyaltyBadgeProps) {
       case 'gold':
         return '#B8860B';
       case 'platinum':
-        return '#4A4A4A';
+        return '#4A4AFF';
       default:
         return '#666666';
     }
