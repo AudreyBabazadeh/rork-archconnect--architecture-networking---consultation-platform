@@ -240,116 +240,116 @@ export default function ManageAvailabilityScreen() {
       <Stack.Screen options={{ title: 'Manage Availability' }} />
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Consultation Topics</Text>
-          <Text style={styles.sectionDescription}>
-            Add topics you can help with and set individual pricing
-          </Text>
-          <TopicManager 
-            topics={topics}
-            onTopicsChange={setTopics}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Booking Settings</Text>
-          
-          <View style={styles.settingItem}>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>Available for Booking</Text>
-              <Text style={styles.settingDescription}>
-                Allow others to book consultations with you
-              </Text>
-            </View>
-            <Switch
-              value={isAvailableForBooking}
-              onValueChange={setIsAvailableForBooking}
-              trackColor={{ false: Colors.border, true: Colors.primary }}
-              thumbColor={Colors.white}
+            <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Consultation Topics</Text>
+            <Text style={styles.sectionDescription}>
+              Add topics you can help with and set individual pricing
+            </Text>
+            <TopicManager 
+              topics={topics}
+              onTopicsChange={setTopics}
             />
           </View>
 
-          <View style={styles.settingItem}>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>Advance Booking</Text>
-              <Text style={styles.settingDescription}>
-                How many days in advance can people book? Currently: {advanceBookingDays} days
-              </Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Booking Settings</Text>
+            
+            <View style={styles.settingItem}>
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>Available for Booking</Text>
+                <Text style={styles.settingDescription}>
+                  Allow others to book consultations with you
+                </Text>
+              </View>
+              <Switch
+                value={isAvailableForBooking}
+                onValueChange={setIsAvailableForBooking}
+                trackColor={{ false: Colors.border, true: Colors.primary }}
+                thumbColor={Colors.white}
+              />
             </View>
-            <View style={styles.advanceBookingControls}>
-              <TouchableOpacity 
-                style={styles.advanceButton}
-                onPress={() => setAdvanceBookingDays(Math.max(1, advanceBookingDays - 1))}
-              >
-                <Text style={styles.advanceButtonText}>-</Text>
-              </TouchableOpacity>
-              <Text style={styles.advanceValue}>{advanceBookingDays}</Text>
-              <TouchableOpacity 
-                style={styles.advanceButton}
-                onPress={() => setAdvanceBookingDays(Math.min(30, advanceBookingDays + 1))}
-              >
-                <Text style={styles.advanceButtonText}>+</Text>
-              </TouchableOpacity>
+
+            <View style={styles.settingItem}>
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingLabel}>Advance Booking</Text>
+                <Text style={styles.settingDescription}>
+                  How many days in advance can people book? Currently: {advanceBookingDays} days
+                </Text>
+              </View>
+              <View style={styles.advanceBookingControls}>
+                <TouchableOpacity 
+                  style={styles.advanceButton}
+                  onPress={() => setAdvanceBookingDays(Math.max(1, advanceBookingDays - 1))}
+                >
+                  <Text style={styles.advanceButtonText}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.advanceValue}>{advanceBookingDays}</Text>
+                <TouchableOpacity 
+                  style={styles.advanceButton}
+                  onPress={() => setAdvanceBookingDays(Math.min(30, advanceBookingDays + 1))}
+                >
+                  <Text style={styles.advanceButtonText}>+</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Calendar size={20} color={Colors.text} />
-            <Text style={styles.sectionTitle}>Weekly Schedule</Text>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Calendar size={20} color={Colors.text} />
+              <Text style={styles.sectionTitle}>Weekly Schedule</Text>
+            </View>
+            <Text style={styles.sectionDescription}>
+              Set your available hours for each day of the week
+            </Text>
+            
+            <View style={styles.timeSlotsList}>
+              {daySchedules.map(renderDaySchedule)}
+            </View>
           </View>
-          <Text style={styles.sectionDescription}>
-            Set your available hours for each day of the week
-          </Text>
-          
-          <View style={styles.timeSlotsList}>
-            {daySchedules.map(renderDaySchedule)}
-          </View>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          
-          <TouchableOpacity 
-            style={styles.quickAction}
-            onPress={() => {
-              setDaySchedules(prev => 
-                prev.map(schedule => ({ ...schedule, isEnabled: true }))
-              );
-            }}
-          >
-            <Text style={styles.quickActionText}>Enable All Days</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.quickAction}
-            onPress={() => {
-              setDaySchedules(prev => 
-                prev.map(schedule => ({ 
-                  ...schedule, 
-                  isEnabled: schedule.day !== 'Saturday' && schedule.day !== 'Sunday'
-                }))
-              );
-            }}
-          >
-            <Text style={styles.quickActionText}>Weekdays Only</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[styles.quickAction, styles.quickActionDanger]}
-            onPress={() => {
-              setDaySchedules(prev => 
-                prev.map(schedule => ({ ...schedule, isEnabled: false }))
-              );
-            }}
-          >
-            <Text style={[styles.quickActionText, styles.quickActionDangerText]}>Disable All Days</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Quick Actions</Text>
+            
+            <TouchableOpacity 
+              style={styles.quickAction}
+              onPress={() => {
+                setDaySchedules(prev => 
+                  prev.map(schedule => ({ ...schedule, isEnabled: true }))
+                );
+              }}
+            >
+              <Text style={styles.quickActionText}>Enable All Days</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.quickAction}
+              onPress={() => {
+                setDaySchedules(prev => 
+                  prev.map(schedule => ({ 
+                    ...schedule, 
+                    isEnabled: schedule.day !== 'Saturday' && schedule.day !== 'Sunday'
+                  }))
+                );
+              }}
+            >
+              <Text style={styles.quickActionText}>Weekdays Only</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.quickAction, styles.quickActionDanger]}
+              onPress={() => {
+                setDaySchedules(prev => 
+                  prev.map(schedule => ({ ...schedule, isEnabled: false }))
+                );
+              }}
+            >
+              <Text style={[styles.quickActionText, styles.quickActionDangerText]}>Disable All Days</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
-      
-      <Modal
+        
+        <Modal
         visible={timePickerVisible}
         transparent={true}
         animationType="slide"
@@ -378,7 +378,7 @@ export default function ManageAvailabilityScreen() {
             />
           </View>
         </View>
-      </Modal>
+        </Modal>
       </SafeAreaView>
     </>
   );
