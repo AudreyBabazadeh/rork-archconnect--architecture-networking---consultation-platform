@@ -103,9 +103,7 @@ export default function StatusScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>My Status</Text>
-      </View>
+
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
         {/* Current Badge Status */}
@@ -248,18 +246,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.surface,
   },
-  titleContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
-    backgroundColor: Colors.surface,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: Colors.text,
-  },
+
   content: {
     flex: 1,
     padding: 20,
