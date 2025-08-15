@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
-import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut } from 'lucide-react-native';
+import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -90,7 +90,7 @@ export default function ProfileScreen() {
 
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{user.totalConsultations || 0}</Text>
+            <Text style={styles.statNumber}>{(user as any).totalConsultations || 0}</Text>
             <Text style={styles.statLabel}>Consultations</Text>
           </View>
           <View style={styles.statDivider} />
@@ -122,6 +122,20 @@ export default function ProfileScreen() {
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>Edit Profile</Text>
               <Text style={styles.actionSubtitle}>Update your information and portfolio</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.actionItem}
+            onPress={() => router.push('/profile/status')}
+            testID="my-status-action"
+          >
+            <View style={styles.actionIcon}>
+              <Award size={20} color={Colors.primary} />
+            </View>
+            <View style={styles.actionContent}>
+              <Text style={styles.actionTitle}>My Status</Text>
+              <Text style={styles.actionSubtitle}>View badge progress and platform fees</Text>
             </View>
           </TouchableOpacity>
 
