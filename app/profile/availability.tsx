@@ -680,6 +680,6 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
   },
   headerRightContainer: {
-    marginRight: 20,
+    marginRight: 10,
   },
 });

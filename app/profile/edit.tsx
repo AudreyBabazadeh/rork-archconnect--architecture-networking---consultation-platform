@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   headerRightContainer: {
-    marginRight: 20,
+    marginRight: 10,
   },
   saveButtonHeader: {
     flexDirection: 'row',
