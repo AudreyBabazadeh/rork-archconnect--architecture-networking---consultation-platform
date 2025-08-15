@@ -166,7 +166,7 @@ export default function ManageAvailabilityScreen() {
       <Stack.Screen options={{ title: 'Manage Availability' }} />
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
+          <View style={styles.section}>
           <Text style={styles.sectionTitle}>Consultation Topics</Text>
           <Text style={styles.sectionDescription}>
             Add topics you can help with and set individual pricing
