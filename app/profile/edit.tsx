@@ -156,41 +156,37 @@ export default function EditProfileScreen() {
     <>
       <Stack.Screen 
         options={{ 
-          title: 'Edit Profile',
+          headerShown: true,
+          title: '',
+          headerStyle: {
+            backgroundColor: Colors.white,
+          },
+          headerShadowVisible: true,
           headerLeft: () => (
             <TouchableOpacity
-              style={styles.backButtonHeader}
+              style={styles.headerBackButton}
               onPress={() => router.back()}
               testID="back-button"
             >
-              <ArrowLeft size={24} color={Colors.primary} />
+              <ArrowLeft size={24} color={Colors.text} />
             </TouchableOpacity>
           ),
           headerRight: () => (
-            <View style={styles.headerRightContainer}>
-              <TouchableOpacity
-                style={styles.saveButtonHeader}
-                onPress={handleSave}
-                disabled={isLoading}
-                testID="save-button"
-              >
-                {isLoading ? (
-                  <ActivityIndicator size={16} color={Colors.textLight} />
-                ) : (
-                  <Check size={20} color={Colors.primary} />
-                )}
-                {!isLoading && (
-                  <Text style={[styles.saveButtonText, isLoading && styles.saveButtonTextDisabled]}>
-                    Save
-                  </Text>
-                )}
-                {isLoading && (
-                  <Text style={[styles.saveButtonText, styles.saveButtonTextDisabled]}>
-                    Saving...
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.headerSaveButton}
+              onPress={handleSave}
+              disabled={isLoading}
+              testID="save-button"
+            >
+              {isLoading ? (
+                <ActivityIndicator size={16} color={Colors.primary} />
+              ) : (
+                <>
+                  <Check size={16} color={Colors.primary} />
+                  <Text style={styles.headerSaveText}>Save</Text>
+                </>
+              )}
+            </TouchableOpacity>
           )
         }} 
       />
@@ -330,15 +326,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backButtonHeader: {
+  headerBackButton: {
     padding: 8,
-    marginLeft: -8,
-    backgroundColor: Colors.primary + '15',
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 40,
-    minHeight: 40,
+    marginLeft: 4,
   },
   headerTitle: {
     fontSize: 18,
@@ -434,24 +424,19 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     marginTop: 4,
   },
-  headerRightContainer: {
-    marginRight: 10,
-  },
-  saveButtonHeader: {
+  headerSaveButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: Colors.primary + '10',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#E8E8E8',
+    borderRadius: 20,
+    marginRight: 4,
   },
-  saveButtonText: {
-    fontSize: 14,
+  headerSaveText: {
+    fontSize: 16,
     fontWeight: '600',
-    color: Colors.primary,
-  },
-  saveButtonTextDisabled: {
-    color: Colors.textLight,
+    color: Colors.text,
   },
 });
