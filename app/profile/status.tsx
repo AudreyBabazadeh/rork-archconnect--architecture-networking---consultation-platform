@@ -1,7 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
-import { ArrowLeft, Star, TrendingUp, Calendar, DollarSign } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import { Star, TrendingUp, Calendar, DollarSign } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoyaltyBadge } from '@/components/LoyaltyBadge';
@@ -104,14 +103,7 @@ export default function StatusScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => router.back()}
-          testID="back-button"
-        >
-          <ArrowLeft size={24} color={Colors.text} />
-        </TouchableOpacity>
+      <View style={styles.titleContainer}>
         <Text style={styles.title}>My Status</Text>
       </View>
 
@@ -256,18 +248,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.surface,
   },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  titleContainer: {
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 20,
     backgroundColor: Colors.surface,
-    gap: 16,
-  },
-  backButton: {
-    padding: 8,
-    marginLeft: -8,
   },
   title: {
     fontSize: 24,
