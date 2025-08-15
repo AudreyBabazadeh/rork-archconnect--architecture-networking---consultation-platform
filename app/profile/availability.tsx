@@ -1,4 +1,4 @@
-import { Clock, Calendar, ChevronDown, Plus } from 'lucide-react-native';
+import { Clock, Calendar, ChevronDown, Plus, Check } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -71,6 +71,7 @@ export default function ManageAvailabilityScreen() {
   const [isAvailableForBooking, setIsAvailableForBooking] = useState(true);
   const [advanceBookingDays, setAdvanceBookingDays] = useState(7);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const toggleDaySchedule = (dayId: string) => {
     setDaySchedules(prev => 
@@ -116,6 +117,29 @@ export default function ManageAvailabilityScreen() {
   };
 
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<{ dayId: string; intervalId: string; type: 'start' | 'end' } | null>(null);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // Here you would typically save to your backend/database
+      console.log('Saving availability settings:', {
+        topics,
+        daySchedules,
+        isAvailableForBooking,
+        advanceBookingDays
+      });
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success feedback (you could add a toast notification here)
+      console.log('Availability settings saved successfully!');
+    } catch (error) {
+      console.error('Failed to save availability settings:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const openTimePicker = (dayId: string, intervalId: string, type: 'start' | 'end') => {
     setSelectedTimeSlot({ dayId, intervalId, type });
@@ -237,7 +261,23 @@ export default function ManageAvailabilityScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Manage Availability' }} />
+      <Stack.Screen 
+        options={{ 
+          title: 'Manage Availability',
+          headerRight: () => (
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={handleSave}
+              disabled={isSaving}
+            >
+              <Check size={20} color={isSaving ? Colors.textLight : Colors.primary} />
+              <Text style={[styles.saveButtonText, isSaving && styles.saveButtonTextDisabled]}>
+                {isSaving ? 'Saving...' : 'Save'}
+              </Text>
+            </TouchableOpacity>
+          )
+        }} 
+      />
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             <View style={styles.section}>
@@ -623,5 +663,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
     textAlign: 'center',
+  },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: Colors.primary + '10',
+  },
+  saveButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  saveButtonTextDisabled: {
+    color: Colors.textLight,
   },
 });
