@@ -1,5 +1,4 @@
-import { router } from 'expo-router';
-import { ArrowLeft, Clock, Calendar, Save } from 'lucide-react-native';
+import { Clock, Calendar } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -9,7 +8,6 @@ import {
   SafeAreaView,
   ScrollView,
   Alert,
-  ActivityIndicator,
   Switch,
 } from 'react-native';
 import { Colors } from '@/constants/colors';
@@ -38,8 +36,7 @@ const DAYS_OF_WEEK = [
 
 
 export default function ManageAvailabilityScreen() {
-  const { user, updateProfile } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
   const [topics, setTopics] = useState<Topic[]>((user as any)?.topics || []);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(
     DAYS_OF_WEEK.map(day => ({
@@ -52,24 +49,6 @@ export default function ManageAvailabilityScreen() {
   );
   const [isAvailableForBooking, setIsAvailableForBooking] = useState(true);
   const [advanceBookingDays, setAdvanceBookingDays] = useState(7);
-
-  const handleSave = async () => {
-    setIsLoading(true);
-    try {
-      await updateProfile({ 
-        ...user, 
-        topics
-      } as any);
-      
-      Alert.alert('Success', 'Availability updated successfully', [
-        { text: 'OK', onPress: () => router.back() }
-      ]);
-    } catch {
-      Alert.alert('Error', 'Failed to update availability. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const toggleTimeSlot = (dayId: string) => {
     setTimeSlots(prev => 
@@ -141,29 +120,6 @@ export default function ManageAvailabilityScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          testID="back-button"
-        >
-          <ArrowLeft size={24} color={Colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Manage Availability</Text>
-        <TouchableOpacity
-          style={[styles.saveButton, isLoading && styles.disabledButton]}
-          onPress={handleSave}
-          disabled={isLoading}
-          testID="save-button"
-        >
-          {isLoading ? (
-            <ActivityIndicator size="small" color={Colors.primary} />
-          ) : (
-            <Save size={20} color={Colors.primary} />
-          )}
-        </TouchableOpacity>
-      </View>
-
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Consultation Topics</Text>
@@ -282,30 +238,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    backgroundColor: Colors.white,
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  saveButton: {
-    padding: 8,
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
+
   content: {
     flex: 1,
   },
