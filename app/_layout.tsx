@@ -53,6 +53,7 @@ function RootLayoutNav() {
       <Stack.Screen name="consultant/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="booking/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="profile/edit" options={{ headerShown: false }} />
+      <Stack.Screen name="profile/status" options={{ title: "My Status" }} />
       <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
     </Stack>
   );
