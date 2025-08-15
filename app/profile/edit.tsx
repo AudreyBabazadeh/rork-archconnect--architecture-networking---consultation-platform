@@ -301,7 +301,7 @@ export default function EditProfileScreen() {
             </View>
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
       </SafeAreaView>
     </>
   );
