@@ -163,7 +163,7 @@ export default function EditProfileScreen() {
               onPress={() => router.back()}
               testID="back-button"
             >
-              <ArrowLeft size={24} color={Colors.text} />
+              <ArrowLeft size={24} color={Colors.primary} />
             </TouchableOpacity>
           ),
           headerRight: () => (
@@ -326,8 +326,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   backButton: {
-    padding: 8,
-    marginLeft: -8,
+    padding: 12,
+    marginLeft: -4,
+    backgroundColor: Colors.primary + '10',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
     fontSize: 18,
