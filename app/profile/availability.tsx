@@ -10,6 +10,7 @@ import {
   Alert,
   Switch,
 } from 'react-native';
+import { Stack } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { TopicManager } from '@/components/TopicManager';
@@ -115,7 +116,9 @@ export default function ManageAvailabilityScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
+      <Stack.Screen options={{ title: 'Manage Availability' }} />
+      <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Consultation Topics</Text>
@@ -226,6 +229,7 @@ export default function ManageAvailabilityScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
+    </>
   );
 }
 
