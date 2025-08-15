@@ -1,4 +1,4 @@
-import { Clock, Calendar, ChevronDown } from 'lucide-react-native';
+import { Clock, Calendar, ChevronDown, Plus } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -17,12 +17,19 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TopicManager } from '@/components/TopicManager';
 import { Topic } from '@/types/user';
 
-interface TimeSlot {
+
+
+interface TimeInterval {
   id: string;
-  day: string;
   startTime: string;
   endTime: string;
+}
+
+interface DaySchedule {
+  id: string;
+  day: string;
   isEnabled: boolean;
+  intervals: TimeInterval[];
 }
 
 const DAYS_OF_WEEK = [
@@ -51,48 +58,94 @@ const TIME_OPTIONS = generateTimeSlots();
 export default function ManageAvailabilityScreen() {
   const { user } = useAuth();
   const [topics, setTopics] = useState<Topic[]>((user as any)?.topics || []);
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(
+  const [daySchedules, setDaySchedules] = useState<DaySchedule[]>(
     DAYS_OF_WEEK.map(day => ({
       id: day.toLowerCase(),
       day,
-      startTime: '09:00',
-      endTime: '17:00',
-      isEnabled: day !== 'Saturday' && day !== 'Sunday'
+      isEnabled: day !== 'Saturday' && day !== 'Sunday',
+      intervals: [{
+        id: `${day.toLowerCase()}-1`,
+        startTime: '09:00',
+        endTime: '17:00'
+      }]
     }))
   );
   const [isAvailableForBooking, setIsAvailableForBooking] = useState(true);
   const [advanceBookingDays, setAdvanceBookingDays] = useState(7);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<{ dayId: string; type: 'start' | 'end' } | null>(null);
 
-  const toggleTimeSlot = (dayId: string) => {
-    setTimeSlots(prev => 
-      prev.map(slot => 
-        slot.id === dayId 
-          ? { ...slot, isEnabled: !slot.isEnabled }
-          : slot
+
+  const toggleDaySchedule = (dayId: string) => {
+    setDaySchedules(prev => 
+      prev.map(schedule => 
+        schedule.id === dayId 
+          ? { ...schedule, isEnabled: !schedule.isEnabled }
+          : schedule
       )
     );
   };
 
-  const openTimePicker = (dayId: string, type: 'start' | 'end') => {
-    setSelectedTimeSlot({ dayId, type });
+  const addTimeInterval = (dayId: string) => {
+    setDaySchedules(prev => 
+      prev.map(schedule => {
+        if (schedule.id === dayId) {
+          const newInterval: TimeInterval = {
+            id: `${dayId}-${Date.now()}`,
+            startTime: '09:00',
+            endTime: '17:00'
+          };
+          return {
+            ...schedule,
+            intervals: [...schedule.intervals, newInterval]
+          };
+        }
+        return schedule;
+      })
+    );
+  };
+
+  const removeTimeInterval = (dayId: string, intervalId: string) => {
+    setDaySchedules(prev => 
+      prev.map(schedule => {
+        if (schedule.id === dayId && schedule.intervals.length > 1) {
+          return {
+            ...schedule,
+            intervals: schedule.intervals.filter(interval => interval.id !== intervalId)
+          };
+        }
+        return schedule;
+      })
+    );
+  };
+
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<{ dayId: string; intervalId: string; type: 'start' | 'end' } | null>(null);
+
+  const openTimePicker = (dayId: string, intervalId: string, type: 'start' | 'end') => {
+    setSelectedTimeSlot({ dayId, intervalId, type });
     setTimePickerVisible(true);
   };
 
   const selectTime = (time: string) => {
     if (!selectedTimeSlot) return;
     
-    setTimeSlots(prev => 
-      prev.map(slot => {
-        if (slot.id === selectedTimeSlot.dayId) {
-          if (selectedTimeSlot.type === 'start') {
-            return { ...slot, startTime: time };
-          } else {
-            return { ...slot, endTime: time };
-          }
+    setDaySchedules(prev => 
+      prev.map(schedule => {
+        if (schedule.id === selectedTimeSlot.dayId) {
+          return {
+            ...schedule,
+            intervals: schedule.intervals.map(interval => {
+              if (interval.id === selectedTimeSlot.intervalId) {
+                if (selectedTimeSlot.type === 'start') {
+                  return { ...interval, startTime: time };
+                } else {
+                  return { ...interval, endTime: time };
+                }
+              }
+              return interval;
+            })
+          };
         }
-        return slot;
+        return schedule;
       })
     );
     
@@ -109,43 +162,67 @@ export default function ManageAvailabilityScreen() {
     </TouchableOpacity>
   );
 
-  const renderTimeSlot = (slot: TimeSlot) => (
-    <View key={slot.id} style={styles.timeSlotItem}>
+  const renderDaySchedule = (schedule: DaySchedule) => (
+    <View key={schedule.id} style={styles.timeSlotItem}>
       <View style={styles.timeSlotHeader}>
-        <Text style={styles.dayLabel}>{slot.day}</Text>
+        <Text style={styles.dayLabel}>{schedule.day}</Text>
         <Switch
-          value={slot.isEnabled}
-          onValueChange={() => toggleTimeSlot(slot.id)}
+          value={schedule.isEnabled}
+          onValueChange={() => toggleDaySchedule(schedule.id)}
           trackColor={{ false: Colors.border, true: Colors.primary }}
           thumbColor={Colors.white}
         />
       </View>
       
-      {slot.isEnabled && (
-        <View style={styles.timeInputs}>
-          <View style={styles.timeInputGroup}>
-            <Text style={styles.timeLabel}>From</Text>
-            <TouchableOpacity 
-              style={styles.timeButton}
-              onPress={() => openTimePicker(slot.id, 'start')}
-            >
-              <Clock size={16} color={Colors.textLight} />
-              <Text style={styles.timeText}>{slot.startTime}</Text>
-              <ChevronDown size={16} color={Colors.textLight} />
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.timeInputGroup}>
-            <Text style={styles.timeLabel}>To</Text>
-            <TouchableOpacity 
-              style={styles.timeButton}
-              onPress={() => openTimePicker(slot.id, 'end')}
-            >
-              <Clock size={16} color={Colors.textLight} />
-              <Text style={styles.timeText}>{slot.endTime}</Text>
-              <ChevronDown size={16} color={Colors.textLight} />
-            </TouchableOpacity>
-          </View>
+      {schedule.isEnabled && (
+        <View style={styles.intervalsContainer}>
+          {schedule.intervals.map((interval, index) => (
+            <View key={interval.id} style={styles.intervalRow}>
+              <View style={styles.timeInputs}>
+                <View style={styles.timeInputGroup}>
+                  <Text style={styles.timeLabel}>From</Text>
+                  <TouchableOpacity 
+                    style={styles.timeButton}
+                    onPress={() => openTimePicker(schedule.id, interval.id, 'start')}
+                  >
+                    <Clock size={16} color={Colors.textLight} />
+                    <Text style={styles.timeText}>{interval.startTime}</Text>
+                    <ChevronDown size={16} color={Colors.textLight} />
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={styles.timeInputGroup}>
+                  <Text style={styles.timeLabel}>To</Text>
+                  <TouchableOpacity 
+                    style={styles.timeButton}
+                    onPress={() => openTimePicker(schedule.id, interval.id, 'end')}
+                  >
+                    <Clock size={16} color={Colors.textLight} />
+                    <Text style={styles.timeText}>{interval.endTime}</Text>
+                    <ChevronDown size={16} color={Colors.textLight} />
+                  </TouchableOpacity>
+                </View>
+                
+                {schedule.intervals.length > 1 && (
+                  <TouchableOpacity 
+                    style={styles.removeIntervalButton}
+                    onPress={() => removeTimeInterval(schedule.id, interval.id)}
+                  >
+                    <Text style={styles.removeIntervalText}>×</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              
+              {index === schedule.intervals.length - 1 && (
+                <TouchableOpacity 
+                  style={styles.addIntervalButton}
+                  onPress={() => addTimeInterval(schedule.id)}
+                >
+                  <Plus size={16} color={Colors.primary} />
+                </TouchableOpacity>
+              )}
+            </View>
+          ))}
         </View>
       )}
     </View>
@@ -230,7 +307,7 @@ export default function ManageAvailabilityScreen() {
           </Text>
           
           <View style={styles.timeSlotsList}>
-            {timeSlots.map(renderTimeSlot)}
+            {daySchedules.map(renderDaySchedule)}
           </View>
         </View>
 
@@ -240,8 +317,8 @@ export default function ManageAvailabilityScreen() {
           <TouchableOpacity 
             style={styles.quickAction}
             onPress={() => {
-              setTimeSlots(prev => 
-                prev.map(slot => ({ ...slot, isEnabled: true }))
+              setDaySchedules(prev => 
+                prev.map(schedule => ({ ...schedule, isEnabled: true }))
               );
             }}
           >
@@ -251,10 +328,10 @@ export default function ManageAvailabilityScreen() {
           <TouchableOpacity 
             style={styles.quickAction}
             onPress={() => {
-              setTimeSlots(prev => 
-                prev.map(slot => ({ 
-                  ...slot, 
-                  isEnabled: slot.day !== 'Saturday' && slot.day !== 'Sunday'
+              setDaySchedules(prev => 
+                prev.map(schedule => ({ 
+                  ...schedule, 
+                  isEnabled: schedule.day !== 'Saturday' && schedule.day !== 'Sunday'
                 }))
               );
             }}
@@ -265,8 +342,8 @@ export default function ManageAvailabilityScreen() {
           <TouchableOpacity 
             style={[styles.quickAction, styles.quickActionDanger]}
             onPress={() => {
-              setTimeSlots(prev => 
-                prev.map(slot => ({ ...slot, isEnabled: false }))
+              setDaySchedules(prev => 
+                prev.map(schedule => ({ ...schedule, isEnabled: false }))
               );
             }}
           >
@@ -439,6 +516,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text,
     fontWeight: '500',
+  },
+  intervalsContainer: {
+    gap: 12,
+  },
+  intervalRow: {
+    gap: 8,
+  },
+  addIntervalButton: {
+    alignSelf: 'center',
+    backgroundColor: Colors.primary + '10',
+    borderRadius: 16,
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  removeIntervalButton: {
+    backgroundColor: Colors.error + '10',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  removeIntervalText: {
+    fontSize: 16,
+    color: Colors.error,
+    fontWeight: '600',
   },
   quickAction: {
     backgroundColor: Colors.surface,
