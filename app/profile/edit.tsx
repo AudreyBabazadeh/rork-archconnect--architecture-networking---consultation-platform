@@ -159,7 +159,7 @@ export default function EditProfileScreen() {
           title: 'Edit Profile',
           headerLeft: () => (
             <TouchableOpacity
-              style={styles.backButton}
+              style={styles.backButtonHeader}
               onPress={() => router.back()}
               testID="back-button"
             >
@@ -329,6 +329,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  backButtonHeader: {
+    padding: 8,
+    marginLeft: -8,
+    backgroundColor: Colors.primary + '15',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 40,
+    minHeight: 40,
   },
   headerTitle: {
     fontSize: 18,
