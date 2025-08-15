@@ -1,4 +1,4 @@
-import { Clock, Calendar } from 'lucide-react-native';
+import { Clock, Calendar, ChevronDown } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -7,8 +7,9 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
-  Alert,
   Switch,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { Colors } from '@/constants/colors';
@@ -34,6 +35,19 @@ const DAYS_OF_WEEK = [
   'Sunday'
 ];
 
+const generateTimeSlots = () => {
+  const times: string[] = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      times.push(timeString);
+    }
+  }
+  return times;
+};
+
+const TIME_OPTIONS = generateTimeSlots();
+
 export default function ManageAvailabilityScreen() {
   const { user } = useAuth();
   const [topics, setTopics] = useState<Topic[]>((user as any)?.topics || []);
@@ -48,6 +62,8 @@ export default function ManageAvailabilityScreen() {
   );
   const [isAvailableForBooking, setIsAvailableForBooking] = useState(true);
   const [advanceBookingDays, setAdvanceBookingDays] = useState(7);
+  const [timePickerVisible, setTimePickerVisible] = useState(false);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<{ dayId: string; type: 'start' | 'end' } | null>(null);
 
   const toggleTimeSlot = (dayId: string) => {
     setTimeSlots(prev => 
@@ -58,6 +74,40 @@ export default function ManageAvailabilityScreen() {
       )
     );
   };
+
+  const openTimePicker = (dayId: string, type: 'start' | 'end') => {
+    setSelectedTimeSlot({ dayId, type });
+    setTimePickerVisible(true);
+  };
+
+  const selectTime = (time: string) => {
+    if (!selectedTimeSlot) return;
+    
+    setTimeSlots(prev => 
+      prev.map(slot => {
+        if (slot.id === selectedTimeSlot.dayId) {
+          if (selectedTimeSlot.type === 'start') {
+            return { ...slot, startTime: time };
+          } else {
+            return { ...slot, endTime: time };
+          }
+        }
+        return slot;
+      })
+    );
+    
+    setTimePickerVisible(false);
+    setSelectedTimeSlot(null);
+  };
+
+  const renderTimePickerItem = ({ item }: { item: string }) => (
+    <TouchableOpacity
+      style={styles.timePickerItem}
+      onPress={() => selectTime(item)}
+    >
+      <Text style={styles.timePickerText}>{item}</Text>
+    </TouchableOpacity>
+  );
 
   const renderTimeSlot = (slot: TimeSlot) => (
     <View key={slot.id} style={styles.timeSlotItem}>
@@ -77,13 +127,11 @@ export default function ManageAvailabilityScreen() {
             <Text style={styles.timeLabel}>From</Text>
             <TouchableOpacity 
               style={styles.timeButton}
-              onPress={() => {
-                // In a real app, you'd show a time picker here
-                Alert.alert('Time Picker', 'Time picker would open here');
-              }}
+              onPress={() => openTimePicker(slot.id, 'start')}
             >
               <Clock size={16} color={Colors.textLight} />
               <Text style={styles.timeText}>{slot.startTime}</Text>
+              <ChevronDown size={16} color={Colors.textLight} />
             </TouchableOpacity>
           </View>
           
@@ -91,13 +139,11 @@ export default function ManageAvailabilityScreen() {
             <Text style={styles.timeLabel}>To</Text>
             <TouchableOpacity 
               style={styles.timeButton}
-              onPress={() => {
-                // In a real app, you'd show a time picker here
-                Alert.alert('Time Picker', 'Time picker would open here');
-              }}
+              onPress={() => openTimePicker(slot.id, 'end')}
             >
               <Clock size={16} color={Colors.textLight} />
               <Text style={styles.timeText}>{slot.endTime}</Text>
+              <ChevronDown size={16} color={Colors.textLight} />
             </TouchableOpacity>
           </View>
         </View>
@@ -228,6 +274,37 @@ export default function ManageAvailabilityScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      
+      <Modal
+        visible={timePickerVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setTimePickerVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.timePickerModal}>
+            <View style={styles.timePickerHeader}>
+              <Text style={styles.timePickerTitle}>
+                Select {selectedTimeSlot?.type === 'start' ? 'Start' : 'End'} Time
+              </Text>
+              <TouchableOpacity
+                onPress={() => setTimePickerVisible(false)}
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <FlatList
+              data={TIME_OPTIONS}
+              renderItem={renderTimePickerItem}
+              keyExtractor={(item) => item}
+              style={styles.timePickerList}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
     </>
   );
@@ -394,6 +471,53 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 16,
     color: Colors.textLight,
+    textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  timePickerModal: {
+    backgroundColor: Colors.white,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+  },
+  timePickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  timePickerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  closeButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  timePickerList: {
+    flex: 1,
+  },
+  timePickerItem: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  timePickerText: {
+    fontSize: 16,
+    color: Colors.text,
     textAlign: 'center',
   },
 });
