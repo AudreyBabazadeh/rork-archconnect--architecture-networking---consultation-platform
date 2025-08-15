@@ -179,9 +179,16 @@ export default function EditProfileScreen() {
                 ) : (
                   <Check size={20} color={Colors.primary} />
                 )}
-                <Text style={[styles.saveButtonText, isLoading && styles.saveButtonTextDisabled]}>
-                  {isLoading ? 'Saving...' : 'Save'}
-                </Text>
+                {!isLoading && (
+                  <Text style={[styles.saveButtonText, isLoading && styles.saveButtonTextDisabled]}>
+                    Save
+                  </Text>
+                )}
+                {isLoading && (
+                  <Text style={[styles.saveButtonText, styles.saveButtonTextDisabled]}>
+                    Saving...
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           )
