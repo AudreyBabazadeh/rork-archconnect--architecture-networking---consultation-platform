@@ -181,10 +181,10 @@ export default function EditProfileScreen() {
               {isLoading ? (
                 <ActivityIndicator size={16} color={Colors.primary} />
               ) : (
-                <>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Check size={16} color={Colors.primary} />
                   <Text style={styles.headerSaveText}>Save</Text>
-                </>
+                </View>
               )}
             </TouchableOpacity>
           )
