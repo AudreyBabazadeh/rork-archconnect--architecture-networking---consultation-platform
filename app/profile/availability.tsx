@@ -121,7 +121,6 @@ export default function ManageAvailabilityScreen() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      // Here you would typically save to your backend/database
       console.log('Saving availability settings:', {
         topics,
         daySchedules,
@@ -129,10 +128,8 @@ export default function ManageAvailabilityScreen() {
         advanceBookingDays
       });
       
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Show success feedback (you could add a toast notification here)
       console.log('Availability settings saved successfully!');
     } catch (error) {
       console.error('Failed to save availability settings:', error);
@@ -280,7 +277,7 @@ export default function ManageAvailabilityScreen() {
       />
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            <View style={styles.section}>
+          <View style={styles.section}>
             <Text style={styles.sectionTitle}>Consultation Topics</Text>
             <Text style={styles.sectionDescription}>
               Add topics you can help with and set individual pricing
@@ -390,34 +387,33 @@ export default function ManageAvailabilityScreen() {
         </ScrollView>
         
         <Modal
-        visible={timePickerVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setTimePickerVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.timePickerModal}>
-            <View style={styles.timePickerHeader}>
-              <Text style={styles.timePickerTitle}>
-                Select {selectedTimeSlot?.type === 'start' ? 'Start' : 'End'} Time
-              </Text>
-              <TouchableOpacity
-                onPress={() => setTimePickerVisible(false)}
-                style={styles.closeButton}
-              >
-                <Text style={styles.closeButtonText}>Cancel</Text>
-              </TouchableOpacity>
+          visible={timePickerVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setTimePickerVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.timePickerModal}>
+              <View style={styles.timePickerHeader}>
+                <Text style={styles.timePickerTitle}>
+                  Select {selectedTimeSlot?.type === 'start' ? 'Start' : 'End'} Time
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setTimePickerVisible(false)}
+                  style={styles.closeButton}
+                >
+                  <Text style={styles.closeButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={TIME_OPTIONS}
+                renderItem={renderTimePickerItem}
+                keyExtractor={(item) => item}
+                style={styles.timePickerList}
+                showsVerticalScrollIndicator={false}
+              />
             </View>
-            
-            <FlatList
-              data={TIME_OPTIONS}
-              renderItem={renderTimePickerItem}
-              keyExtractor={(item) => item}
-              style={styles.timePickerList}
-              showsVerticalScrollIndicator={false}
-            />
           </View>
-        </View>
         </Modal>
       </SafeAreaView>
     </>
