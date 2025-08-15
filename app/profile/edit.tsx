@@ -300,8 +300,6 @@ export default function EditProfileScreen() {
               <Text style={styles.helpText}>This is used as a fallback rate for topics without specific pricing.</Text>
             </View>
           </View>
-
-
         </View>
       </ScrollView>
       </SafeAreaView>
