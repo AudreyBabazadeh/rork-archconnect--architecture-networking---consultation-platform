@@ -181,7 +181,7 @@ export default function EditProfileScreen() {
               {isLoading ? (
                 <ActivityIndicator size={16} color={Colors.primary} />
               ) : (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={styles.saveButtonContent}>
                   <Check size={16} color={Colors.primary} />
                   <Text style={styles.headerSaveText}>Save</Text>
                 </View>
@@ -293,7 +293,7 @@ export default function EditProfileScreen() {
                 keyboardType="numeric"
                 testID="hourly-rate-input"
               />
-              <Text style={styles.helpText}>This is used as a fallback rate for topics without specific pricing.</Text>
+              <Text style={styles.helpText}>This is used as a fallback rate for topics without specific pricing</Text>
             </View>
           </View>
         </View>
@@ -427,7 +427,6 @@ const styles = StyleSheet.create({
   headerSaveButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,
     backgroundColor: '#E8E8E8',
@@ -438,5 +437,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.text,
+    marginLeft: 6,
+  },
+  saveButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
