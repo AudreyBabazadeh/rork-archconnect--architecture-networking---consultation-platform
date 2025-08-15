@@ -103,20 +103,17 @@ export default function StatusScreen() {
   const progressPercentage = (badgeStatus.sessionsCompleted / badgeStatus.sessionsRequired) * 100;
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => router.back()}
-            testID="back-button"
-          >
-            <ArrowLeft size={24} color={Colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.title}>My Status</Text>
-          <View style={styles.placeholder} />
-        </View>
-      </SafeAreaView>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => router.back()}
+          testID="back-button"
+        >
+          <ArrowLeft size={24} color={Colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.title}>My Status</Text>
+      </View>
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
         {/* Current Badge Status */}
@@ -250,7 +247,7 @@ export default function StatusScreen() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -259,30 +256,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.surface,
   },
-  safeArea: {
-    backgroundColor: Colors.white,
-  },
-  header: {
+  headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    paddingTop: 16,
+    paddingBottom: 20,
+    backgroundColor: Colors.surface,
+    gap: 16,
   },
   backButton: {
     padding: 8,
     marginLeft: -8,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 24,
+    fontWeight: '700',
     color: Colors.text,
-  },
-  placeholder: {
-    width: 40,
   },
   content: {
     flex: 1,
