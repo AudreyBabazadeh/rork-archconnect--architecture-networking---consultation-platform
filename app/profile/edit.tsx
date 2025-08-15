@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { ArrowLeft, Camera, Save } from 'lucide-react-native';
+import { router, Stack } from 'expo-router';
+import { Camera, Check } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -153,29 +153,32 @@ export default function EditProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          testID="back-button"
-        >
-          <ArrowLeft size={24} color={Colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit Profile</Text>
-        <TouchableOpacity
-          style={[styles.saveButton, isLoading && styles.disabledButton]}
-          onPress={handleSave}
-          disabled={isLoading}
-          testID="save-button"
-        >
-          {isLoading ? (
-            <ActivityIndicator size="small" color={Colors.primary} />
-          ) : (
-            <Save size={20} color={Colors.primary} />
-          )}
-        </TouchableOpacity>
-      </View>
+    <>
+      <Stack.Screen 
+        options={{ 
+          title: 'Edit Profile',
+          headerRight: () => (
+            <View style={styles.headerRightContainer}>
+              <TouchableOpacity
+                style={styles.saveButtonHeader}
+                onPress={handleSave}
+                disabled={isLoading}
+                testID="save-button"
+              >
+                {isLoading ? (
+                  <ActivityIndicator size={16} color={Colors.textLight} />
+                ) : (
+                  <Check size={20} color={Colors.primary} />
+                )}
+                <Text style={[styles.saveButtonText, isLoading && styles.saveButtonTextDisabled]}>
+                  {isLoading ? 'Saving...' : 'Save'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )
+        }} 
+      />
+      <SafeAreaView style={styles.container}>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.profileImageContainer}>
@@ -286,7 +289,8 @@ export default function EditProfileScreen() {
 
         </View>
       </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </>
   );
 }
 
@@ -401,5 +405,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textLight,
     marginTop: 4,
+  },
+  headerRightContainer: {
+    marginRight: 20,
+  },
+  saveButtonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: Colors.primary + '10',
+  },
+  saveButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  saveButtonTextDisabled: {
+    color: Colors.textLight,
   },
 });

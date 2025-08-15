@@ -262,16 +262,18 @@ export default function ManageAvailabilityScreen() {
         options={{ 
           title: 'Manage Availability',
           headerRight: () => (
-            <TouchableOpacity
-              style={styles.saveButton}
-              onPress={handleSave}
-              disabled={isSaving}
-            >
-              <Check size={20} color={isSaving ? Colors.textLight : Colors.primary} />
-              <Text style={[styles.saveButtonText, isSaving && styles.saveButtonTextDisabled]}>
-                {isSaving ? 'Saving...' : 'Save'}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.headerRightContainer}>
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSave}
+                disabled={isSaving}
+              >
+                <Check size={20} color={isSaving ? Colors.textLight : Colors.primary} />
+                <Text style={[styles.saveButtonText, isSaving && styles.saveButtonTextDisabled]}>
+                  {isSaving ? 'Saving...' : 'Save'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           )
         }} 
       />
@@ -676,5 +678,8 @@ const styles = StyleSheet.create({
   },
   saveButtonTextDisabled: {
     color: Colors.textLight,
+  },
+  headerRightContainer: {
+    marginRight: 20,
   },
 });
