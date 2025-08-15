@@ -10,7 +10,7 @@ import {
   ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Plus, TrendingUp, Users, BookOpen } from 'lucide-react-native';
+import { TrendingUp, Users, BookOpen } from 'lucide-react-native';
 import { PostCard } from '@/components/PostCard';
 import { mockPosts } from '@/data/mockPosts';
 import { Post } from '@/types/user';
@@ -85,10 +85,7 @@ export default function HomeScreen() {
     router.push(`/consultant/${authorId}`);
   };
 
-  const handleCreatePost = () => {
-    // Navigate to create post screen
-    console.log('Create new post');
-  };
+
 
   const filters = [
     { key: 'all' as FilterType, label: 'All', icon: null },
@@ -115,9 +112,6 @@ export default function HomeScreen() {
           <Text style={styles.greeting}>Good morning,</Text>
           <Text style={styles.userName}>{user?.name || 'Architect'}</Text>
         </View>
-        <TouchableOpacity style={styles.createButton} onPress={handleCreatePost}>
-          <Plus size={24} color={Colors.white} />
-        </TouchableOpacity>
       </View>
       
       <ScrollView 
@@ -206,19 +200,7 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginTop: 2,
   },
-  createButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
+
   filtersContainer: {
     paddingLeft: 16,
   },
