@@ -17,8 +17,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TopicManager } from '@/components/TopicManager';
 import { Topic } from '@/types/user';
 
-
-
 interface TimeInterval {
   id: string;
   startTime: string;
@@ -73,7 +71,6 @@ export default function ManageAvailabilityScreen() {
   const [isAvailableForBooking, setIsAvailableForBooking] = useState(true);
   const [advanceBookingDays, setAdvanceBookingDays] = useState(7);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
-
 
   const toggleDaySchedule = (dayId: string) => {
     setDaySchedules(prev => 
