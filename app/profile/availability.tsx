@@ -33,8 +33,6 @@ const DAYS_OF_WEEK = [
   'Sunday'
 ];
 
-
-
 export default function ManageAvailabilityScreen() {
   const { user } = useAuth();
   const [topics, setTopics] = useState<Topic[]>((user as any)?.topics || []);
@@ -59,8 +57,6 @@ export default function ManageAvailabilityScreen() {
       )
     );
   };
-
-
 
   const renderTimeSlot = (slot: TimeSlot) => (
     <View key={slot.id} style={styles.timeSlotItem}>
