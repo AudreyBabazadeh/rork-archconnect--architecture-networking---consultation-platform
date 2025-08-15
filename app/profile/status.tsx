@@ -103,18 +103,20 @@ export default function StatusScreen() {
   const progressPercentage = (badgeStatus.sessionsCompleted / badgeStatus.sessionsRequired) * 100;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => router.back()}
-          testID="back-button"
-        >
-          <ArrowLeft size={24} color={Colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.title}>My Status</Text>
-        <View style={styles.placeholder} />
-      </View>
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => router.back()}
+            testID="back-button"
+          >
+            <ArrowLeft size={24} color={Colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.title}>My Status</Text>
+          <View style={styles.placeholder} />
+        </View>
+      </SafeAreaView>
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
         {/* Current Badge Status */}
@@ -248,7 +250,7 @@ export default function StatusScreen() {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -256,6 +258,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.surface,
+  },
+  safeArea: {
+    backgroundColor: Colors.white,
   },
   header: {
     flexDirection: 'row',
