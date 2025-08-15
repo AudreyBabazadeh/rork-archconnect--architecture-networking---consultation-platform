@@ -1,5 +1,5 @@
 import { router, Stack } from 'expo-router';
-import { Camera, Check } from 'lucide-react-native';
+import { Camera, Check, ArrowLeft } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -157,6 +157,15 @@ export default function EditProfileScreen() {
       <Stack.Screen 
         options={{ 
           title: 'Edit Profile',
+          headerLeft: () => (
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              testID="back-button"
+            >
+              <ArrowLeft size={24} color={Colors.text} />
+            </TouchableOpacity>
+          ),
           headerRight: () => (
             <View style={styles.headerRightContainer}>
               <TouchableOpacity
