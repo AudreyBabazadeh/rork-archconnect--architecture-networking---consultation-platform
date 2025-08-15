@@ -18,8 +18,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
-import { TopicManager } from '@/components/TopicManager';
-import { Topic } from '@/types/user';
+
 
 export default function EditProfileScreen() {
   const { user, updateProfile } = useAuth();
@@ -34,7 +33,7 @@ export default function EditProfileScreen() {
     hourlyRate: user?.hourlyRate || 0,
     profileImage: user?.profileImage || '',
   });
-  const [topics, setTopics] = useState<Topic[]>((user as any)?.topics || []);
+
 
   const handleSave = async () => {
     if (!formData.name?.trim()) {
@@ -44,7 +43,7 @@ export default function EditProfileScreen() {
 
     setIsLoading(true);
     try {
-      await updateProfile({ ...formData, topics });
+      await updateProfile(formData);
       Alert.alert('Success', 'Profile updated successfully', [
         { text: 'OK', onPress: () => router.back() }
       ]);
@@ -284,12 +283,7 @@ export default function EditProfileScreen() {
             </View>
           </View>
 
-          <View style={styles.section}>
-            <TopicManager 
-              topics={topics}
-              onTopicsChange={setTopics}
-            />
-          </View>
+
         </View>
       </ScrollView>
     </SafeAreaView>

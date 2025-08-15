@@ -139,7 +139,11 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionItem}>
+          <TouchableOpacity 
+            style={styles.actionItem}
+            onPress={() => router.push('/profile/availability')}
+            testID="manage-availability-action"
+          >
             <View style={styles.actionIcon}>
               <Briefcase size={20} color={Colors.primary} />
             </View>
