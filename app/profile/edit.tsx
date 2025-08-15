@@ -195,8 +195,7 @@ export default function EditProfileScreen() {
         }} 
       />
       <SafeAreaView style={styles.container}>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.profileImageContainer}>
           <Image
             source={{ uri: formData.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' }}
