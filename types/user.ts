@@ -70,3 +70,31 @@ export interface Conversation {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Post {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar: string;
+  authorTitle: string;
+  authorType: 'student' | 'mentor' | 'professor';
+  content: string;
+  images?: string[];
+  timestamp: Date;
+  likes: number;
+  comments: number;
+  isLiked: boolean;
+  tags?: string[];
+}
+
+export interface Comment {
+  id: string;
+  postId: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar: string;
+  content: string;
+  timestamp: Date;
+  likes: number;
+  isLiked: boolean;
+}

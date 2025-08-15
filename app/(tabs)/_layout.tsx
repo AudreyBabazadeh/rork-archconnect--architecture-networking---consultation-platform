@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Search, MessageCircle, User } from 'lucide-react-native';
+import { Home, Search, MessageCircle, User } from 'lucide-react-native';
 import React from 'react';
 import { Colors } from '@/constants/colors';
 import AuthGuard from '@/components/AuthGuard';
@@ -27,6 +27,13 @@ export default function TabLayout() {
           },
         }}
       >
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
+          }}
+        />
         <Tabs.Screen
           name="browse"
           options={{

@@ -10,7 +10,7 @@ export default function IndexScreen() {
   }
 
   if (isAuthenticated) {
-    return <Redirect href="/(tabs)/browse" />;
+    return <Redirect href="/(tabs)/home" />;
   }
 
   return <Redirect href="/auth/welcome" />;
