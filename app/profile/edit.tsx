@@ -292,7 +292,7 @@ export default function EditProfileScreen() {
               <Text style={styles.label}>Hourly Rate (USD)</Text>
               <TextInput
                 style={styles.input}
-                value={formData.hourlyRate?.toString()}
+                value={formData.hourlyRate?.toString() || ''}
                 onChangeText={(value) => updateFormData('hourlyRate', parseInt(value) || 0)}
                 placeholder="25"
                 keyboardType="numeric"
