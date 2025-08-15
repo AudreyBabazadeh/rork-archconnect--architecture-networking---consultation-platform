@@ -114,7 +114,7 @@ export default function HomeScreen() {
         </View>
         <TouchableOpacity 
           style={styles.messagesButton}
-          onPress={() => router.push('/messages')}
+          onPress={() => router.push('/(tabs)/messages')}
         >
           <MessageCircle size={24} color={Colors.text} />
         </TouchableOpacity>
