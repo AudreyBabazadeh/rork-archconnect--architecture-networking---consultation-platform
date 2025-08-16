@@ -263,7 +263,6 @@ const styles = StyleSheet.create({
   optionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
   },
   optionChip: {
     flexDirection: 'row',
@@ -275,6 +274,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     backgroundColor: Colors.surface,
     marginBottom: 8,
+    marginRight: 8,
   },
   selectedChip: {
     backgroundColor: Colors.primary,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   },
   availabilityOptions: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'space-between',
   },
   availabilityOption: {
     flex: 1,
@@ -317,6 +317,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     backgroundColor: Colors.surface,
     alignItems: 'center',
+    marginHorizontal: 4,
   },
   footer: {
     backgroundColor: Colors.white,
