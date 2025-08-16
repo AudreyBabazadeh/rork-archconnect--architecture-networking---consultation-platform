@@ -225,7 +225,7 @@ export default function CreatePost() {
               <View key={attachment.id} style={styles.attachmentItem}>
                 <View style={styles.attachmentInfo}>
                   {attachment.type === 'image' && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={styles.imageAttachmentContainer}>
                       <ImageIcon size={20} color={Colors.primary} />
                       {attachment.uri && (
                         <Image source={{ uri: attachment.uri }} style={styles.attachmentPreview} />
@@ -502,5 +502,9 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     marginTop: 4,
     fontWeight: '500',
+  },
+  imageAttachmentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
