@@ -117,7 +117,7 @@ function EventDetailsModal({ visible, event, onClose }: EventDetailsModalProps) 
             
             <Text style={styles.eventTitle}>{event.title}</Text>
             
-            <View style={styles.eventDetailsModal}>
+            <View style={styles.eventDetails}>
               <View style={styles.detailRow}>
                 <Calendar size={16} color={Colors.textSecondary} />
                 <Text style={styles.detailText}>{new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</Text>
@@ -857,7 +857,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: Colors.textSecondary,
   },
-  eventDetailsModal: {
+  eventDetails: {
     marginTop: 16,
   },
 });
