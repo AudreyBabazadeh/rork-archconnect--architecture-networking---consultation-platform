@@ -39,19 +39,7 @@ export default function TabLayout() {
           name="create"
           options={{
             title: '',
-            tabBarIcon: ({ color, size }) => (
-              <View style={{
-                width: 48,
-                height: 48,
-                borderRadius: 24,
-                backgroundColor: '#1e3a8a',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: 8,
-              }}>
-                <Plus size={24} color={Colors.white} />
-              </View>
-            ),
+            tabBarIcon: ({ color, size }) => <Plus size={24} color={color} />,
           }}
         />
 
