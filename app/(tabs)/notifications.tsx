@@ -39,11 +39,11 @@ function RequestCard({ request, onAccept, onDecline, showActions = false }: Requ
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'accepted':
-        return Colors.success || '#10B981';
+        return Colors.success;
       case 'declined':
-        return Colors.error || '#EF4444';
+        return Colors.error;
       default:
-        return Colors.warning || '#F59E0B';
+        return Colors.warning;
     }
   };
 
@@ -70,7 +70,7 @@ function RequestCard({ request, onAccept, onDecline, showActions = false }: Requ
             <Text style={styles.requestTopic}>{request.topic}</Text>
           </View>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(request.status) + '20' }]}>
+        <View style={[styles.statusBadge, { backgroundColor: `${getStatusColor(request.status)}20` }]}>
           <Text style={[styles.statusText, { color: getStatusColor(request.status) }]}>
             {getStatusText(request.status)}
           </Text>
@@ -100,15 +100,15 @@ function RequestCard({ request, onAccept, onDecline, showActions = false }: Requ
               style={[styles.actionButton, styles.declineButton]}
               onPress={() => onDecline?.(request.id)}
             >
-              <XCircle size={16} color={Colors.error || '#EF4444'} />
-              <Text style={[styles.actionButtonText, { color: Colors.error || '#EF4444' }]}>Decline</Text>
+              <XCircle size={16} color={Colors.error} />
+              <Text style={[styles.actionButtonText, { color: Colors.error }]}>Decline</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.actionButton, styles.acceptButton]}
               onPress={() => onAccept?.(request.id)}
             >
-              <CheckCircle size={16} color={Colors.success || '#10B981'} />
-              <Text style={[styles.actionButtonText, { color: Colors.success || '#10B981' }]}>Accept</Text>
+              <CheckCircle size={16} color={Colors.success} />
+              <Text style={[styles.actionButtonText, { color: Colors.success }]}>Accept</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   tabBadge: {
-    backgroundColor: Colors.textSecondary + '20',
+    backgroundColor: `${Colors.textSecondary}20`,
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -419,10 +419,10 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   acceptButton: {
-    backgroundColor: (Colors.success || '#10B981') + '20',
+    backgroundColor: `${Colors.success}20`,
   },
   declineButton: {
-    backgroundColor: (Colors.error || '#EF4444') + '20',
+    backgroundColor: `${Colors.error}20`,
   },
   actionButtonText: {
     fontSize: 14,
