@@ -36,14 +36,6 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="browse"
-          options={{
-            title: '',
-            tabBarIcon: ({ color, size }) => <Search size={24} color={color} />,
-          }}
-        />
-
-        <Tabs.Screen
           name="create"
           options={{
             title: '',
@@ -60,6 +52,14 @@ export default function TabLayout() {
                 <Plus size={24} color={Colors.white} />
               </View>
             ),
+          }}
+        />
+
+        <Tabs.Screen
+          name="browse"
+          options={{
+            title: '',
+            tabBarIcon: ({ color, size }) => <Search size={24} color={color} />,
           }}
         />
 
