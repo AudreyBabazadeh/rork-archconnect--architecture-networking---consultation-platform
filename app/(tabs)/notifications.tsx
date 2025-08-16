@@ -259,8 +259,9 @@ export default function NotificationsScreen() {
         options={{
           title: 'Notifications',
           headerRight: () => (
-            <TouchableOpacity onPress={handleScheduleBuilder} style={styles.calendarButton}>
-              <Calendar size={24} color={Colors.primary} />
+            <TouchableOpacity onPress={handleScheduleBuilder} style={styles.scheduleButton}>
+              <Calendar size={20} color={Colors.white} />
+              <Text style={styles.scheduleButtonText}>Schedule</Text>
             </TouchableOpacity>
           ),
         }} 
@@ -308,9 +309,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  calendarButton: {
-    padding: 8,
+  scheduleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
     marginRight: 8,
+    gap: 4,
+  },
+  scheduleButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
   },
   tabContainer: {
     flexDirection: 'row',
