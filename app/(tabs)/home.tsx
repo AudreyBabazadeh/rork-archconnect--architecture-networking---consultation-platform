@@ -87,8 +87,6 @@ export default function HomeScreen() {
     router.push(`/consultant/${authorId}`);
   };
 
-
-
   const filters = [
     { key: 'all' as FilterType, label: 'All', icon: null },
     { key: 'trending' as FilterType, label: 'Trending', icon: TrendingUp },
