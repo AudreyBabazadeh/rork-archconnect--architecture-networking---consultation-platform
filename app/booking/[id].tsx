@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { DollarSign, Plus } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
-import { PaymentModal } from '@/components/PaymentModal';
 import { Colors } from '@/constants/colors';
 import { Topic } from '@/types/user';
 import { getFilteredSuggestions } from '@/constants/topicSuggestions';
 import { useAuth } from '@/contexts/AuthContext';
+import { useBooking } from '@/contexts/BookingContext';
 
 const defaultTopics: Topic[] = [
   { id: 'portfolio', name: 'Portfolio Review', duration: 60, description: 'Comprehensive review of your work', price: 50, isActive: true },
@@ -24,7 +24,8 @@ const timeSlots = [
 export default function BookingScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { getUserById } = useAuth();
+  const { getUserById, user } = useAuth();
+  const { sendBookingRequest } = useBooking();
   const [consultant, setConsultant] = useState<any>(null);
   const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
@@ -35,7 +36,7 @@ export default function BookingScreen() {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [description, setDescription] = useState('');
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
 
   // Load consultant data and topics
@@ -178,7 +179,7 @@ export default function BookingScreen() {
   const platformFee = totalPrice * 0.05; // 5% platform fee
   const finalPrice = totalPrice + platformFee;
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     if (!selectedDate || !selectedTime) {
       Alert.alert('Missing Information', 'Please select a date and time for your session.');
       return;
@@ -194,19 +195,35 @@ export default function BookingScreen() {
       return;
     }
 
-    setShowPaymentModal(true);
-  };
+    if (!user) {
+      Alert.alert('Error', 'You must be logged in to book a session.');
+      return;
+    }
 
-  const handlePaymentSuccess = () => {
-    Alert.alert(
-      'Booking Confirmed!',
-      `Your ${showCustomTopic ? customTopicName : selectedTopic?.name} session with ${consultant.name} has been successfully booked for ${selectedDate} at ${selectedTime}.`,
-      [
-        { text: 'OK', onPress: () => router.back() }
-      ]
-    );
-  };
+    try {
+      await sendBookingRequest({
+        mentorId: consultant.id,
+        mentorName: consultant.name,
+        studentId: user.id,
+        studentName: user.name,
+        topic: showCustomTopic ? customTopicName : selectedTopic?.name || '',
+        date: selectedDate,
+        time: selectedTime,
+        description: description,
+        amount: finalPrice,
+      });
 
+      Alert.alert(
+        'Request Sent!',
+        `Your booking request has been sent to ${consultant.name}. You'll receive a notification when they respond.`,
+        [
+          { text: 'OK', onPress: () => router.back() }
+        ]
+      );
+    } catch {
+      Alert.alert('Error', 'Failed to send booking request. Please try again.');
+    }
+  };
 
 
   return (
@@ -395,19 +412,11 @@ export default function BookingScreen() {
           onPress={handleBooking}
           disabled={!selectedDate || !selectedTime || (!selectedTopic && !showCustomTopic) || (showCustomTopic && !customTopicName.trim())}
         >
-          <DollarSign size={20} color={Colors.white} />
-          <Text style={styles.bookButtonText}>Book for ${finalPrice.toFixed(2)}</Text>
+          <Text style={styles.bookButtonText}>Send Booking Request</Text>
         </TouchableOpacity>
       </View>
 
-      <PaymentModal
-        visible={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        onPaymentSuccess={handlePaymentSuccess}
-        amount={finalPrice}
-        consultantName={consultant.name}
-        consultationType={showCustomTopic ? customTopicName : selectedTopic?.name || ''}
-      />
+
     </SafeAreaView>
   );
 }
