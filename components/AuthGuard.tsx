@@ -29,7 +29,11 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <View style={{ flex: 1 }}>
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
