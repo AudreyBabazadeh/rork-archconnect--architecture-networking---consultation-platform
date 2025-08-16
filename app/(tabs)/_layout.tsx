@@ -17,9 +17,9 @@ export default function TabLayout() {
             backgroundColor: Colors.white,
             borderTopWidth: 1,
             borderTopColor: Colors.border,
-            paddingTop: 8,
+            paddingTop: 12,
             paddingBottom: 28,
-            height: 80,
+            height: 85,
           },
           tabBarLabelStyle: {
             fontSize: 12,
@@ -31,38 +31,39 @@ export default function TabLayout() {
         <Tabs.Screen
           name="home"
           options={{
-            title: 'Home',
-            tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
+            title: '',
+            tabBarIcon: ({ color, size }) => <Home size={24} color={color} />,
           }}
         />
         <Tabs.Screen
           name="browse"
           options={{
-            title: 'Browse',
-            tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
+            title: '',
+            tabBarIcon: ({ color, size }) => <Search size={24} color={color} />,
           }}
         />
         <Tabs.Screen
           name="notifications"
           options={{
-            title: 'Notifications',
-            tabBarIcon: ({ color, size }) => <Bell size={size} color={color} />,
+            title: '',
+            tabBarIcon: ({ color, size }) => <Bell size={24} color={color} />,
           }}
         />
         <Tabs.Screen
           name="create"
           options={{
-            title: 'Create',
+            title: '',
             tabBarIcon: ({ color, size }) => (
               <View style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
-                backgroundColor: Colors.primary,
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: '#1e3a8a',
                 justifyContent: 'center',
                 alignItems: 'center',
+                marginBottom: 8,
               }}>
-                <Plus size={20} color={Colors.white} />
+                <Plus size={24} color={Colors.white} />
               </View>
             ),
           }}
@@ -70,8 +71,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Profile',
-            tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+            title: '',
+            tabBarIcon: ({ color, size }) => <User size={24} color={color} />,
           }}
         />
 
