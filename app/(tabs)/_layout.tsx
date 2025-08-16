@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Search, User, Plus, Bell } from 'lucide-react-native';
+import { Home, Search, User, Plus, Bell, MessageCircle } from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
 import { Colors } from '@/constants/colors';
@@ -63,14 +63,26 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="messages"
+          options={{
+            title: '',
+            tabBarIcon: ({ color, size }) => <MessageCircle size={24} color={color} />,
+          }}
+        />
+        <Tabs.Screen
           name="notifications"
           options={{
             title: '',
             tabBarIcon: ({ color, size }) => <Bell size={24} color={color} />,
           }}
         />
-
-
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: '',
+            tabBarIcon: ({ color, size }) => <User size={24} color={color} />,
+          }}
+        />
       </Tabs>
     </AuthGuard>
   );
