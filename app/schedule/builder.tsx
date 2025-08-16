@@ -252,6 +252,38 @@ export default function ScheduleBuilderScreen() {
     setSelectedDate(newDate);
   };
 
+  const renderCalendarDay = (dayIndex: number, currentDate: Date, month: number) => {
+    const dateStr = currentDate.toISOString().split('T')[0];
+    const dayEvents = filteredEvents.filter(event => event.date.startsWith(dateStr));
+    const isCurrentMonth = currentDate.getMonth() === month;
+    const isToday = currentDate.toDateString() === new Date().toDateString();
+    
+    return (
+      <TouchableOpacity
+        key={dayIndex}
+        style={[
+          styles.calendarDay,
+          !isCurrentMonth && styles.calendarDayInactive,
+          isToday && styles.calendarDayToday,
+        ]}
+        onPress={() => handleDateSelect(new Date(currentDate))}
+      >
+        <Text style={[
+          styles.calendarDayText,
+          !isCurrentMonth && styles.calendarDayTextInactive,
+          isToday && styles.calendarDayTextToday,
+        ]}>
+          {currentDate.getDate()}
+        </Text>
+        {dayEvents.length > 0 && (
+          <View style={styles.eventIndicator}>
+            <Text style={styles.eventCount}>{dayEvents.length}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   const renderMonthView = () => {
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth();
@@ -259,40 +291,11 @@ export default function ScheduleBuilderScreen() {
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
-    const days = [];
+    const calendarDays = [];
     const currentDate = new Date(startDate);
     
     for (let i = 0; i < 42; i++) {
-      const dateStr = currentDate.toISOString().split('T')[0];
-      const dayEvents = filteredEvents.filter(event => event.date.startsWith(dateStr));
-      const isCurrentMonth = currentDate.getMonth() === month;
-      const isToday = currentDate.toDateString() === new Date().toDateString();
-      
-      days.push(
-        <TouchableOpacity
-          key={i}
-          style={[
-            styles.calendarDay,
-            !isCurrentMonth && styles.calendarDayInactive,
-            isToday && styles.calendarDayToday,
-          ]}
-          onPress={() => handleDateSelect(new Date(currentDate))}
-        >
-          <Text style={[
-            styles.calendarDayText,
-            !isCurrentMonth && styles.calendarDayTextInactive,
-            isToday && styles.calendarDayTextToday,
-          ]}>
-            {currentDate.getDate()}
-          </Text>
-          {dayEvents.length > 0 && (
-            <View style={styles.eventIndicator}>
-              <Text style={styles.eventCount}>{dayEvents.length}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      );
-      
+      calendarDays.push(renderCalendarDay(i, new Date(currentDate), month));
       currentDate.setDate(currentDate.getDate() + 1);
     }
     
@@ -304,7 +307,7 @@ export default function ScheduleBuilderScreen() {
           ))}
         </View>
         <View style={styles.calendarGrid}>
-          {days.map((day, index) => day)}
+          {...calendarDays}
         </View>
       </View>
     );
