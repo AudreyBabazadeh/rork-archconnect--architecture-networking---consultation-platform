@@ -69,13 +69,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, size }) => <Bell size={24} color={color} />,
           }}
         />
-        <Tabs.Screen
-          name="profile"
-          options={{
-            title: '',
-            tabBarIcon: ({ color, size }) => <User size={24} color={color} />,
-          }}
-        />
+
 
       </Tabs>
     </AuthGuard>
