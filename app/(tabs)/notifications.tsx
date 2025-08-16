@@ -217,7 +217,6 @@ export default function NotificationsScreen() {
         }
       >
         {activeTab === 'received' ? (
-          /* Requests Received Content */
           <View style={styles.tabContent}>
             {requestsReceived.length > 0 ? (
               requestsReceived.map((request: BookingRequest) => (
@@ -237,7 +236,6 @@ export default function NotificationsScreen() {
             )}
           </View>
         ) : (
-          /* Requests Accepted Content */
           <View style={styles.tabContent}>
             {requestsAccepted.length > 0 ? (
               requestsAccepted.map((request: BookingRequest) => (
