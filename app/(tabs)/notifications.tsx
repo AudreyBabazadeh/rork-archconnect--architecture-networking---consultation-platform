@@ -132,16 +132,15 @@ export default function NotificationsScreen() {
     }, 1000);
   };
 
-  // Filter requests received by current user (where they are the mentor)
+  // Filter requests received by current user (where they are the mentor and status is pending)
   const requestsReceived = bookingRequests.filter(
     (request: BookingRequest) => request.mentorId === user?.id && request.status === 'pending'
   );
 
-  // Filter requests accepted (where current user is involved and status is accepted)
+  // Filter requests accepted - these are requests the CURRENT USER SENT that have been accepted by others
   const requestsAccepted = bookingRequests.filter(
     (request: BookingRequest) => 
-      (request.mentorId === user?.id || request.studentId === user?.id) && 
-      request.status === 'accepted'
+      request.studentId === user?.id && request.status === 'accepted'
   );
 
   const handleAccept = async (requestId: string) => {
@@ -199,7 +198,7 @@ export default function NotificationsScreen() {
           onPress={() => setActiveTab('accepted')}
         >
           <Text style={[styles.tabText, activeTab === 'accepted' && styles.activeTabText]}>
-            Requests Accepted
+            Confirmed Requests
           </Text>
           {requestsAccepted.length > 0 && (
             <View style={[styles.tabBadge, activeTab === 'accepted' && styles.activeTabBadge]}>
@@ -250,8 +249,8 @@ export default function NotificationsScreen() {
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyStateText}>No accepted sessions</Text>
-                <Text style={styles.emptyStateSubtext}>Confirmed sessions will appear here</Text>
+                <Text style={styles.emptyStateText}>No confirmed requests</Text>
+                <Text style={styles.emptyStateSubtext}>Requests you've sent that get accepted will appear here</Text>
               </View>
             )}
           </View>
