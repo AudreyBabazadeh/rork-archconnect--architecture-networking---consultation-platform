@@ -192,7 +192,6 @@ export default function ScheduleBuilderScreen() {
   const { bookingRequests } = useBooking();
   const { user } = useAuth();
 
-  // Convert booking requests to schedule events
   const scheduleEvents = useMemo<ScheduleEvent[]>(() => {
     if (!user) return [];
     
@@ -205,7 +204,7 @@ export default function ScheduleBuilderScreen() {
           title: request.topic,
           time: request.time,
           date: request.date,
-          duration: 60, // Default duration
+          duration: 60,
           participantName: isBookedByMe ? request.mentorName : request.studentName,
           type: isBookedByMe ? 'booked-by-me' : 'booked-with-me',
           amount: request.amount,
@@ -216,13 +215,11 @@ export default function ScheduleBuilderScreen() {
       });
   }, [bookingRequests, user]);
 
-  // Filter events based on selected filter
   const filteredEvents = useMemo<ScheduleEvent[]>(() => {
     if (filter === 'all') return scheduleEvents;
     return scheduleEvents.filter(event => event.type === filter);
   }, [scheduleEvents, filter]);
 
-  // Get events for selected date (for day view)
   const dayEvents = useMemo<ScheduleEvent[]>(() => {
     const dateStr = selectedDate.toISOString().split('T')[0];
     return filteredEvents.filter(event => event.date.startsWith(dateStr));
@@ -320,7 +317,6 @@ export default function ScheduleBuilderScreen() {
     
     return (
       <ScrollView style={styles.dayView}>
-        {/* Legend */}
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: Colors.primary }]} />
@@ -392,7 +388,6 @@ export default function ScheduleBuilderScreen() {
         }} 
       />
       
-      {/* Header Controls */}
       <View style={styles.header}>
         <View style={styles.dateNavigation}>
           <TouchableOpacity onPress={() => navigateMonth('prev')} style={styles.navButton}>
@@ -412,7 +407,6 @@ export default function ScheduleBuilderScreen() {
           </TouchableOpacity>
         </View>
         
-        {/* View Mode Toggle */}
         <View style={styles.viewModeToggle}>
           {(['month', 'day'] as ViewMode[]).map(mode => (
             <TouchableOpacity
@@ -428,7 +422,6 @@ export default function ScheduleBuilderScreen() {
         </View>
       </View>
       
-      {/* Filter */}
       <View style={styles.filterContainer}>
         <Filter size={16} color={Colors.textSecondary} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
@@ -450,12 +443,10 @@ export default function ScheduleBuilderScreen() {
         </ScrollView>
       </View>
       
-      {/* Content */}
       <View style={styles.content}>
         {viewMode === 'month' ? renderMonthView() : renderDayView()}
       </View>
       
-      {/* Event Details Modal */}
       <EventDetailsModal
         visible={showEventDetails}
         event={selectedEvent}
@@ -549,7 +540,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  // Month View Styles
   monthView: {
     flex: 1,
     backgroundColor: Colors.surface,
@@ -615,7 +605,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.white,
   },
-  // Day View Styles
   dayView: {
     flex: 1,
     backgroundColor: Colors.background,
@@ -750,7 +739,6 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
   },
-  // Modal Styles
   modalContainer: {
     flex: 1,
     backgroundColor: Colors.background,
