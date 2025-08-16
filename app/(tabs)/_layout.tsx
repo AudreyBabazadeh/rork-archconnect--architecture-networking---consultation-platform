@@ -43,10 +43,10 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="notifications"
+          name="messages"
           options={{
             title: '',
-            tabBarIcon: ({ color, size }) => <Bell size={24} color={color} />,
+            tabBarIcon: ({ color, size }) => <MessageCircle size={24} color={color} />,
           }}
         />
         <Tabs.Screen
