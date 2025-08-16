@@ -228,8 +228,6 @@ export default function ScheduleBuilderScreen() {
     return filteredEvents.filter(event => event.date.startsWith(dateStr));
   }, [filteredEvents, selectedDate]);
 
-
-
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
     if (viewMode === 'month') {
