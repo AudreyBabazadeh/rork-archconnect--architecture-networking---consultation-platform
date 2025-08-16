@@ -258,14 +258,15 @@ export default function NotificationsScreen() {
       <Stack.Screen 
         options={{
           title: 'Notifications',
-          headerRight: () => (
-            <TouchableOpacity onPress={handleScheduleBuilder} style={styles.scheduleButton}>
-              <Calendar size={20} color={Colors.white} />
-              <Text style={styles.scheduleButtonText}>Schedule</Text>
-            </TouchableOpacity>
-          ),
         }} 
       />
+      
+      <View style={styles.headerSection}>
+        <Text style={styles.headerTitle}>Booking Requests</Text>
+        <TouchableOpacity onPress={handleScheduleBuilder} style={styles.calendarButton}>
+          <Calendar size={20} color={Colors.primary} />
+        </TouchableOpacity>
+      </View>
       
       <View style={styles.tabContainer}>
         <TouchableOpacity
@@ -309,20 +310,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  scheduleButton: {
+  headerSection: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginRight: 8,
-    gap: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
   },
-  scheduleButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.white,
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  calendarButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: `${Colors.primary}15`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: `${Colors.primary}30`,
   },
   tabContainer: {
     flexDirection: 'row',
