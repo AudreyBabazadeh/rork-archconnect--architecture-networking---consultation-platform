@@ -190,13 +190,6 @@ export default function CreatePost() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-          testID="back-button"
-        >
-          <ArrowLeft size={24} color={Colors.text} />
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Post</Text>
         <TouchableOpacity
           style={[styles.postButton, (!postText.trim() && attachments.length === 0) && styles.postButtonDisabled]}
@@ -358,9 +351,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },
-  backButton: {
-    padding: 8,
-  },
+
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
