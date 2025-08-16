@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { Calendar, Clock, User, CheckCircle, XCircle } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { useBooking, BookingRequest } from '@/contexts/BookingContext';
@@ -166,7 +166,7 @@ export default function NotificationsScreen() {
           title: 'Session Activity',
           headerRight: () => (
             <TouchableOpacity
-              onPress={() => setCalendarVisible(true)}
+              onPress={() => router.push('/schedule/builder')}
               style={styles.calendarButton}
             >
               <Calendar size={24} color={Colors.primary} />
