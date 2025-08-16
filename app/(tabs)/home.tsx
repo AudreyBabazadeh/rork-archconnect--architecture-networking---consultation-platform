@@ -10,7 +10,7 @@ import {
   ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { TrendingUp, Users, BookOpen, MessageCircle } from 'lucide-react-native';
+import { TrendingUp, Users, BookOpen } from 'lucide-react-native';
 import { PostCard } from '@/components/PostCard';
 import { mockPosts } from '@/data/mockPosts';
 import { Post } from '@/types/user';
@@ -112,12 +112,7 @@ export default function HomeScreen() {
           <Text style={styles.greeting}>Good morning,</Text>
           <Text style={styles.userName}>{user?.name || 'Architect'}</Text>
         </View>
-        <TouchableOpacity 
-          style={styles.messagesButton}
-          onPress={() => router.push('/(tabs)/messages')}
-        >
-          <MessageCircle size={24} color={Colors.text} />
-        </TouchableOpacity>
+
       </View>
       
       <ScrollView 
@@ -243,9 +238,5 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: Colors.surface,
   },
-  messagesButton: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: Colors.surface,
-  },
+
 });
