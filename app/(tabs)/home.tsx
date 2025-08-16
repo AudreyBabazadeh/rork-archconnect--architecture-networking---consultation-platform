@@ -10,18 +10,20 @@ import {
   ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { TrendingUp, Users, BookOpen } from 'lucide-react-native';
+import { TrendingUp, Users, BookOpen, MessageCircle } from 'lucide-react-native';
 import { PostCard } from '@/components/PostCard';
 import { mockPosts } from '@/data/mockPosts';
 import { Post } from '@/types/user';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMessaging } from '@/contexts/MessagingContext';
 
 type FilterType = 'all' | 'trending' | 'students' | 'mentors' | 'professors';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { getTotalUnreadCount } = useMessaging();
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
@@ -112,7 +114,19 @@ export default function HomeScreen() {
           <Text style={styles.greeting}>Good morning,</Text>
           <Text style={styles.userName}>{user?.name || 'Architect'}</Text>
         </View>
-
+        <TouchableOpacity
+          style={styles.messageButton}
+          onPress={() => router.push('/messages')}
+        >
+          <MessageCircle size={24} color={Colors.text} />
+          {getTotalUnreadCount() > 0 && (
+            <View style={styles.messageBadge}>
+              <Text style={styles.messageBadgeText}>
+                {getTotalUnreadCount() > 9 ? '9+' : getTotalUnreadCount()}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
       
       <ScrollView 
@@ -238,5 +252,28 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: Colors.surface,
   },
-
+  messageButton: {
+    position: 'relative',
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.surface,
+  },
+  messageBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.white,
+  },
+  messageBadgeText: {
+    color: Colors.white,
+    fontSize: 12,
+    fontWeight: '600',
+  },
 });

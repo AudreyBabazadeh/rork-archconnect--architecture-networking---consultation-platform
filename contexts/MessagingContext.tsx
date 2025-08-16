@@ -1,306 +1,195 @@
+import React, { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { Message, Conversation, User } from '@/types/user';
-import { AppState } from 'react-native';
 
-interface MessagingState {
-  conversations: Conversation[];
-  messages: { [conversationId: string]: Message[] };
-  isLoading: boolean;
+export interface Message {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar?: string;
+  content: string;
+  timestamp: Date;
+  isRead: boolean;
 }
 
-interface MessagingActions {
-  sendMessage: (conversationId: string, content: string, type?: 'text' | 'image') => Promise<void>;
-  createConversation: (participantId: string, participantName: string, participantAvatar: string) => Promise<string>;
-  getOrCreateConversation: (participantId: string, participantName: string, participantAvatar: string) => Promise<string>;
-  markMessagesAsRead: (conversationId: string) => Promise<void>;
-  loadMessages: (conversationId: string) => Promise<void>;
-  setCurrentUser: (user: User | null) => void;
-  startLiveSync: () => void;
-  stopLiveSync: () => void;
-  syncMessages: () => Promise<void>;
+export interface Conversation {
+  id: string;
+  participantId: string;
+  participantName: string;
+  participantAvatar?: string;
+  lastMessage: Message;
+  unreadCount: number;
+  messages: Message[];
 }
 
-const CONVERSATIONS_STORAGE_KEY = 'app_conversations';
-const MESSAGES_STORAGE_KEY = 'app_messages';
+const STORAGE_KEY = 'messaging_data';
 
+const mockConversations: Conversation[] = [
+  {
+    id: '1',
+    participantId: '2',
+    participantName: 'Dr. Sarah Chen',
+    participantAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    unreadCount: 2,
+    messages: [
+      {
+        id: '1',
+        senderId: '2',
+        senderName: 'Dr. Sarah Chen',
+        content: 'Hi! I saw your question about sustainable architecture. I\'d love to help you with your project.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 30),
+        isRead: false,
+      },
+      {
+        id: '2',
+        senderId: '2',
+        senderName: 'Dr. Sarah Chen',
+        content: 'Are you available for a consultation this week?',
+        timestamp: new Date(Date.now() - 1000 * 60 * 15),
+        isRead: false,
+      },
+    ],
+    lastMessage: {
+      id: '2',
+      senderId: '2',
+      senderName: 'Dr. Sarah Chen',
+      content: 'Are you available for a consultation this week?',
+      timestamp: new Date(Date.now() - 1000 * 60 * 15),
+      isRead: false,
+    },
+  },
+  {
+    id: '2',
+    participantId: '3',
+    participantName: 'Prof. Michael Torres',
+    participantAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    unreadCount: 0,
+    messages: [
+      {
+        id: '3',
+        senderId: '1',
+        senderName: 'You',
+        content: 'Thank you for the feedback on my portfolio!',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+        isRead: true,
+      },
+      {
+        id: '4',
+        senderId: '3',
+        senderName: 'Prof. Michael Torres',
+        content: 'You\'re welcome! Keep up the great work.',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60),
+        isRead: true,
+      },
+    ],
+    lastMessage: {
+      id: '4',
+      senderId: '3',
+      senderName: 'Prof. Michael Torres',
+      content: 'You\'re welcome! Keep up the great work.',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60),
+      isRead: true,
+    },
+  },
+];
 
-export const [MessagingProvider, useMessaging] = createContextHook((): MessagingState & MessagingActions => {
+export const [MessagingProvider, useMessaging] = createContextHook(() => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [messages, setMessages] = useState<{ [conversationId: string]: Message[] }>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const intervalRefs = useRef<ReturnType<typeof setInterval>[]>([]);
-
-  const loadConversations = useCallback(async () => {
-    if (!currentUser) {
-      setIsLoading(false);
-      return;
-    }
-    
-    try {
-      // Load conversations from local storage
-      const storedConversations = await AsyncStorage.getItem(CONVERSATIONS_STORAGE_KEY);
-      const localConversations: Conversation[] = storedConversations ? JSON.parse(storedConversations) : [];
-      const userConversations = localConversations
-        .filter(conv => conv.participants.includes(currentUser.id))
-        .map(conv => ({
-          ...conv,
-          createdAt: typeof conv.createdAt === 'string' ? new Date(conv.createdAt) : conv.createdAt,
-          updatedAt: typeof conv.updatedAt === 'string' ? new Date(conv.updatedAt) : conv.updatedAt,
-          lastMessage: conv.lastMessage ? {
-            ...conv.lastMessage,
-            timestamp: typeof conv.lastMessage.timestamp === 'string' ? new Date(conv.lastMessage.timestamp) : conv.lastMessage.timestamp
-          } : undefined
-        }));
-      setConversations(userConversations);
-      console.log('Loaded conversations from local storage:', userConversations.length);
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentUser]);
-
-  const loadMessages = useCallback(async (conversationId: string) => {
-    try {
-      // Load messages from local storage
-      const storedMessages = await AsyncStorage.getItem(MESSAGES_STORAGE_KEY);
-      const allMessages: { [key: string]: Message[] } = storedMessages ? JSON.parse(storedMessages) : {};
-      const localMessages = (allMessages[conversationId] || []).map(msg => ({
-        ...msg,
-        timestamp: typeof msg.timestamp === 'string' ? new Date(msg.timestamp) : msg.timestamp
-      }));
-      
-      setMessages(prev => ({
-        ...prev,
-        [conversationId]: localMessages
-      }));
-      console.log(`Loaded ${localMessages.length} messages from local storage for conversation ${conversationId}`);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-    }
-  }, []);
 
   useEffect(() => {
     loadConversations();
-  }, [loadConversations]);
+  }, []);
 
-  const createConversation = useCallback(async (participantId: string, participantName: string, participantAvatar: string): Promise<string> => {
-    if (!currentUser) throw new Error('User not authenticated');
-    
+  const loadConversations = async () => {
     try {
-      const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      const localConversation: Conversation = {
-        id: conversationId,
-        participants: [currentUser.id, participantId],
-        participantNames: {
-          [currentUser.id]: currentUser.name,
-          [participantId]: participantName
-        },
-        participantAvatars: {
-          [currentUser.id]: currentUser.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-          [participantId]: participantAvatar
-        },
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      const storedConversations = await AsyncStorage.getItem(CONVERSATIONS_STORAGE_KEY);
-      const allConversations: Conversation[] = storedConversations ? JSON.parse(storedConversations) : [];
-      allConversations.push(localConversation);
-      await AsyncStorage.setItem(CONVERSATIONS_STORAGE_KEY, JSON.stringify(allConversations));
-      
-      setConversations(prev => [...prev, localConversation]);
-      console.log('Conversation created locally:', conversationId);
-      return conversationId;
-    } catch (error) {
-      console.error('Error creating conversation:', error);
-      throw error;
-    }
-  }, [currentUser]);
-
-  const getOrCreateConversation = useCallback(async (participantId: string, participantName: string, participantAvatar: string): Promise<string> => {
-    if (!currentUser) throw new Error('User not authenticated');
-    
-    // Check if conversation already exists
-    const existingConversation = conversations.find(conv => 
-      conv.participants.includes(currentUser.id) && conv.participants.includes(participantId)
-    );
-    
-    if (existingConversation) {
-      return existingConversation.id;
-    }
-    
-    return createConversation(participantId, participantName, participantAvatar);
-  }, [currentUser, conversations, createConversation]);
-
-  const sendMessage = useCallback(async (conversationId: string, content: string, type: 'text' | 'image' = 'text') => {
-    if (!currentUser) throw new Error('User not authenticated');
-    
-    try {
-      const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
-      const newMessage: Message = {
-        id: messageId,
-        conversationId,
-        senderId: currentUser.id,
-        senderName: currentUser.name,
-        content,
-        timestamp: new Date(),
-        type,
-        read: false
-      };
-      
-      // Update local state immediately for better UX
-      setMessages(prev => ({
-        ...prev,
-        [conversationId]: [...(prev[conversationId] || []), newMessage]
-      }));
-      
-      // Update local conversation state
-      setConversations(prev => prev.map(conv => 
-        conv.id === conversationId 
-          ? { ...conv, lastMessage: newMessage, updatedAt: new Date() }
-          : conv
-      ));
-      
-      // Store message locally
-      const storedMessages = await AsyncStorage.getItem(MESSAGES_STORAGE_KEY);
-      const allMessages: { [key: string]: Message[] } = storedMessages ? JSON.parse(storedMessages) : {};
-      
-      if (!allMessages[conversationId]) {
-        allMessages[conversationId] = [];
-      }
-      allMessages[conversationId].push(newMessage);
-      await AsyncStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(allMessages));
-      
-      // Update conversations storage
-      const storedConversations = await AsyncStorage.getItem(CONVERSATIONS_STORAGE_KEY);
-      const allConversations: Conversation[] = storedConversations ? JSON.parse(storedConversations) : [];
-      const updatedConversations = allConversations.map(conv => 
-        conv.id === conversationId 
-          ? { ...conv, lastMessage: newMessage, updatedAt: new Date() }
-          : conv
-      );
-      await AsyncStorage.setItem(CONVERSATIONS_STORAGE_KEY, JSON.stringify(updatedConversations));
-      
-      console.log('Message stored locally successfully');
-      
-    } catch (error) {
-      console.error('Error sending message:', error);
-      throw error;
-    }
-  }, [currentUser]);
-
-  const markMessagesAsRead = useCallback(async (conversationId: string) => {
-    if (!currentUser) return;
-    
-    try {
-      const storedMessages = await AsyncStorage.getItem(MESSAGES_STORAGE_KEY);
-      const allMessages: { [key: string]: Message[] } = storedMessages ? JSON.parse(storedMessages) : {};
-      
-      if (allMessages[conversationId]) {
-        // Mark messages as read for current user
-        allMessages[conversationId] = allMessages[conversationId].map(msg => 
-          msg.senderId !== currentUser.id ? { ...msg, read: true } : msg
-        );
-        
-        await AsyncStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(allMessages));
-        
-        setMessages(prev => ({
-          ...prev,
-          [conversationId]: allMessages[conversationId]
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Convert timestamp strings back to Date objects
+        const conversationsWithDates = parsed.map((conv: any) => ({
+          ...conv,
+          lastMessage: {
+            ...conv.lastMessage,
+            timestamp: new Date(conv.lastMessage.timestamp),
+          },
+          messages: conv.messages.map((msg: any) => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp),
+          })),
         }));
+        setConversations(conversationsWithDates);
+      } else {
+        // First time, use mock data
+        setConversations(mockConversations);
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(mockConversations));
       }
     } catch (error) {
-      console.error('Error marking messages as read:', error);
+      console.error('Error loading conversations:', error);
+      setConversations(mockConversations);
+    } finally {
+      setIsLoading(false);
     }
-  }, [currentUser]);
+  };
 
-  const setCurrentUserCallback = useCallback((user: User | null) => {
-    setCurrentUser(user);
-  }, []);
-
-  // Periodic sync for local storage (simulating real-time updates)
-  const setupPeriodicSync = useCallback(() => {
-    if (!currentUser) return;
-    
-    // Clean up existing intervals
-    intervalRefs.current.forEach(clearInterval);
-    intervalRefs.current = [];
-    
-    // Periodic sync every 5 seconds
-    const syncInterval = setInterval(() => {
-      loadConversations();
-    }, 5000);
-    
-    intervalRefs.current.push(syncInterval);
-    console.log('Periodic sync set up for local storage');
-  }, [currentUser, loadConversations]);
-  
-  const syncMessages = useCallback(async () => {
-    // Reload conversations and messages from local storage
-    await loadConversations();
-    console.log('Synced messages from local storage');
-  }, [loadConversations]);
-
-  const startLiveSync = useCallback(() => {
-    setupPeriodicSync();
-    console.log('Started periodic local sync');
-  }, [setupPeriodicSync]);
-
-  const stopLiveSync = useCallback(() => {
-    // Clean up all intervals
-    intervalRefs.current.forEach(clearInterval);
-    intervalRefs.current = [];
-    console.log('Stopped periodic local sync');
-  }, []);
-
-  // Set up periodic sync when user changes
-  useEffect(() => {
-    if (currentUser) {
-      setupPeriodicSync();
+  const saveConversations = async (newConversations: Conversation[]) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newConversations));
+    } catch (error) {
+      console.error('Error saving conversations:', error);
     }
-    
-    return () => {
-      // Clean up intervals when component unmounts or user changes
-      intervalRefs.current.forEach(clearInterval);
-      intervalRefs.current = [];
+  };
+
+  const sendMessage = async (conversationId: string, content: string) => {
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      senderId: '1', // Current user ID
+      senderName: 'You',
+      content,
+      timestamp: new Date(),
+      isRead: true,
     };
-  }, [currentUser, setupPeriodicSync]);
-  
-  // Handle app state changes for periodic sync
-  useEffect(() => {
-    const handleAppStateChange = (nextAppState: string) => {
-      if (nextAppState === 'active' && currentUser) {
-        setupPeriodicSync();
-      } else {
-        stopLiveSync();
+
+    const updatedConversations = conversations.map(conv => {
+      if (conv.id === conversationId) {
+        return {
+          ...conv,
+          messages: [...conv.messages, newMessage],
+          lastMessage: newMessage,
+        };
       }
-    };
+      return conv;
+    });
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
-    
-    return () => {
-      subscription?.remove();
-    };
-  }, [currentUser, setupPeriodicSync, stopLiveSync]);
+    setConversations(updatedConversations);
+    await saveConversations(updatedConversations);
+  };
 
-  return useMemo(() => ({
+  const markAsRead = async (conversationId: string) => {
+    const updatedConversations = conversations.map(conv => {
+      if (conv.id === conversationId) {
+        return {
+          ...conv,
+          unreadCount: 0,
+          messages: conv.messages.map(msg => ({ ...msg, isRead: true })),
+        };
+      }
+      return conv;
+    });
+
+    setConversations(updatedConversations);
+    await saveConversations(updatedConversations);
+  };
+
+  const getTotalUnreadCount = () => {
+    return conversations.reduce((total, conv) => total + conv.unreadCount, 0);
+  };
+
+  return {
     conversations,
-    messages,
     isLoading,
     sendMessage,
-    createConversation,
-    getOrCreateConversation,
-    markMessagesAsRead,
-    loadMessages,
-    setCurrentUser: setCurrentUserCallback,
-    startLiveSync,
-    stopLiveSync,
-    syncMessages
-  }), [conversations, messages, isLoading, sendMessage, createConversation, getOrCreateConversation, markMessagesAsRead, loadMessages, setCurrentUserCallback, startLiveSync, stopLiveSync, syncMessages]);
+    markAsRead,
+    getTotalUnreadCount,
+  };
 });
