@@ -289,11 +289,15 @@ export default function ScheduleBuilderScreen() {
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
-    const calendarDays: React.ReactElement[] = [];
+    const calendarDays = [];
     const currentDate = new Date(startDate);
     
     for (let i = 0; i < 42; i++) {
-      calendarDays.push(renderCalendarDay(i, new Date(currentDate), month));
+      calendarDays.push({
+        index: i,
+        date: new Date(currentDate),
+        month: month
+      });
       currentDate.setDate(currentDate.getDate() + 1);
     }
     
@@ -305,7 +309,7 @@ export default function ScheduleBuilderScreen() {
           ))}
         </View>
         <View style={styles.calendarGrid}>
-          {calendarDays}
+          {calendarDays.map(({ index, date, month }) => renderCalendarDay(index, date, month))}
         </View>
       </View>
     );
