@@ -305,7 +305,7 @@ export default function ScheduleBuilderScreen() {
           ))}
         </View>
         <View style={styles.calendarGrid}>
-          {calendarDays}
+          {calendarDays.map((day, index) => day)}
         </View>
       </View>
     );
