@@ -120,6 +120,7 @@ function RequestCard({ request, onAccept, onDecline, showActions = false }: Requ
 export default function NotificationsScreen() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'received' | 'accepted'>('received');
   const { bookingRequests, acceptBookingRequest, declineBookingRequest } = useBooking();
   const { user } = useAuth();
 
@@ -175,63 +176,86 @@ export default function NotificationsScreen() {
         }} 
       />
       
+      {/* Tab Navigation */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'received' && styles.activeTab]}
+          onPress={() => setActiveTab('received')}
+        >
+          <Text style={[styles.tabText, activeTab === 'received' && styles.activeTabText]}>
+            Requests Received
+          </Text>
+          {requestsReceived.length > 0 && (
+            <View style={[styles.tabBadge, activeTab === 'received' && styles.activeTabBadge]}>
+              <Text style={[styles.tabBadgeText, activeTab === 'received' && styles.activeTabBadgeText]}>
+                {requestsReceived.length}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'accepted' && styles.activeTab]}
+          onPress={() => setActiveTab('accepted')}
+        >
+          <Text style={[styles.tabText, activeTab === 'accepted' && styles.activeTabText]}>
+            Requests Accepted
+          </Text>
+          {requestsAccepted.length > 0 && (
+            <View style={[styles.tabBadge, activeTab === 'accepted' && styles.activeTabBadge]}>
+              <Text style={[styles.tabBadgeText, activeTab === 'accepted' && styles.activeTabBadgeText]}>
+                {requestsAccepted.length}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+
       <ScrollView 
         style={styles.content}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Requests Received Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Requests Received</Text>
-            <View style={styles.countBadge}>
-              <Text style={styles.countText}>{requestsReceived.length}</Text>
-            </View>
+        {activeTab === 'received' ? (
+          /* Requests Received Content */
+          <View style={styles.tabContent}>
+            {requestsReceived.length > 0 ? (
+              requestsReceived.map((request: BookingRequest) => (
+                <RequestCard
+                  key={request.id}
+                  request={request}
+                  onAccept={handleAccept}
+                  onDecline={handleDecline}
+                  showActions={true}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateText}>No pending requests</Text>
+                <Text style={styles.emptyStateSubtext}>New booking requests will appear here</Text>
+              </View>
+            )}
           </View>
-          
-          {requestsReceived.length > 0 ? (
-            requestsReceived.map((request: BookingRequest) => (
-              <RequestCard
-                key={request.id}
-                request={request}
-                onAccept={handleAccept}
-                onDecline={handleDecline}
-                showActions={true}
-              />
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>No pending requests</Text>
-              <Text style={styles.emptyStateSubtext}>New booking requests will appear here</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Requests Accepted Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Requests Accepted</Text>
-            <View style={styles.countBadge}>
-              <Text style={styles.countText}>{requestsAccepted.length}</Text>
-            </View>
+        ) : (
+          /* Requests Accepted Content */
+          <View style={styles.tabContent}>
+            {requestsAccepted.length > 0 ? (
+              requestsAccepted.map((request: BookingRequest) => (
+                <RequestCard
+                  key={request.id}
+                  request={request}
+                  showActions={false}
+                />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateText}>No accepted sessions</Text>
+                <Text style={styles.emptyStateSubtext}>Confirmed sessions will appear here</Text>
+              </View>
+            )}
           </View>
-          
-          {requestsAccepted.length > 0 ? (
-            requestsAccepted.map((request: BookingRequest) => (
-              <RequestCard
-                key={request.id}
-                request={request}
-                showActions={false}
-              />
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>No accepted sessions</Text>
-              <Text style={styles.emptyStateSubtext}>Confirmed sessions will appear here</Text>
-            </View>
-          )}
-        </View>
+        )}
       </ScrollView>
 
       <CalendarModal
@@ -254,36 +278,56 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
+  tabContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
     backgroundColor: Colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
-  countBadge: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    minWidth: 24,
+  activeTab: {
+    borderBottomColor: Colors.primary,
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+  },
+  activeTabText: {
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  tabBadge: {
+    backgroundColor: Colors.textSecondary + '20',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 6,
+    minWidth: 20,
     alignItems: 'center',
   },
-  countText: {
-    fontSize: 12,
+  activeTabBadge: {
+    backgroundColor: Colors.primary,
+  },
+  tabBadgeText: {
+    fontSize: 11,
     fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  activeTabBadgeText: {
     color: Colors.surface,
+  },
+  tabContent: {
+    paddingTop: 8,
   },
   requestCard: {
     backgroundColor: Colors.surface,
