@@ -375,9 +375,9 @@ export default function ScheduleBuilderScreen() {
             {generateTimeSlots().map((time, timeIndex) => (
               <View key={timeIndex} style={styles.weekTimeRow}>
                 <View style={styles.weekTimeLabel}>
-                  {time.includes('00 ') && (
+                  {time.includes('00 ') ? (
                     <Text style={styles.weekTimeText}>{time}</Text>
-                  )}
+                  ) : null}
                 </View>
                 {weekDays.map((day, dayIndex) => (
                   <View key={dayIndex} style={styles.weekTimeSlot} />
@@ -445,9 +445,9 @@ export default function ScheduleBuilderScreen() {
             {timeSlots.map((time, index) => (
               <View key={index} style={styles.dayTimeRow}>
                 <View style={styles.dayTimeLabel}>
-                  {time.includes('00 ') && (
+                  {time.includes('00 ') ? (
                     <Text style={styles.dayTimeText}>{time}</Text>
-                  )}
+                  ) : null}
                 </View>
                 <View style={styles.dayTimeSlot} />
               </View>
