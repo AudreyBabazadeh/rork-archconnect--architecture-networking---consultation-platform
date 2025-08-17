@@ -15,6 +15,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Send } from 'lucide-react-native';
 import { useMessaging, Message } from '@/contexts/MessagingContext';
 import { Colors } from '@/constants/colors';
+import { formatTimeTo12Hour } from '@/constants/timeUtils';
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -43,7 +44,10 @@ export default function ChatScreen() {
   };
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    return formatTimeTo12Hour(timeString);
   };
 
   const renderMessage = ({ item }: { item: Message }) => {

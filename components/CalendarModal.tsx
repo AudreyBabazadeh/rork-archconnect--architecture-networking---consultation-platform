@@ -10,6 +10,7 @@ import {
 import { Calendar } from 'react-native-calendars';
 import { X } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
+import { formatTimeTo12Hour } from '@/constants/timeUtils';
 import { useBooking, BookingRequest } from '@/contexts/BookingContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -136,7 +137,7 @@ export default function CalendarModal({ visible, onClose }: CalendarModalProps) 
                 selectedDateEvents.map((event) => (
                   <View key={event.id} style={styles.eventCard}>
                     <View style={styles.eventTime}>
-                      <Text style={styles.eventTimeText}>{event.time}</Text>
+                      <Text style={styles.eventTimeText}>{formatTimeTo12Hour(event.time)}</Text>
                     </View>
                     <View style={styles.eventDetails}>
                       <Text style={styles.eventTitle}>{event.title}</Text>

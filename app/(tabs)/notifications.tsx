@@ -19,6 +19,7 @@ import {
   DollarSign,
 } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
+import { formatTimeTo12Hour } from '@/constants/timeUtils';
 import { useBooking, BookingRequest } from '@/contexts/BookingContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -117,7 +118,7 @@ function RequestCard({ request, onAccept, onDecline, onMessage }: RequestCardPro
         </View>
         <View style={styles.detailItem}>
           <Clock size={14} color={Colors.textSecondary} />
-          <Text style={styles.detailText}>{request.time}</Text>
+          <Text style={styles.detailText}>{formatTimeTo12Hour(request.time)}</Text>
         </View>
       </View>
       

@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { Colors } from '@/constants/colors';
+import { formatTimeTo24Hour } from '@/constants/timeUtils';
 import { Topic } from '@/types/user';
 import { getFilteredSuggestions } from '@/constants/topicSuggestions';
 import { useAuth } from '@/contexts/AuthContext';
@@ -208,7 +209,7 @@ export default function BookingScreen() {
         studentName: user.name,
         topic: showCustomTopic ? customTopicName : selectedTopic?.name || '',
         date: selectedDate,
-        time: selectedTime,
+        time: formatTimeTo24Hour(selectedTime),
         description: description,
         amount: finalPrice,
       });

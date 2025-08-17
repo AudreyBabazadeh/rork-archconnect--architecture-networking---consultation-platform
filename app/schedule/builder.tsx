@@ -24,6 +24,7 @@ import {
   Video,
 } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
+import { formatTimeTo12Hour, generateTimeSlots12Hour } from '@/constants/timeUtils';
 import { useBooking, BookingRequest } from '@/contexts/BookingContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -124,7 +125,7 @@ function EventDetailsModal({ visible, event, onClose }: EventDetailsModalProps) 
               </View>
               <View style={styles.detailRow}>
                 <Clock size={16} color={Colors.textSecondary} />
-                <Text style={styles.detailText}>{event.time} ({event.duration} min)</Text>
+                <Text style={styles.detailText}>{formatTimeTo12Hour(event.time)} ({event.duration} min)</Text>
               </View>
               {event.timezone && (
                 <View style={styles.timezoneChip}>
@@ -313,15 +314,11 @@ export default function ScheduleBuilderScreen() {
   };
 
   const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 6; hour < 24; hour++) {
-      slots.push(`${hour.toString().padStart(2, '0')}:00`);
-      slots.push(`${hour.toString().padStart(2, '0')}:30`);
-    }
-    return slots;
+    return generateTimeSlots12Hour(6, 24);
   };
 
   const getEventPosition = (eventTime: string, duration: number) => {
+    // Convert 24-hour time to minutes from 6 AM
     const [hours, minutes] = eventTime.split(':').map(Number);
     const startMinutes = (hours - 6) * 60 + minutes;
     const slotHeight = 30;
@@ -378,7 +375,7 @@ export default function ScheduleBuilderScreen() {
             {generateTimeSlots().map((time, timeIndex) => (
               <View key={timeIndex} style={styles.weekTimeRow}>
                 <View style={styles.weekTimeLabel}>
-                  {time.endsWith(':00') && (
+                  {time.includes('00 ') && (
                     <Text style={styles.weekTimeText}>{time}</Text>
                   )}
                 </View>
@@ -414,7 +411,7 @@ export default function ScheduleBuilderScreen() {
                       {event.title}
                     </Text>
                     <Text style={styles.weekEventTime} numberOfLines={1}>
-                      {event.time} • {event.participantName}
+                      {formatTimeTo12Hour(event.time)} • {event.participantName}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -448,7 +445,7 @@ export default function ScheduleBuilderScreen() {
             {timeSlots.map((time, index) => (
               <View key={index} style={styles.dayTimeRow}>
                 <View style={styles.dayTimeLabel}>
-                  {time.endsWith(':00') && (
+                  {time.includes('00 ') && (
                     <Text style={styles.dayTimeText}>{time}</Text>
                   )}
                 </View>
@@ -492,7 +489,7 @@ export default function ScheduleBuilderScreen() {
                     </View>
                     <View style={styles.dayEventMeta}>
                       <Text style={styles.dayEventTime}>
-                        {event.time} • {event.duration}min
+                        {formatTimeTo12Hour(event.time)} • {event.duration}min
                       </Text>
                       <Text style={styles.dayEventLocation}>
                         {event.location}
