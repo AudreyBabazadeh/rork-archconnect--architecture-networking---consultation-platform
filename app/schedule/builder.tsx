@@ -312,11 +312,126 @@ export default function ScheduleBuilderScreen() {
     );
   };
 
+  const generateTimeSlots = () => {
+    const slots = [];
+    for (let hour = 6; hour < 24; hour++) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`);
+      slots.push(`${hour.toString().padStart(2, '0')}:30`);
+    }
+    return slots;
+  };
+
+  const getEventPosition = (eventTime: string, duration: number) => {
+    const [hours, minutes] = eventTime.split(':').map(Number);
+    const startMinutes = (hours - 6) * 60 + minutes;
+    const slotHeight = 30;
+    const top = (startMinutes / 30) * slotHeight;
+    const height = (duration / 30) * slotHeight;
+    return { top, height };
+  };
+
+  const renderWeekView = () => {
+    const startOfWeek = new Date(selectedDate);
+    startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
+    
+    const weekDays: Date[] = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      weekDays.push(day);
+    }
+    
+    return (
+      <View style={styles.weekView}>
+        <View style={styles.weekHeader}>
+          <View style={styles.timeColumnHeader} />
+          {weekDays.map((day, index) => {
+            const isToday = day.toDateString() === new Date().toDateString();
+            const dayEvents = filteredEvents.filter(event => 
+              event.date.startsWith(day.toISOString().split('T')[0])
+            );
+            
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[styles.weekDayHeader, isToday && styles.weekDayHeaderToday]}
+                onPress={() => handleDateSelect(day)}
+              >
+                <Text style={[styles.weekDayName, isToday && styles.weekDayNameToday]}>
+                  {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                </Text>
+                <Text style={[styles.weekDayNumber, isToday && styles.weekDayNumberToday]}>
+                  {day.getDate()}
+                </Text>
+                {dayEvents.length > 0 && (
+                  <View style={styles.weekEventIndicator}>
+                    <Text style={styles.weekEventCount}>{dayEvents.length}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+        
+        <ScrollView style={styles.weekContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.weekGrid}>
+            {generateTimeSlots().map((time, timeIndex) => (
+              <View key={timeIndex} style={styles.weekTimeRow}>
+                <View style={styles.weekTimeLabel}>
+                  {time.endsWith(':00') && (
+                    <Text style={styles.weekTimeText}>{time}</Text>
+                  )}
+                </View>
+                {weekDays.map((day, dayIndex) => (
+                  <View key={dayIndex} style={styles.weekTimeSlot} />
+                ))}
+              </View>
+            ))}
+            
+            {weekDays.map((day, dayIndex) => {
+              const dayEvents = filteredEvents.filter(event => 
+                event.date.startsWith(day.toISOString().split('T')[0])
+              );
+              
+              return dayEvents.map(event => {
+                const { top, height } = getEventPosition(event.time, event.duration);
+                return (
+                  <TouchableOpacity
+                    key={event.id}
+                    style={[
+                      styles.weekEventBar,
+                      {
+                        left: 60 + (dayIndex * ((100 - 8.5) / 7)) + '%',
+                        width: (100 - 8.5) / 7 + '%',
+                        top: top + 40,
+                        height: Math.max(height, 30),
+                        backgroundColor: event.type === 'booked-by-me' ? Colors.primary : Colors.success,
+                      }
+                    ]}
+                    onPress={() => handleEventPress(event)}
+                  >
+                    <Text style={styles.weekEventTitle} numberOfLines={1}>
+                      {event.title}
+                    </Text>
+                    <Text style={styles.weekEventTime} numberOfLines={1}>
+                      {event.time} • {event.participantName}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              });
+            })}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  };
+
   const renderDayView = () => {
+    const timeSlots = generateTimeSlots();
     const sortedEvents = [...dayEvents].sort((a, b) => a.time.localeCompare(b.time));
     
     return (
-      <ScrollView style={styles.dayView}>
+      <View style={styles.dayView}>
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: Colors.primary }]} />
@@ -328,54 +443,76 @@ export default function ScheduleBuilderScreen() {
           </View>
         </View>
         
-        {sortedEvents.length > 0 ? (
-          sortedEvents.map(event => (
-            <TouchableOpacity
-              key={event.id}
-              style={styles.eventCard}
-              onPress={() => handleEventPress(event)}
-            >
-              <View style={styles.eventTime}>
-                <Text style={styles.eventTimeText}>{event.time}</Text>
-                <Text style={styles.eventDuration}>{event.duration}m</Text>
+        <ScrollView style={styles.dayContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.dayGrid}>
+            {timeSlots.map((time, index) => (
+              <View key={index} style={styles.dayTimeRow}>
+                <View style={styles.dayTimeLabel}>
+                  {time.endsWith(':00') && (
+                    <Text style={styles.dayTimeText}>{time}</Text>
+                  )}
+                </View>
+                <View style={styles.dayTimeSlot} />
               </View>
-              
-              <View style={styles.eventContent}>
-                <View style={styles.eventHeader}>
-                  <Text style={styles.eventTitle}>{event.title}</Text>
-                  <View style={[styles.typeBadge, { backgroundColor: event.type === 'booked-by-me' ? `${Colors.primary}20` : `${Colors.success}20` }]}>
-                    <Text style={[styles.typeBadgeText, { color: event.type === 'booked-by-me' ? Colors.primary : Colors.success }]}>
-                      {event.type === 'booked-by-me' ? 'Booked by Me' : 'Booked with Me'}
+            ))}
+            
+            {sortedEvents.map(event => {
+              const { top, height } = getEventPosition(event.time, event.duration);
+              return (
+                <TouchableOpacity
+                  key={event.id}
+                  style={[
+                    styles.dayEventBar,
+                    {
+                      top: top + 20,
+                      height: Math.max(height, 60),
+                      backgroundColor: event.type === 'booked-by-me' ? Colors.primary : Colors.success,
+                    }
+                  ]}
+                  onPress={() => handleEventPress(event)}
+                >
+                  <View style={styles.dayEventContent}>
+                    <Text style={styles.dayEventTitle} numberOfLines={1}>
+                      {event.title}
                     </Text>
+                    <View style={styles.dayEventDetails}>
+                      <View style={styles.dayEventParticipant}>
+                        <View style={styles.dayEventAvatar}>
+                          <User size={12} color={Colors.white} />
+                        </View>
+                        <Text style={styles.dayEventParticipantName} numberOfLines={1}>
+                          {event.participantName}
+                        </Text>
+                      </View>
+                      <View style={styles.dayEventBadge}>
+                        <Text style={styles.dayEventBadgeText}>
+                          {event.type === 'booked-by-me' ? 'Booked by Me' : 'Booked with Me'}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.dayEventMeta}>
+                      <Text style={styles.dayEventTime}>
+                        {event.time} • {event.duration}min
+                      </Text>
+                      <Text style={styles.dayEventLocation}>
+                        {event.location}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-                
-                <View style={styles.participantInfo}>
-                  <View style={styles.avatarPlaceholder}>
-                    <User size={16} color={Colors.textSecondary} />
-                  </View>
-                  <Text style={styles.participantName}>{event.participantName}</Text>
-                </View>
-                
-                <View style={styles.eventLocation}>
-                  <MapPin size={14} color={Colors.textSecondary} />
-                  <Text style={styles.eventLocationText}>{event.location}</Text>
-                </View>
-              </View>
-              
-              <View style={styles.eventAmount}>
-                <Text style={styles.amountText}>${event.amount}</Text>
-              </View>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <View style={styles.emptyDay}>
-            <Calendar size={48} color={Colors.textSecondary} />
-            <Text style={styles.emptyDayText}>No sessions scheduled</Text>
-            <Text style={styles.emptyDaySubtext}>Your confirmed sessions will appear here</Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
-        )}
-      </ScrollView>
+          
+          {sortedEvents.length === 0 && (
+            <View style={styles.emptyDay}>
+              <Calendar size={48} color={Colors.textSecondary} />
+              <Text style={styles.emptyDayText}>No sessions scheduled</Text>
+              <Text style={styles.emptyDaySubtext}>Your confirmed sessions will appear here</Text>
+            </View>
+          )}
+        </ScrollView>
+      </View>
     );
   };
 
@@ -408,7 +545,7 @@ export default function ScheduleBuilderScreen() {
         </View>
         
         <View style={styles.viewModeToggle}>
-          {(['month', 'day'] as ViewMode[]).map(mode => (
+          {(['month', 'week', 'day'] as ViewMode[]).map(mode => (
             <TouchableOpacity
               key={mode}
               style={[styles.viewModeButton, viewMode === mode && styles.viewModeButtonActive]}
@@ -444,7 +581,9 @@ export default function ScheduleBuilderScreen() {
       </View>
       
       <View style={styles.content}>
-        {viewMode === 'month' ? renderMonthView() : renderDayView()}
+        {viewMode === 'month' && renderMonthView()}
+        {viewMode === 'week' && renderWeekView()}
+        {viewMode === 'day' && renderDayView()}
       </View>
       
       <EventDetailsModal
@@ -605,9 +744,211 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.white,
   },
+  weekView: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  weekHeader: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  timeColumnHeader: {
+    width: 60,
+    height: 60,
+  },
+  weekDayHeader: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    position: 'relative',
+  },
+  weekDayHeaderToday: {
+    backgroundColor: `${Colors.primary}10`,
+  },
+  weekDayName: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  weekDayNameToday: {
+    color: Colors.primary,
+  },
+  weekDayNumber: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  weekDayNumberToday: {
+    color: Colors.primary,
+    fontWeight: '700',
+  },
+  weekEventIndicator: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: Colors.primary,
+    borderRadius: 6,
+    minWidth: 12,
+    height: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  weekEventCount: {
+    fontSize: 8,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  weekContent: {
+    flex: 1,
+  },
+  weekGrid: {
+    position: 'relative',
+    minHeight: 1080,
+  },
+  weekTimeRow: {
+    flexDirection: 'row',
+    height: 30,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.border,
+  },
+  weekTimeLabel: {
+    width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRightWidth: 1,
+    borderRightColor: Colors.border,
+  },
+  weekTimeText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  weekTimeSlot: {
+    flex: 1,
+    borderRightWidth: 0.5,
+    borderRightColor: Colors.border,
+  },
+  weekEventBar: {
+    position: 'absolute',
+    borderRadius: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    marginHorizontal: 1,
+  },
+  weekEventTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  weekEventTime: {
+    fontSize: 9,
+    color: Colors.white,
+    opacity: 0.9,
+  },
   dayView: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  dayContent: {
+    flex: 1,
+  },
+  dayGrid: {
+    position: 'relative',
+    minHeight: 1080,
+  },
+  dayTimeRow: {
+    flexDirection: 'row',
+    height: 30,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.border,
+  },
+  dayTimeLabel: {
+    width: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRightWidth: 1,
+    borderRightColor: Colors.border,
+  },
+  dayTimeText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '500',
+  },
+  dayTimeSlot: {
+    flex: 1,
+  },
+  dayEventBar: {
+    position: 'absolute',
+    left: 62,
+    right: 8,
+    borderRadius: 8,
+    padding: 8,
+    marginVertical: 1,
+  },
+  dayEventContent: {
+    flex: 1,
+  },
+  dayEventTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+    marginBottom: 4,
+  },
+  dayEventDetails: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  dayEventParticipant: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  dayEventAvatar: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 4,
+  },
+  dayEventParticipantName: {
+    fontSize: 12,
+    color: Colors.white,
+    fontWeight: '500',
+    flex: 1,
+  },
+  dayEventBadge: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  dayEventBadgeText: {
+    fontSize: 9,
+    color: Colors.white,
+    fontWeight: '600',
+  },
+  dayEventMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dayEventTime: {
+    fontSize: 11,
+    color: Colors.white,
+    opacity: 0.9,
+  },
+  dayEventLocation: {
+    fontSize: 11,
+    color: Colors.white,
+    opacity: 0.9,
   },
   legend: {
     flexDirection: 'row',
