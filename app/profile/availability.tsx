@@ -16,6 +16,7 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { TopicManager } from '@/components/TopicManager';
 import { Topic } from '@/types/user';
+import { formatTimeTo12Hour, formatTimeTo24Hour, generateTimeSlots12Hour } from '@/constants/timeUtils';
 
 interface TimeInterval {
   id: string;
@@ -40,18 +41,7 @@ const DAYS_OF_WEEK = [
   'Sunday'
 ];
 
-const generateTimeSlots = () => {
-  const times: string[] = [];
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-      times.push(timeString);
-    }
-  }
-  return times;
-};
-
-const TIME_OPTIONS = generateTimeSlots();
+const TIME_OPTIONS = generateTimeSlots12Hour(0, 24);
 
 export default function ManageAvailabilityScreen() {
   const { user } = useAuth();
@@ -146,6 +136,9 @@ export default function ManageAvailabilityScreen() {
   const selectTime = (time: string) => {
     if (!selectedTimeSlot) return;
     
+    // Convert 12-hour format back to 24-hour format for storage
+    const time24 = formatTimeTo24Hour(time);
+    
     setDaySchedules(prev => 
       prev.map(schedule => {
         if (schedule.id === selectedTimeSlot.dayId) {
@@ -154,9 +147,9 @@ export default function ManageAvailabilityScreen() {
             intervals: schedule.intervals.map(interval => {
               if (interval.id === selectedTimeSlot.intervalId) {
                 if (selectedTimeSlot.type === 'start') {
-                  return { ...interval, startTime: time };
+                  return { ...interval, startTime: time24 };
                 } else {
-                  return { ...interval, endTime: time };
+                  return { ...interval, endTime: time24 };
                 }
               }
               return interval;
@@ -204,7 +197,7 @@ export default function ManageAvailabilityScreen() {
                     onPress={() => openTimePicker(schedule.id, interval.id, 'start')}
                   >
                     <Clock size={16} color={Colors.textLight} />
-                    <Text style={styles.timeText}>{interval.startTime}</Text>
+                    <Text style={styles.timeText}>{formatTimeTo12Hour(interval.startTime)}</Text>
                     <ChevronDown size={16} color={Colors.textLight} />
                   </TouchableOpacity>
                 </View>
@@ -216,7 +209,7 @@ export default function ManageAvailabilityScreen() {
                     onPress={() => openTimePicker(schedule.id, interval.id, 'end')}
                   >
                     <Clock size={16} color={Colors.textLight} />
-                    <Text style={styles.timeText}>{interval.endTime}</Text>
+                    <Text style={styles.timeText}>{formatTimeTo12Hour(interval.endTime)}</Text>
                     <ChevronDown size={16} color={Colors.textLight} />
                   </TouchableOpacity>
                 </View>
