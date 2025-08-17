@@ -411,7 +411,7 @@ export default function ScheduleBuilderScreen() {
                       {event.title}
                     </Text>
                     <Text style={styles.weekEventTime} numberOfLines={1}>
-                      {formatTimeTo12Hour(event.time)} • {event.participantName}
+                      {`${formatTimeTo12Hour(event.time)} • ${event.participantName}`}
                     </Text>
                   </TouchableOpacity>
                 );
@@ -489,7 +489,7 @@ export default function ScheduleBuilderScreen() {
                     </View>
                     <View style={styles.dayEventMeta}>
                       <Text style={styles.dayEventTime}>
-                        {formatTimeTo12Hour(event.time)} • {event.duration}min
+                        {`${formatTimeTo12Hour(event.time)} • ${event.duration}min`}
                       </Text>
                       <Text style={styles.dayEventLocation}>
                         {event.location}
