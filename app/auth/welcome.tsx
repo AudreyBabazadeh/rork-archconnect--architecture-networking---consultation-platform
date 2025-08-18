@@ -10,7 +10,7 @@ export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <View style={[styles.content, { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 40 }]}>
+      <View style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 40 }]}>
         
         {/* Hero Section */}
         <View style={styles.hero}>
@@ -80,8 +80,8 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    paddingTop: 80,
-    paddingBottom: 60,
+    paddingTop: 20,
+    paddingBottom: 40,
   },
   title: {
     fontSize: 36,
