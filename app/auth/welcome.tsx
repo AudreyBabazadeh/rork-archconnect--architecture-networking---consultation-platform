@@ -1,80 +1,71 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { ArrowRight, BookOpen, TrendingUp, Heart } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/colors';
 
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
-      <LinearGradient
-        colors={['#FF6B35', '#F7931E']}
-        style={styles.gradient}
-      >
-        <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 40 }]}>
-          {/* Hero Section */}
-          <View style={styles.hero}>
-            <Image 
-              source={{ uri: 'https://r2-pub.rork.com/generated-images/e85d2b63-236d-4cc7-bf94-1ad28d87277a.png' }}
-              style={styles.heroIcon}
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>Welcome to Arcal</Text>
-            <Text style={styles.subtitle}>
-              Connect, learn, and grow with a community that cares about your success
-            </Text>
+      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
+      <View style={[styles.content, { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 40 }]}>
+        {/* Hero Section */}
+        <View style={styles.hero}>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logoText}>A</Text>
+          </View>
+          <Text style={styles.title}>Welcome to Arcal</Text>
+          <Text style={styles.subtitle}>
+            Connect, learn, and grow with a community that cares about your success
+          </Text>
+        </View>
+
+        {/* Key Messages */}
+        <View style={styles.keyMessages}>
+          <View style={styles.messageCard}>
+            <View style={styles.messageIcon}>
+              <TrendingUp size={20} color="#1A1A1A" />
+            </View>
+            <Text style={styles.messageTitle}>Share your expertise</Text>
           </View>
 
-          {/* Key Messages */}
-          <View style={styles.keyMessages}>
-            <View style={styles.messageCard}>
-              <View style={styles.messageIcon}>
-                <TrendingUp size={24} color={Colors.secondary} />
-              </View>
-              <Text style={styles.messageTitle}>Share your expertise</Text>
+          <View style={styles.messageCard}>
+            <View style={styles.messageIcon}>
+              <Heart size={20} color="#1A1A1A" />
             </View>
-
-            <View style={styles.messageCard}>
-              <View style={styles.messageIcon}>
-                <Heart size={24} color={Colors.secondary} />
-              </View>
-              <Text style={styles.messageTitle}>Support the next generation</Text>
-            </View>
-
-            <View style={styles.messageCard}>
-              <View style={styles.messageIcon}>
-                <BookOpen size={24} color={Colors.secondary} />
-              </View>
-              <Text style={styles.messageTitle}>Learn from those ahead of you</Text>
-            </View>
+            <Text style={styles.messageTitle}>Support the next generation</Text>
           </View>
 
-          {/* Action Buttons */}
-          <View style={styles.buttons}>
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={() => router.push('/auth/signup')}
-              testID="signup-button"
-            >
-              <Text style={styles.primaryButtonText}>Get Started</Text>
-              <ArrowRight size={18} color={Colors.primary} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => router.push('/auth/signin')}
-              testID="signin-button"
-            >
-              <Text style={styles.secondaryButtonText}>Already have an account?</Text>
-            </TouchableOpacity>
+          <View style={styles.messageCard}>
+            <View style={styles.messageIcon}>
+              <BookOpen size={20} color="#1A1A1A" />
+            </View>
+            <Text style={styles.messageTitle}>Learn from those ahead of you</Text>
           </View>
         </View>
-      </LinearGradient>
+
+        {/* Action Buttons */}
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={() => router.push('/auth/signup')}
+            testID="signup-button"
+          >
+            <Text style={styles.primaryButtonText}>Get Started</Text>
+            <ArrowRight size={18} color="#FFFFFF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => router.push('/auth/signin')}
+            testID="signin-button"
+          >
+            <Text style={styles.secondaryButtonText}>Already have an account?</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
@@ -82,101 +73,115 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
+    backgroundColor: '#F8F9FA',
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 40,
+    paddingHorizontal: 32,
+    justifyContent: 'space-between',
   },
   hero: {
     alignItems: 'center',
-    marginBottom: 20,
+    flex: 1,
+    justifyContent: 'center',
+    paddingTop: 40,
   },
-  heroIcon: {
-    width: 80,
-    height: 80,
-    marginBottom: 24,
-    tintColor: Colors.white,
+  logoContainer: {
+    width: 120,
+    height: 120,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
+    elevation: 8,
+  },
+  logoText: {
+    fontSize: 64,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    fontFamily: 'serif',
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontWeight: '700',
-    color: Colors.white,
+    color: '#1A1A1A',
     marginBottom: 16,
     textAlign: 'center',
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 18,
-    color: Colors.white,
+    fontSize: 17,
+    color: '#6B7280',
     textAlign: 'center',
-    opacity: 0.9,
     lineHeight: 24,
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    paddingHorizontal: 20,
+    fontWeight: '400',
   },
   keyMessages: {
-    marginVertical: 10,
-    marginBottom: 20,
+    marginVertical: 40,
+    gap: 16,
   },
   messageCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 20,
-    marginBottom: 16,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
   },
   messageIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: 'rgba(245, 101, 0, 0.1)',
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#F9FAFB',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
   },
   messageTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
+    color: '#1A1A1A',
     flex: 1,
+    lineHeight: 20,
   },
   buttons: {
-    gap: 8,
-    marginTop: 10,
-    marginBottom: 20,
+    gap: 12,
+    paddingBottom: 20,
   },
   primaryButton: {
-    backgroundColor: Colors.white,
+    backgroundColor: '#1A1A1A',
     paddingVertical: 18,
     paddingHorizontal: 32,
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: '#1A1A1A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 6,
   },
   primaryButtonText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.primary,
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#FFFFFF',
     marginRight: 8,
   },
   secondaryButton: {
-    paddingVertical: 8,
+    paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 12,
     alignItems: 'center',
@@ -184,14 +189,6 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: '500',
-    color: Colors.white,
-    opacity: 0.9,
-  },
-  footer: {
-    fontSize: 14,
-    color: Colors.white,
-    textAlign: 'center',
-    opacity: 0.8,
-    fontWeight: '500',
+    color: '#6B7280',
   },
 });
