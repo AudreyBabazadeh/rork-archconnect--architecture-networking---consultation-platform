@@ -4,18 +4,49 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+// Icon component matching the app icon
+const AppIcon = () => (
+  <View style={styles.iconContainer}>
+    <View style={styles.iconBackground}>
+      {/* Person helping another person up steps */}
+      <View style={styles.iconContent}>
+        {/* First person (helper) */}
+        <View style={styles.person1}>
+          <View style={styles.head1} />
+          <View style={styles.body1} />
+          <View style={styles.arm1} />
+        </View>
+        {/* Second person (being helped) */}
+        <View style={styles.person2}>
+          <View style={styles.head2} />
+          <View style={styles.body2} />
+          <View style={styles.arm2} />
+        </View>
+        {/* Steps */}
+        <View style={styles.steps}>
+          <View style={styles.step1} />
+          <View style={styles.step2} />
+          <View style={styles.step3} />
+        </View>
+      </View>
+    </View>
+  </View>
+);
+
 export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
-      <View style={[styles.content, { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 40 }]}>
+      <View style={[styles.content, { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 40 }]}>
+        {/* App Icon at top */}
+        <View style={styles.topIconContainer}>
+          <AppIcon />
+        </View>
+
         {/* Hero Section */}
         <View style={styles.hero}>
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>A</Text>
-          </View>
           <Text style={styles.title}>Welcome to Arcal</Text>
           <Text style={styles.subtitle}>
             Connect, learn, and grow with a community that cares about your success
@@ -80,11 +111,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     justifyContent: 'space-between',
   },
+  topIconContainer: {
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
   hero: {
     alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: 40,
+    paddingTop: 20,
+    paddingBottom: 40,
   },
   logoContainer: {
     width: 120,
@@ -123,7 +158,8 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   keyMessages: {
-    marginVertical: 40,
+    marginTop: 60,
+    marginBottom: 60,
     gap: 16,
   },
   messageCard: {
@@ -190,5 +226,133 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: '#6B7280',
+  },
+  // App Icon Styles
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconBackground: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  iconContent: {
+    width: 50,
+    height: 40,
+    position: 'relative',
+  },
+  // Steps
+  steps: {
+    position: 'absolute',
+    bottom: 0,
+    left: 5,
+    right: 5,
+  },
+  step1: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: 12,
+    height: 8,
+    backgroundColor: '#1A1A1A',
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A',
+  },
+  step2: {
+    position: 'absolute',
+    bottom: 0,
+    left: 12,
+    width: 12,
+    height: 12,
+    backgroundColor: '#1A1A1A',
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A',
+  },
+  step3: {
+    position: 'absolute',
+    bottom: 0,
+    left: 24,
+    width: 12,
+    height: 16,
+    backgroundColor: '#1A1A1A',
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A',
+  },
+  // Person 1 (helper)
+  person1: {
+    position: 'absolute',
+    left: 8,
+    top: 0,
+  },
+  head1: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A',
+    marginBottom: 2,
+  },
+  body1: {
+    width: 8,
+    height: 12,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A',
+    borderTopLeftRadius: 2,
+    borderTopRightRadius: 2,
+    marginLeft: -1,
+  },
+  arm1: {
+    position: 'absolute',
+    top: 8,
+    right: -6,
+    width: 8,
+    height: 1.5,
+    backgroundColor: '#1A1A1A',
+    transform: [{ rotate: '-20deg' }],
+  },
+  // Person 2 (being helped)
+  person2: {
+    position: 'absolute',
+    right: 8,
+    top: 8,
+  },
+  head2: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A',
+    marginBottom: 2,
+  },
+  body2: {
+    width: 8,
+    height: 10,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#1A1A1A',
+    borderTopLeftRadius: 2,
+    borderTopRightRadius: 2,
+    marginLeft: -1,
+  },
+  arm2: {
+    position: 'absolute',
+    top: 8,
+    left: -6,
+    width: 8,
+    height: 1.5,
+    backgroundColor: '#1A1A1A',
+    transform: [{ rotate: '20deg' }],
   },
 });
