@@ -9,14 +9,11 @@ export default function WelcomeScreen() {
   
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F8F9FA" />
-      <View style={[styles.content, { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 20 }]}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <View style={[styles.content, { paddingTop: insets.top + 60, paddingBottom: insets.bottom + 40 }]}>
         
         {/* Hero Section */}
         <View style={styles.hero}>
-          <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>A</Text>
-          </View>
           <Text style={styles.title}>Welcome to Arcal</Text>
           <Text style={styles.subtitle}>
             Connect, learn, and grow with a community that cares about your success
@@ -74,7 +71,7 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
@@ -83,109 +80,83 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: 40,
-  },
-  logoContainer: {
-    width: 120,
-    height: 120,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 24,
-    elevation: 8,
-  },
-  logoText: {
-    fontSize: 64,
-    fontWeight: '700' as const,
-    color: '#1A1A1A',
-    fontFamily: 'serif',
+    paddingTop: 80,
+    paddingBottom: 60,
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: '700' as const,
     color: '#1A1A1A',
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: 'center',
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 17,
+    fontSize: 18,
     color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 26,
     paddingHorizontal: 20,
     fontWeight: '400' as const,
   },
   keyMessages: {
-    gap: 16,
+    gap: 20,
     paddingVertical: 40,
   },
   messageCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8F9FA',
     borderRadius: 16,
-    padding: 20,
+    padding: 24,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    elevation: 2,
     borderWidth: 1,
-    borderColor: '#F3F4F6',
+    borderColor: '#E5E7EB',
   },
   messageIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: '#F9FAFB',
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   messageTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600' as const,
     color: '#1A1A1A',
     flex: 1,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   buttons: {
-    gap: 12,
-    paddingBottom: 20,
+    gap: 16,
+    paddingBottom: 40,
   },
   primaryButton: {
     backgroundColor: '#1A1A1A',
-    paddingVertical: 18,
+    paddingVertical: 20,
     paddingHorizontal: 32,
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#1A1A1A',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 6,
   },
   primaryButtonText: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '600' as const,
     color: '#FFFFFF',
     marginRight: 8,
   },
   secondaryButton: {
-    paddingVertical: 16,
+    paddingVertical: 18,
     paddingHorizontal: 24,
     borderRadius: 12,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFFFFF',
   },
   secondaryButtonText: {
     fontSize: 16,
