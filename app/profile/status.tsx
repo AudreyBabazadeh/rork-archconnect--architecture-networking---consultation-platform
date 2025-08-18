@@ -1,27 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { Star, TrendingUp, Calendar, DollarSign } from 'lucide-react-native';
+import { TrendingUp, Calendar } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
-import { LoyaltyBadge } from '@/components/LoyaltyBadge';
 
-interface BadgeStatus {
-  currentBadge: 'none' | 'silver' | 'gold';
-  currentYear: number;
-  sessionsCompleted: number;
-  sessionsRequired: number;
-  yearsSinceStart: number;
-  feePercentage: number;
-  nextBadgeRequirements?: {
-    badge: 'silver' | 'gold';
-    sessionsNeeded: number;
-    timeRemaining: string;
-  };
-  maintenanceInfo?: {
-    sessionsThisYear: number;
-    sessionsNeeded: number;
-    yearEnd: string;
-  };
+type UserStatus = 'First User' | 'Next User' | 'Final User';
+
+interface StatusInfo {
+  currentStatus: UserStatus;
+  sessionsThisMonth: number;
+  progressPercentage: number;
+  nextThreshold?: number;
+  isMaxStatus: boolean;
 }
 
 export default function StatusScreen() {
@@ -37,205 +27,129 @@ export default function StatusScreen() {
     );
   }
 
-  // Mock badge status calculation - in real app this would come from backend
-  const getBadgeStatus = (): BadgeStatus => {
-    const accountAge = new Date().getFullYear() - new Date(user.createdAt).getFullYear();
-    const totalSessions = (user as any).totalConsultations || 0;
+  // Mock sessions this month - in real app this would come from backend
+  const getStatusInfo = (): StatusInfo => {
+    // Simulate current month sessions (0-35 for demo purposes)
+    const sessionsThisMonth = Math.floor(Math.random() * 35);
     
-    // Simulate current year progress
-    const currentYearSessions = Math.min(totalSessions, 8); // Mock current year sessions
+    let currentStatus: UserStatus;
+    let nextThreshold: number | undefined;
+    let isMaxStatus = false;
     
-    if (accountAge >= 2 && totalSessions >= 15) {
-      // Gold badge holder
-      return {
-        currentBadge: 'gold',
-        currentYear: 2,
-        sessionsCompleted: currentYearSessions,
-        sessionsRequired: 10,
-        yearsSinceStart: accountAge,
-        feePercentage: 7,
-        maintenanceInfo: {
-          sessionsThisYear: currentYearSessions,
-          sessionsNeeded: Math.max(0, 10 - currentYearSessions),
-          yearEnd: 'December 31, 2025'
-        }
-      };
-    } else if (accountAge >= 1 && totalSessions >= 5) {
-      // Silver badge holder
-      return {
-        currentBadge: 'silver',
-        currentYear: accountAge >= 2 ? 2 : 1,
-        sessionsCompleted: currentYearSessions,
-        sessionsRequired: accountAge >= 2 ? 10 : 5,
-        yearsSinceStart: accountAge,
-        feePercentage: 9,
-        nextBadgeRequirements: accountAge >= 2 ? {
-          badge: 'gold',
-          sessionsNeeded: Math.max(0, 10 - currentYearSessions),
-          timeRemaining: `${12 - new Date().getMonth()} months remaining`
-        } : undefined
-      };
+    if (sessionsThisMonth >= 30) {
+      currentStatus = 'Final User';
+      isMaxStatus = true;
+    } else if (sessionsThisMonth >= 16) {
+      currentStatus = 'Next User';
+      nextThreshold = 30;
     } else {
-      // No badge yet
-      const sessionsNeeded = accountAge >= 1 ? Math.max(0, 5 - totalSessions) : 5;
-      const timeRemaining = accountAge >= 1 ? 
-        `${12 - new Date().getMonth()} months remaining` : 
-        `${12 - accountAge * 12 - new Date().getMonth()} months remaining`;
-      
-      return {
-        currentBadge: 'none',
-        currentYear: 1,
-        sessionsCompleted: totalSessions,
-        sessionsRequired: 5,
-        yearsSinceStart: accountAge,
-        feePercentage: 12, // Standard fee
-        nextBadgeRequirements: {
-          badge: 'silver',
-          sessionsNeeded,
-          timeRemaining
-        }
-      };
+      currentStatus = 'First User';
+      nextThreshold = 16;
     }
+    
+    // Calculate progress percentage (0-30 scale)
+    const progressPercentage = Math.min((sessionsThisMonth / 30) * 100, 100);
+    
+    return {
+      currentStatus,
+      sessionsThisMonth,
+      progressPercentage,
+      nextThreshold,
+      isMaxStatus
+    };
   };
 
-  const badgeStatus = getBadgeStatus();
-  const progressPercentage = (badgeStatus.sessionsCompleted / badgeStatus.sessionsRequired) * 100;
+  const statusInfo = getStatusInfo();
 
   return (
     <SafeAreaView style={styles.container}>
-
-
       <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
-        {/* Current Badge Status */}
-        <View style={styles.badgeCard}>
-          <View style={styles.badgeHeader}>
-            <Text style={styles.cardTitle}>Current Badge Status</Text>
-            {badgeStatus.currentBadge !== 'none' && (
-              <View style={styles.badgeContainer}>
-                <LoyaltyBadge badge={badgeStatus.currentBadge} size={32} />
-              </View>
-            )}
-          </View>
+        {/* Current User Status */}
+        <View style={styles.statusCard}>
+          <Text style={styles.statusTitle}>User Status: {statusInfo.currentStatus}</Text>
           
-          <View style={styles.badgeInfo}>
-            <Text style={styles.badgeTitle}>
-              {badgeStatus.currentBadge === 'none' ? 'No Badge' : 
-               badgeStatus.currentBadge === 'silver' ? 'Silver Badge' : 'Gold Badge'}
-            </Text>
-            <Text style={styles.badgeSubtitle}>
-              Platform fee: {badgeStatus.feePercentage}%
-            </Text>
-          </View>
-
-          {badgeStatus.currentBadge !== 'none' && (
-            <View style={styles.benefitsContainer}>
-              <Text style={styles.benefitsTitle}>Benefits:</Text>
-              <Text style={styles.benefitText}>• Reduced platform fee ({badgeStatus.feePercentage}%)</Text>
-              <Text style={styles.benefitText}>• Priority support</Text>
-              <Text style={styles.benefitText}>• Enhanced profile visibility</Text>
-              {badgeStatus.currentBadge === 'gold' && (
-                <Text style={styles.benefitText}>• Premium consultant badge</Text>
-              )}
-            </View>
-          )}
+          <Text style={styles.sessionsText}>
+            {statusInfo.isMaxStatus 
+              ? "You've reached the highest status: Final User." 
+              : `You've completed ${statusInfo.sessionsThisMonth} sessions this month`
+            }
+          </Text>
         </View>
 
-        {/* Progress Card */}
+        {/* Progress Bar */}
         <View style={styles.progressCard}>
           <View style={styles.progressHeader}>
-            <TrendingUp size={20} color={Colors.primary} />
-            <Text style={styles.cardTitle}>Year {badgeStatus.currentYear} Progress</Text>
+            <TrendingUp size={20} color={Colors.black} />
+            <Text style={styles.cardTitle}>Monthly Progress</Text>
           </View>
           
           <View style={styles.progressInfo}>
             <Text style={styles.progressText}>
-              {badgeStatus.sessionsCompleted}/{badgeStatus.sessionsRequired} sessions completed
+              {statusInfo.sessionsThisMonth}/30 sessions
             </Text>
-            <Text style={styles.progressPercentage}>{Math.round(progressPercentage)}%</Text>
+            <Text style={styles.progressPercentage}>
+              {Math.round(statusInfo.progressPercentage)}%
+            </Text>
           </View>
           
           <View style={styles.progressBarContainer}>
             <View style={styles.progressBarBackground}>
+              {/* Progress fill */}
               <View 
-                style={[styles.progressBarFill, { width: `${Math.min(progressPercentage, 100)}%` }]} 
+                style={[styles.progressBarFill, { width: `${statusInfo.progressPercentage}%` }]} 
               />
+              
+              {/* First User marker at 15 sessions */}
+              <View style={[styles.marker, { left: '50%' }]}>
+                <View style={styles.markerLine} />
+                <Text style={styles.markerText}>First</Text>
+              </View>
+              
+              {/* Final User marker at 30 sessions */}
+              <View style={[styles.marker, { right: 0 }]}>
+                <View style={styles.markerLine} />
+                <Text style={styles.markerText}>Final</Text>
+              </View>
             </View>
           </View>
           
-          {badgeStatus.sessionsCompleted < badgeStatus.sessionsRequired && (
+          {!statusInfo.isMaxStatus && statusInfo.nextThreshold && (
             <Text style={styles.progressNote}>
-              Complete {badgeStatus.sessionsRequired - badgeStatus.sessionsCompleted} more sessions to 
-              {badgeStatus.currentBadge === 'none' ? 'earn Silver badge' : 
-               badgeStatus.currentBadge === 'silver' ? 'maintain Silver badge' : 'maintain Gold badge'}
+              Complete {statusInfo.nextThreshold - statusInfo.sessionsThisMonth} more sessions to reach {statusInfo.nextThreshold === 16 ? 'Next User' : 'Final User'} status
             </Text>
           )}
         </View>
 
-        {/* Next Badge Requirements */}
-        {badgeStatus.nextBadgeRequirements && (
-          <View style={styles.requirementsCard}>
-            <View style={styles.requirementsHeader}>
-              <Star size={20} color={Colors.secondary} />
-              <Text style={styles.cardTitle}>
-                {badgeStatus.nextBadgeRequirements.badge === 'silver' ? 'Silver' : 'Gold'} Badge Requirements
-              </Text>
-            </View>
-            
-            <View style={styles.requirementsList}>
-              <View style={styles.requirementItem}>
-                <Calendar size={16} color={Colors.textSecondary} />
-                <Text style={styles.requirementText}>
-                  {badgeStatus.nextBadgeRequirements.badge === 'silver' ? 
-                    '1 year of platform membership' : 
-                    '1 year after earning Silver badge'}
-                </Text>
-              </View>
-              
-              <View style={styles.requirementItem}>
-                <TrendingUp size={16} color={Colors.textSecondary} />
-                <Text style={styles.requirementText}>
-                  {badgeStatus.nextBadgeRequirements.badge === 'silver' ? 
-                    '5 sessions completed in first year' : 
-                    '10 sessions completed per year'}
-                </Text>
-              </View>
-              
-              <View style={styles.requirementItem}>
-                <DollarSign size={16} color={Colors.textSecondary} />
-                <Text style={styles.requirementText}>
-                  Platform fee reduced to {badgeStatus.nextBadgeRequirements.badge === 'silver' ? '9%' : '7%'}
-                </Text>
-              </View>
-            </View>
-            
-            {badgeStatus.nextBadgeRequirements.sessionsNeeded > 0 && (
-              <View style={styles.nextSteps}>
-                <Text style={styles.nextStepsTitle}>Next Steps:</Text>
-                <Text style={styles.nextStepsText}>
-                  Complete {badgeStatus.nextBadgeRequirements.sessionsNeeded} more sessions
-                </Text>
-                <Text style={styles.timeRemaining}>
-                  {badgeStatus.nextBadgeRequirements.timeRemaining}
-                </Text>
-              </View>
-            )}
+        {/* Status Tiers Information */}
+        <View style={styles.tiersCard}>
+          <View style={styles.tiersHeader}>
+            <Calendar size={20} color={Colors.black} />
+            <Text style={styles.cardTitle}>Status Tiers (Monthly)</Text>
           </View>
-        )}
-
-        {/* Maintenance Info for Badge Holders */}
-        {badgeStatus.maintenanceInfo && (
-          <View style={styles.maintenanceCard}>
-            <Text style={styles.cardTitle}>Badge Maintenance</Text>
-            <Text style={styles.maintenanceText}>
-              To maintain your {badgeStatus.currentBadge} badge, complete {badgeStatus.maintenanceInfo.sessionsNeeded} more sessions by {badgeStatus.maintenanceInfo.yearEnd}.
+          
+          <View style={styles.tiersList}>
+            <View style={[styles.tierItem, statusInfo.currentStatus === 'First User' && styles.activeTier]}>
+              <Text style={[styles.tierName, statusInfo.currentStatus === 'First User' && styles.activeTierText]}>First User</Text>
+              <Text style={[styles.tierRange, statusInfo.currentStatus === 'First User' && styles.activeTierText]}>0–15 sessions</Text>
+            </View>
+            
+            <View style={[styles.tierItem, statusInfo.currentStatus === 'Next User' && styles.activeTier]}>
+              <Text style={[styles.tierName, statusInfo.currentStatus === 'Next User' && styles.activeTierText]}>Next User</Text>
+              <Text style={[styles.tierRange, statusInfo.currentStatus === 'Next User' && styles.activeTierText]}>16–30 sessions</Text>
+            </View>
+            
+            <View style={[styles.tierItem, statusInfo.currentStatus === 'Final User' && styles.activeTier]}>
+              <Text style={[styles.tierName, statusInfo.currentStatus === 'Final User' && styles.activeTierText]}>Final User</Text>
+              <Text style={[styles.tierRange, statusInfo.currentStatus === 'Final User' && styles.activeTierText]}>30+ sessions</Text>
+            </View>
+          </View>
+          
+          <View style={styles.resetInfo}>
+            <Text style={styles.resetText}>
+              Status tiers reset every month, giving you a fresh start to reach higher levels.
             </Text>
-            {badgeStatus.maintenanceInfo.sessionsNeeded === 0 && (
-              <Text style={styles.maintenanceSuccess}>
-                ✅ You&apos;ve met this year&apos;s requirements!
-              </Text>
-            )}
           </View>
-        )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -246,72 +160,37 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.surface,
   },
-
   content: {
     flex: 1,
     padding: 20,
   },
-  badgeCard: {
+  statusCard: {
     backgroundColor: Colors.white,
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    padding: 24,
+    marginBottom: 20,
     shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
-  badgeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  badgeContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeInfo: {
-    marginBottom: 16,
-  },
-  badgeTitle: {
+  statusTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.text,
-    marginBottom: 4,
+    color: Colors.black,
+    marginBottom: 12,
   },
-  badgeSubtitle: {
+  sessionsText: {
     fontSize: 16,
     color: Colors.textSecondary,
-  },
-  benefitsContainer: {
-    backgroundColor: Colors.surface,
-    borderRadius: 12,
-    padding: 16,
-  },
-  benefitsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  benefitText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 4,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   progressCard: {
     backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 20,
-    marginBottom: 16,
+    marginBottom: 20,
     shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -324,116 +203,121 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 16,
   },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.black,
+  },
   progressInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   progressText: {
     fontSize: 16,
-    color: Colors.text,
+    color: Colors.black,
     fontWeight: '500',
   },
   progressPercentage: {
     fontSize: 18,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.black,
   },
   progressBarContainer: {
-    marginBottom: 12,
+    marginBottom: 20,
+    position: 'relative',
   },
   progressBarBackground: {
-    height: 8,
-    backgroundColor: Colors.surface,
-    borderRadius: 4,
-    overflow: 'hidden',
+    height: 12,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 6,
+    position: 'relative',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: Colors.primary,
-    borderRadius: 4,
+    backgroundColor: Colors.black,
+    borderRadius: 6,
+  },
+  marker: {
+    position: 'absolute',
+    top: -8,
+    alignItems: 'center',
+  },
+  markerLine: {
+    width: 2,
+    height: 28,
+    backgroundColor: Colors.textSecondary,
+    marginBottom: 4,
+  },
+  markerText: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '500',
   },
   progressNote: {
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
   },
-  requirementsCard: {
+  tiersCard: {
     backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 20,
-    marginBottom: 16,
+    marginBottom: 20,
     shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
-  requirementsHeader: {
+  tiersHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
     marginBottom: 16,
   },
-  requirementsList: {
+  tiersList: {
     gap: 12,
     marginBottom: 16,
   },
-  requirementItem: {
+  tierItem: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 12,
+    padding: 16,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
-  requirementText: {
+  activeTier: {
+    backgroundColor: Colors.black,
+    borderColor: Colors.black,
+  },
+  tierName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.black,
+  },
+  tierRange: {
     fontSize: 14,
     color: Colors.textSecondary,
-    flex: 1,
-    lineHeight: 20,
+    fontWeight: '500',
   },
-  nextSteps: {
-    backgroundColor: Colors.surface,
+  activeTierText: {
+    color: Colors.white,
+  },
+  resetInfo: {
+    backgroundColor: '#f8f8f8',
     borderRadius: 12,
     padding: 16,
   },
-  nextStepsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  nextStepsText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-    marginBottom: 4,
-  },
-  timeRemaining: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '500',
-  },
-  maintenanceCard: {
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  maintenanceText: {
+  resetText: {
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
-    marginTop: 8,
-  },
-  maintenanceSuccess: {
-    fontSize: 14,
-    color: Colors.success || Colors.primary,
-    fontWeight: '500',
-    marginTop: 8,
+    textAlign: 'center',
   },
   errorContainer: {
     flex: 1,
@@ -443,7 +327,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: Colors.textLight,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
 });
