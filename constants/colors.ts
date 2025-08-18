@@ -1,6 +1,6 @@
 export const Colors = {
-  primary: '#1a365d',
-  primaryLight: '#2d5a87',
+  primary: '#000000',
+  primaryLight: '#333333',
   secondary: '#f56500',
   secondaryLight: '#ff8c42',
   background: '#ffffff',
@@ -17,7 +17,7 @@ export const Colors = {
 };
 
 export const Gradients = {
-  primary: ['#1a365d', '#2d5a87'],
+  primary: ['#000000', '#333333'],
   secondary: ['#f56500', '#ff8c42'],
   surface: ['#f8fafc', '#ffffff'],
 };
