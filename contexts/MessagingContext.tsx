@@ -185,11 +185,51 @@ export const [MessagingProvider, useMessaging] = createContextHook(() => {
     return conversations.reduce((total, conv) => total + conv.unreadCount, 0);
   };
 
+  const getOrCreateConversation = async (
+    participantId: string,
+    participantName: string,
+    participantAvatar?: string
+  ): Promise<string> => {
+    // Check if conversation already exists
+    const existingConv = conversations.find(
+      conv => conv.participantId === participantId
+    );
+
+    if (existingConv) {
+      return existingConv.id;
+    }
+
+    // Create new conversation
+    const newConversation: Conversation = {
+      id: Date.now().toString(),
+      participantId,
+      participantName,
+      participantAvatar,
+      unreadCount: 0,
+      messages: [],
+      lastMessage: {
+        id: 'initial',
+        senderId: '1',
+        senderName: 'You',
+        content: '',
+        timestamp: new Date(),
+        isRead: true,
+      },
+    };
+
+    const updatedConversations = [...conversations, newConversation];
+    setConversations(updatedConversations);
+    await saveConversations(updatedConversations);
+
+    return newConversation.id;
+  };
+
   return {
     conversations,
     isLoading,
     sendMessage,
     markAsRead,
     getTotalUnreadCount,
+    getOrCreateConversation,
   };
 });
