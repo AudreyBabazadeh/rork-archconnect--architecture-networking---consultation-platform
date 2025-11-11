@@ -25,7 +25,6 @@ import {
   Plus,
   CalendarPlus,
   CheckSquare,
-  CalendarOff,
 } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { formatTimeTo12Hour, generateTimeSlots12Hour } from '@/constants/timeUtils';
@@ -324,11 +323,6 @@ export default function ScheduleBuilderScreen() {
   const handleAddTask = () => {
     setShowFABMenu(false);
     router.push('/schedule/add-task');
-  };
-
-  const handleMarkOffDay = () => {
-    setShowFABMenu(false);
-    router.push('/schedule/mark-unavailable');
   };
 
   const navigateMonth = (direction: 'prev' | 'next') => {
@@ -787,17 +781,6 @@ export default function ScheduleBuilderScreen() {
                 <CheckSquare size={20} color={Colors.white} />
               </View>
               <Text style={styles.fabMenuText}>Task</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={styles.fabMenuItem}
-              onPress={handleMarkOffDay}
-              activeOpacity={0.7}
-            >
-              <View style={styles.fabMenuIconContainer}>
-                <CalendarOff size={20} color={Colors.white} />
-              </View>
-              <Text style={styles.fabMenuText}>Unavailability</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
