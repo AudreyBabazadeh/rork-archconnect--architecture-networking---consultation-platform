@@ -435,6 +435,39 @@ export default function ScheduleBuilderScreen() {
     return { top, height };
   };
 
+  const getOverlappingEvents = (events: ScheduleEvent[], currentEvent: ScheduleEvent) => {
+    const currentStart = new Date(`${currentEvent.date}T${currentEvent.time}:00`);
+    const currentEnd = new Date(currentStart.getTime() + currentEvent.duration * 60000);
+
+    return events.filter(event => {
+      if (event.id === currentEvent.id) return true;
+      const eventStart = new Date(`${event.date}T${event.time}:00`);
+      const eventEnd = new Date(eventStart.getTime() + event.duration * 60000);
+
+      return (
+        (currentStart >= eventStart && currentStart < eventEnd) ||
+        (currentEnd > eventStart && currentEnd <= eventEnd) ||
+        (currentStart <= eventStart && currentEnd >= eventEnd)
+      );
+    });
+  };
+
+  const getEventLayout = (event: ScheduleEvent, dayEvents: ScheduleEvent[]) => {
+    const overlapping = getOverlappingEvents(dayEvents, event);
+    const totalOverlapping = overlapping.length;
+    
+    if (totalOverlapping === 1) {
+      return { widthPercent: 100, leftPercent: 0 };
+    }
+
+    const sortedOverlapping = overlapping.sort((a, b) => a.id.localeCompare(b.id));
+    const eventIndex = sortedOverlapping.findIndex(e => e.id === event.id);
+    const widthPercent = 100 / totalOverlapping;
+    const leftPercent = widthPercent * eventIndex;
+
+    return { widthPercent, leftPercent };
+  };
+
   const renderWeekView = () => {
     const startOfWeek = new Date(selectedDate);
     startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
@@ -494,22 +527,29 @@ export default function ScheduleBuilderScreen() {
             ))}
             
             {weekDays.map((day, dayIndex) => {
-              const dayEvents = filteredEvents.filter(event => 
+              const dayEventsForDay = filteredEvents.filter(event => 
                 event.date.startsWith(day.toISOString().split('T')[0])
               );
               
-              return dayEvents.map(event => {
+              return dayEventsForDay.map(event => {
                 const { top, height } = getEventPosition(event.time, event.duration);
+                const { widthPercent, leftPercent } = getEventLayout(event, dayEventsForDay);
                 const isHalfHour = event.duration === 30;
                 const isTask = event.title.startsWith('📋');
+                
+                const columnWidth = (100 - 8.5) / 7;
+                const columnLeft = 60 + (dayIndex * columnWidth);
+                const eventWidth = (columnWidth * widthPercent) / 100;
+                const eventLeft = columnLeft + (columnWidth * leftPercent) / 100;
+                
                 return (
                   <TouchableOpacity
                     key={event.id}
                     style={[
                       styles.weekEventBar,
                       {
-                        left: 60 + (dayIndex * ((100 - 8.5) / 7)) + '%',
-                        width: (100 - 8.5) / 7 + '%',
+                        left: eventLeft + '%',
+                        width: eventWidth + '%',
                         top: top,
                         height: height,
                         backgroundColor: event.type === 'booked-by-me' ? Colors.primary : Colors.success,
@@ -520,7 +560,7 @@ export default function ScheduleBuilderScreen() {
                     <Text style={[styles.weekEventTitle, isHalfHour && { fontSize: 10 }]} numberOfLines={isHalfHour ? 2 : 1}>
                       {event.title}
                     </Text>
-                    {!isHalfHour && (
+                    {!isHalfHour && widthPercent > 50 && (
                       <Text style={styles.weekEventTime} numberOfLines={1}>
                         {formatTimeTo12Hour(event.time)} • {isTask ? event.participantName : event.participantName}
                       </Text>
@@ -567,8 +607,11 @@ export default function ScheduleBuilderScreen() {
             
             {sortedEvents.map(event => {
               const { top, height } = getEventPosition(event.time, event.duration);
+              const { widthPercent, leftPercent } = getEventLayout(event, sortedEvents);
               const isHalfHour = event.duration === 30;
               const isTask = event.title.startsWith('📋');
+              const hasMultipleOverlaps = widthPercent < 100;
+              
               return (
                 <TouchableOpacity
                   key={event.id}
@@ -577,16 +620,18 @@ export default function ScheduleBuilderScreen() {
                     {
                       top: top,
                       height: height,
+                      left: hasMultipleOverlaps ? `${62 + leftPercent * 0.85}%` : 62,
+                      right: hasMultipleOverlaps ? `${8 + (100 - leftPercent - widthPercent) * 0.85}%` : 8,
                       backgroundColor: event.type === 'booked-by-me' ? Colors.primary : Colors.success,
                     }
                   ]}
                   onPress={() => handleEventPress(event)}
                 >
                   <View style={styles.dayEventContent}>
-                    <Text style={[styles.dayEventTitle, isHalfHour && { fontSize: 12, marginBottom: 0 }]} numberOfLines={isHalfHour ? 2 : 1}>
+                    <Text style={[styles.dayEventTitle, (isHalfHour || hasMultipleOverlaps) && { fontSize: 12, marginBottom: 0 }]} numberOfLines={isHalfHour || hasMultipleOverlaps ? 2 : 1}>
                       {event.title}
                     </Text>
-                    {!isHalfHour && (
+                    {!isHalfHour && !hasMultipleOverlaps && (
                       <>
                         <View style={styles.dayEventDetails}>
                           <View style={styles.dayEventParticipant}>
