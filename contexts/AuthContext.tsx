@@ -34,22 +34,22 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const loadStoredUser = useCallback(async () => {
-    try {
-      const storedUser = await AsyncStorage.getItem(STORAGE_KEY);
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error('Error loading stored user:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    const loadStoredUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem(STORAGE_KEY);
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error('Error loading stored user:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     loadStoredUser();
-  }, [loadStoredUser]);
+  }, []);
 
   const signIn = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {

@@ -46,58 +46,61 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { user } = useAuth();
 
-  const loadBookingRequests = async () => {
-    try {
-      const stored = await AsyncStorage.getItem('booking_requests');
-      if (stored) {
-        setBookingRequests(JSON.parse(stored));
-      }
-    } catch (error) {
-      console.error('Error loading booking requests:', error);
-    }
-  };
-
-  const loadNotifications = async () => {
-    try {
-      const stored = await AsyncStorage.getItem('notifications');
-      if (stored) {
-        setNotifications(JSON.parse(stored));
-      }
-    } catch (error) {
-      console.error('Error loading notifications:', error);
-    }
-  };
-
-  const saveBookingRequests = useCallback(async () => {
-    try {
-      await AsyncStorage.setItem('booking_requests', JSON.stringify(bookingRequests));
-    } catch (error) {
-      console.error('Error saving booking requests:', error);
-    }
-  }, [bookingRequests]);
-
-  const saveNotifications = useCallback(async () => {
-    try {
-      await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
-    } catch (error) {
-      console.error('Error saving notifications:', error);
-    }
-  }, [notifications]);
-
-  // Load data from storage
+  // Load data from storage on mount
   useEffect(() => {
+    const loadBookingRequests = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('booking_requests');
+        if (stored) {
+          setBookingRequests(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.error('Error loading booking requests:', error);
+      }
+    };
+
+    const loadNotifications = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('notifications');
+        if (stored) {
+          setNotifications(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+      }
+    };
+    
     loadBookingRequests();
     loadNotifications();
   }, []);
 
-  // Save data to storage whenever it changes
+  // Save booking requests to storage whenever they change (skip initial render)
   useEffect(() => {
-    saveBookingRequests();
-  }, [saveBookingRequests]);
+    if (bookingRequests.length > 0 || bookingRequests.length === 0) {
+      const save = async () => {
+        try {
+          await AsyncStorage.setItem('booking_requests', JSON.stringify(bookingRequests));
+        } catch (error) {
+          console.error('Error saving booking requests:', error);
+        }
+      };
+      save();
+    }
+  }, [bookingRequests]);
 
+  // Save notifications to storage whenever they change (skip initial render)
   useEffect(() => {
-    saveNotifications();
-  }, [saveNotifications]);
+    if (notifications.length > 0 || notifications.length === 0) {
+      const save = async () => {
+        try {
+          await AsyncStorage.setItem('notifications', JSON.stringify(notifications));
+        } catch (error) {
+          console.error('Error saving notifications:', error);
+        }
+      };
+      save();
+    }
+  }, [notifications]);
 
   const generateId = () => {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);

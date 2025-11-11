@@ -98,39 +98,39 @@ export const [MessagingProvider, useMessaging] = createContextHook(() => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const loadConversations = async () => {
+      try {
+        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          // Convert timestamp strings back to Date objects
+          const conversationsWithDates = parsed.map((conv: any) => ({
+            ...conv,
+            lastMessage: {
+              ...conv.lastMessage,
+              timestamp: new Date(conv.lastMessage.timestamp),
+            },
+            messages: conv.messages.map((msg: any) => ({
+              ...msg,
+              timestamp: new Date(msg.timestamp),
+            })),
+          }));
+          setConversations(conversationsWithDates);
+        } else {
+          // First time, use mock data
+          setConversations(mockConversations);
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(mockConversations));
+        }
+      } catch (error) {
+        console.error('Error loading conversations:', error);
+        setConversations(mockConversations);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     loadConversations();
   }, []);
-
-  const loadConversations = async () => {
-    try {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // Convert timestamp strings back to Date objects
-        const conversationsWithDates = parsed.map((conv: any) => ({
-          ...conv,
-          lastMessage: {
-            ...conv.lastMessage,
-            timestamp: new Date(conv.lastMessage.timestamp),
-          },
-          messages: conv.messages.map((msg: any) => ({
-            ...msg,
-            timestamp: new Date(msg.timestamp),
-          })),
-        }));
-        setConversations(conversationsWithDates);
-      } else {
-        // First time, use mock data
-        setConversations(mockConversations);
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(mockConversations));
-      }
-    } catch (error) {
-      console.error('Error loading conversations:', error);
-      setConversations(mockConversations);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const saveConversations = async (newConversations: Conversation[]) => {
     try {

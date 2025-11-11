@@ -52,29 +52,37 @@ const STORAGE_KEY = '@schedule_items';
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    const loadScheduleItems = async () => {
+      try {
+        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          setScheduleItems(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.error('Failed to load schedule items:', error);
+      } finally {
+        setIsInitialized(true);
+      }
+    };
+    
     loadScheduleItems();
   }, []);
 
-  const loadScheduleItems = async () => {
-    try {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setScheduleItems(JSON.parse(stored));
-      }
-    } catch (error) {
-      console.error('Failed to load schedule items:', error);
+  useEffect(() => {
+    if (isInitialized) {
+      const saveScheduleItems = async () => {
+        try {
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(scheduleItems));
+        } catch (error) {
+          console.error('Failed to save schedule items:', error);
+        }
+      };
+      saveScheduleItems();
     }
-  };
-
-  const saveScheduleItems = async (items: ScheduleItem[]) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch (error) {
-      console.error('Failed to save schedule items:', error);
-    }
-  };
+  }, [scheduleItems, isInitialized]);
 
   const addEvent = useCallback((event: Omit<Event, 'id' | 'type'>) => {
     const newEvent: Event = {
@@ -82,11 +90,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       type: 'event',
     };
-    setScheduleItems((prev) => {
-      const updatedItems = [...prev, newEvent];
-      saveScheduleItems(updatedItems);
-      return updatedItems;
-    });
+    setScheduleItems((prev) => [...prev, newEvent]);
   }, []);
 
   const addTask = useCallback((task: Omit<Task, 'id' | 'type' | 'completed'>) => {
@@ -96,11 +100,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
       type: 'task',
       completed: false,
     };
-    setScheduleItems((prev) => {
-      const updatedItems = [...prev, newTask];
-      saveScheduleItems(updatedItems);
-      return updatedItems;
-    });
+    setScheduleItems((prev) => [...prev, newTask]);
   }, []);
 
   const addUnavailablePeriod = useCallback((period: Omit<UnavailablePeriod, 'id' | 'type'>) => {
@@ -109,32 +109,22 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       type: 'unavailable',
     };
-    setScheduleItems((prev) => {
-      const updatedItems = [...prev, newPeriod];
-      saveScheduleItems(updatedItems);
-      return updatedItems;
-    });
+    setScheduleItems((prev) => [...prev, newPeriod]);
   }, []);
 
   const toggleTaskComplete = useCallback((taskId: string) => {
-    setScheduleItems((prev) => {
-      const updatedItems = prev.map((item) => {
+    setScheduleItems((prev) => 
+      prev.map((item) => {
         if (item.id === taskId && item.type === 'task') {
           return { ...item, completed: !item.completed };
         }
         return item;
-      });
-      saveScheduleItems(updatedItems);
-      return updatedItems;
-    });
+      })
+    );
   }, []);
 
   const deleteScheduleItem = useCallback((itemId: string) => {
-    setScheduleItems((prev) => {
-      const updatedItems = prev.filter((item) => item.id !== itemId);
-      saveScheduleItems(updatedItems);
-      return updatedItems;
-    });
+    setScheduleItems((prev) => prev.filter((item) => item.id !== itemId));
   }, []);
 
   const value = useMemo(
