@@ -22,6 +22,99 @@ export default function AddTaskScreen() {
   const [description, setDescription] = useState<string>('');
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
 
+  const handleDateSelect = (selectedDate: string) => {
+    setDate(selectedDate);
+    setShowDatePicker(false);
+  };
+
+  const renderCalendar = () => {
+    const currentDate = new Date(date);
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days = [];
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(i);
+    }
+
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    return (
+      <View style={styles.calendarContainer}>
+        <View style={styles.calendarHeader}>
+          <TouchableOpacity
+            onPress={() => {
+              const newDate = new Date(year, month - 1, 1);
+              setDate(newDate.toISOString().split('T')[0]);
+            }}
+            style={styles.calendarNavButton}
+          >
+            <Text style={styles.calendarNavText}>{'<'}</Text>
+          </TouchableOpacity>
+          <Text style={styles.calendarMonth}>
+            {monthNames[month]} {year}
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              const newDate = new Date(year, month + 1, 1);
+              setDate(newDate.toISOString().split('T')[0]);
+            }}
+            style={styles.calendarNavButton}
+          >
+            <Text style={styles.calendarNavText}>{'>'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.calendarDaysHeader}>
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            <Text key={day} style={styles.calendarDayLabel}>
+              {day}
+            </Text>
+          ))}
+        </View>
+
+        <View style={styles.calendarDaysGrid}>
+          {days.map((day, index) => {
+            if (day === null) {
+              return <View key={`empty-${index}`} style={styles.calendarDay} />;
+            }
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isSelected = dateStr === date;
+            const isToday = dateStr === new Date().toISOString().split('T')[0];
+            return (
+              <TouchableOpacity
+                key={day}
+                style={[
+                  styles.calendarDay,
+                  isSelected && styles.calendarDaySelected,
+                  isToday && !isSelected && styles.calendarDayToday,
+                ]}
+                onPress={() => handleDateSelect(dateStr)}
+              >
+                <Text
+                  style={[
+                    styles.calendarDayText,
+                    isSelected && styles.calendarDayTextSelected,
+                    isToday && !isSelected && styles.calendarDayTextToday,
+                  ]}
+                >
+                  {day}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
   const handleSave = () => {
     if (!title.trim()) {
       Alert.alert('Required', 'Please enter a task title');
@@ -93,6 +186,8 @@ export default function AddTaskScreen() {
               })}
             </Text>
           </TouchableOpacity>
+
+          {showDatePicker && renderCalendar()}
         </View>
 
         <View style={styles.section}>
@@ -335,5 +430,76 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.white,
+  },
+  calendarContainer: {
+    marginTop: 12,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    padding: 16,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  calendarNavButton: {
+    padding: 8,
+  },
+  calendarNavText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  calendarMonth: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  calendarDaysHeader: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  calendarDayLabel: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  calendarDaysGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  calendarDay: {
+    width: '14.28%',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+  },
+  calendarDaySelected: {
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+  },
+  calendarDayToday: {
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: 8,
+  },
+  calendarDayText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  calendarDayTextSelected: {
+    color: Colors.white,
+    fontWeight: '600',
+  },
+  calendarDayTextToday: {
+    color: Colors.primary,
+    fontWeight: '600',
   },
 });

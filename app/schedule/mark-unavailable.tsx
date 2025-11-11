@@ -25,6 +25,106 @@ export default function MarkUnavailableScreen() {
   const [reason, setReason] = useState<string>('');
   const [showStartTimePicker, setShowStartTimePicker] = useState<boolean>(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState<boolean>(false);
+  const [showStartDatePicker, setShowStartDatePicker] = useState<boolean>(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState<boolean>(false);
+
+  const handleStartDateSelect = (selectedDate: string) => {
+    setStartDate(selectedDate);
+    setShowStartDatePicker(false);
+  };
+
+  const handleEndDateSelect = (selectedDate: string) => {
+    setEndDate(selectedDate);
+    setShowEndDatePicker(false);
+  };
+
+  const renderCalendar = (date: string, onSelectDate: (date: string) => void, onChangeMonth: (date: string) => void) => {
+    const currentDate = new Date(date);
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days = [];
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(i);
+    }
+
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    return (
+      <View style={styles.calendarContainer}>
+        <View style={styles.calendarHeader}>
+          <TouchableOpacity
+            onPress={() => {
+              const newDate = new Date(year, month - 1, 1);
+              onChangeMonth(newDate.toISOString().split('T')[0]);
+            }}
+            style={styles.calendarNavButton}
+          >
+            <Text style={styles.calendarNavText}>{'<'}</Text>
+          </TouchableOpacity>
+          <Text style={styles.calendarMonth}>
+            {monthNames[month]} {year}
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              const newDate = new Date(year, month + 1, 1);
+              onChangeMonth(newDate.toISOString().split('T')[0]);
+            }}
+            style={styles.calendarNavButton}
+          >
+            <Text style={styles.calendarNavText}>{'>'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.calendarDaysHeader}>
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            <Text key={day} style={styles.calendarDayLabel}>
+              {day}
+            </Text>
+          ))}
+        </View>
+
+        <View style={styles.calendarDaysGrid}>
+          {days.map((day, index) => {
+            if (day === null) {
+              return <View key={`empty-${index}`} style={styles.calendarDay} />;
+            }
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isSelected = dateStr === date;
+            const isToday = dateStr === new Date().toISOString().split('T')[0];
+            return (
+              <TouchableOpacity
+                key={day}
+                style={[
+                  styles.calendarDay,
+                  isSelected && styles.calendarDaySelected,
+                  isToday && !isSelected && styles.calendarDayToday,
+                ]}
+                onPress={() => onSelectDate(dateStr)}
+              >
+                <Text
+                  style={[
+                    styles.calendarDayText,
+                    isSelected && styles.calendarDayTextSelected,
+                    isToday && !isSelected && styles.calendarDayTextToday,
+                  ]}
+                >
+                  {day}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
 
   const handleSave = () => {
     if (!startDate) {
@@ -180,7 +280,10 @@ export default function MarkUnavailableScreen() {
         {durationType === 'full-day' && (
           <View style={styles.section}>
             <Text style={styles.label}>Date *</Text>
-            <TouchableOpacity style={styles.inputButton}>
+            <TouchableOpacity
+              style={styles.inputButton}
+              onPress={() => setShowStartDatePicker(!showStartDatePicker)}
+            >
               <Calendar size={20} color={Colors.textSecondary} />
               <Text style={styles.inputButtonText}>
                 {new Date(startDate).toLocaleDateString('en-US', {
@@ -191,6 +294,8 @@ export default function MarkUnavailableScreen() {
                 })}
               </Text>
             </TouchableOpacity>
+
+            {showStartDatePicker && renderCalendar(startDate, handleStartDateSelect, setStartDate)}
           </View>
         )}
 
@@ -198,7 +303,10 @@ export default function MarkUnavailableScreen() {
           <>
             <View style={styles.section}>
               <Text style={styles.label}>Date *</Text>
-              <TouchableOpacity style={styles.inputButton}>
+              <TouchableOpacity
+                style={styles.inputButton}
+                onPress={() => setShowStartDatePicker(!showStartDatePicker)}
+              >
                 <Calendar size={20} color={Colors.textSecondary} />
                 <Text style={styles.inputButtonText}>
                   {new Date(startDate).toLocaleDateString('en-US', {
@@ -209,6 +317,8 @@ export default function MarkUnavailableScreen() {
                   })}
                 </Text>
               </TouchableOpacity>
+
+              {showStartDatePicker && renderCalendar(startDate, handleStartDateSelect, setStartDate)}
             </View>
 
             <View style={styles.section}>
@@ -239,7 +349,13 @@ export default function MarkUnavailableScreen() {
             <View style={styles.dateRangeContainer}>
               <View style={styles.dateRangeItem}>
                 <Text style={styles.dateRangeLabel}>Start Date</Text>
-                <TouchableOpacity style={styles.inputButton}>
+                <TouchableOpacity
+                  style={styles.inputButton}
+                  onPress={() => {
+                    setShowStartDatePicker(!showStartDatePicker);
+                    setShowEndDatePicker(false);
+                  }}
+                >
                   <Calendar size={20} color={Colors.textSecondary} />
                   <Text style={styles.inputButtonText}>
                     {new Date(startDate).toLocaleDateString('en-US', {
@@ -248,11 +364,18 @@ export default function MarkUnavailableScreen() {
                     })}
                   </Text>
                 </TouchableOpacity>
+                {showStartDatePicker && renderCalendar(startDate, handleStartDateSelect, setStartDate)}
               </View>
 
               <View style={styles.dateRangeItem}>
                 <Text style={styles.dateRangeLabel}>End Date</Text>
-                <TouchableOpacity style={styles.inputButton}>
+                <TouchableOpacity
+                  style={styles.inputButton}
+                  onPress={() => {
+                    setShowEndDatePicker(!showEndDatePicker);
+                    setShowStartDatePicker(false);
+                  }}
+                >
                   <Calendar size={20} color={Colors.textSecondary} />
                   <Text style={styles.inputButtonText}>
                     {new Date(endDate).toLocaleDateString('en-US', {
@@ -261,6 +384,7 @@ export default function MarkUnavailableScreen() {
                     })}
                   </Text>
                 </TouchableOpacity>
+                {showEndDatePicker && renderCalendar(endDate, handleEndDateSelect, setEndDate)}
               </View>
             </View>
           </View>
@@ -585,5 +709,76 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.white,
+  },
+  calendarContainer: {
+    marginTop: 12,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    padding: 16,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  calendarNavButton: {
+    padding: 8,
+  },
+  calendarNavText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  calendarMonth: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  calendarDaysHeader: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  calendarDayLabel: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textSecondary,
+  },
+  calendarDaysGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  calendarDay: {
+    width: '14.28%',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+  },
+  calendarDaySelected: {
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+  },
+  calendarDayToday: {
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: 8,
+  },
+  calendarDayText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.text,
+  },
+  calendarDayTextSelected: {
+    color: Colors.white,
+    fontWeight: '600',
+  },
+  calendarDayTextToday: {
+    color: Colors.primary,
+    fontWeight: '600',
   },
 });
