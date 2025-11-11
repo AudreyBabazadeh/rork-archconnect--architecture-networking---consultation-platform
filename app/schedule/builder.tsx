@@ -22,6 +22,10 @@ import {
   RotateCcw,
   X,
   Video,
+  Plus,
+  CalendarPlus,
+  CheckSquare,
+  CalendarOff,
 } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { formatTimeTo12Hour, generateTimeSlots12Hour } from '@/constants/timeUtils';
@@ -189,6 +193,7 @@ export default function ScheduleBuilderScreen() {
   const [filter, setFilter] = useState<FilterType>('all');
   const [selectedEvent, setSelectedEvent] = useState<ScheduleEvent | null>(null);
   const [showEventDetails, setShowEventDetails] = useState<boolean>(false);
+  const [showFABMenu, setShowFABMenu] = useState<boolean>(false);
   
   const { bookingRequests } = useBooking();
   const { user } = useAuth();
@@ -236,6 +241,21 @@ export default function ScheduleBuilderScreen() {
   const handleEventPress = (event: ScheduleEvent) => {
     setSelectedEvent(event);
     setShowEventDetails(true);
+  };
+
+  const handleAddEvent = () => {
+    setShowFABMenu(false);
+    Alert.alert('Add Event', 'Event creation coming soon');
+  };
+
+  const handleAddTask = () => {
+    setShowFABMenu(false);
+    Alert.alert('Add Task', 'Task creation coming soon');
+  };
+
+  const handleMarkOffDay = () => {
+    setShowFABMenu(false);
+    Alert.alert('Mark Off Day', 'Off day marking coming soon');
   };
 
   const navigateMonth = (direction: 'prev' | 'next') => {
@@ -604,6 +624,61 @@ export default function ScheduleBuilderScreen() {
         event={selectedEvent}
         onClose={() => setShowEventDetails(false)}
       />
+      
+      {showFABMenu && (
+        <TouchableOpacity 
+          style={styles.fabOverlay} 
+          activeOpacity={1}
+          onPress={() => setShowFABMenu(false)}
+        >
+          <View style={styles.fabMenu}>
+            <TouchableOpacity 
+              style={styles.fabMenuItem}
+              onPress={handleAddEvent}
+              activeOpacity={0.7}
+            >
+              <View style={styles.fabMenuIconContainer}>
+                <CalendarPlus size={20} color={Colors.white} />
+              </View>
+              <Text style={styles.fabMenuText}>Event</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.fabMenuItem}
+              onPress={handleAddTask}
+              activeOpacity={0.7}
+            >
+              <View style={styles.fabMenuIconContainer}>
+                <CheckSquare size={20} color={Colors.white} />
+              </View>
+              <Text style={styles.fabMenuText}>Task</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.fabMenuItem}
+              onPress={handleMarkOffDay}
+              activeOpacity={0.7}
+            >
+              <View style={styles.fabMenuIconContainer}>
+                <CalendarOff size={20} color={Colors.white} />
+              </View>
+              <Text style={styles.fabMenuText}>Out of office</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      )}
+      
+      <TouchableOpacity 
+        style={styles.fab}
+        onPress={() => setShowFABMenu(!showFABMenu)}
+        activeOpacity={0.8}
+      >
+        <Plus 
+          size={28} 
+          color={Colors.white} 
+          style={[styles.fabIcon, showFABMenu && styles.fabIconRotated]} 
+        />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -1213,5 +1288,73 @@ const styles = StyleSheet.create({
   },
   eventDetails: {
     marginTop: 16,
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  fabIcon: {
+    transform: [{ rotate: '0deg' }],
+  },
+  fabIconRotated: {
+    transform: [{ rotate: '45deg' }],
+  },
+  fabOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingRight: 20,
+    paddingBottom: 100,
+  },
+  fabMenu: {
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  fabMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    minWidth: 180,
+  },
+  fabMenuIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  fabMenuText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.text,
   },
 });
