@@ -160,28 +160,7 @@ export default function AddEventScreen() {
     if (hasConflict && conflictingItem) {
       Alert.alert(
         'Time Conflict',
-        `You already have "${conflictingItem.title}" scheduled at this time. Do you want to add this event anyway?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Add Anyway',
-            onPress: () => {
-              addEvent({
-                title,
-                date,
-                time,
-                duration: parseInt(duration) || 60,
-                location: location || undefined,
-                description: description || undefined,
-              });
-              Alert.alert(
-                'Event Created',
-                `${title} has been added to your schedule on ${new Date(date).toLocaleDateString()}`,
-                [{ text: 'OK', onPress: () => router.back() }]
-              );
-            },
-          },
-        ]
+        `You already have "${conflictingItem.title}" scheduled at this time. Please pick another time.`
       );
       return;
     }

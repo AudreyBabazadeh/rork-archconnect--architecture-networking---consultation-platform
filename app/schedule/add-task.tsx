@@ -214,28 +214,7 @@ export default function AddTaskScreen() {
     if (hasConflict && conflictingItem) {
       Alert.alert(
         'Time Conflict',
-        `You already have "${conflictingItem.title}" scheduled at this time. Do you want to add this task anyway?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Add Anyway',
-            onPress: () => {
-              addTask({
-                title,
-                date,
-                priority,
-                description: description || undefined,
-                time: hasSpecificTime ? time : undefined,
-                duration: hasSpecificTime ? parseInt(duration) : undefined,
-              });
-              Alert.alert(
-                'Task Created',
-                `${title} has been added to your tasks for ${new Date(date).toLocaleDateString()}`,
-                [{ text: 'OK', onPress: () => router.back() }]
-              );
-            },
-          },
-        ]
+        `You already have "${conflictingItem.title}" scheduled at this time. Please pick another time.`
       );
       return;
     }
