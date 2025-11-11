@@ -415,7 +415,6 @@ export default function ScheduleBuilderScreen() {
   };
 
   const getEventPosition = (eventTime: string, duration: number) => {
-    // Convert 24-hour time to minutes from 6 AM
     const [hours, minutes] = eventTime.split(':').map(Number);
     const startMinutes = (hours - 6) * 60 + minutes;
     const slotHeight = 30;
@@ -497,8 +496,8 @@ export default function ScheduleBuilderScreen() {
                       {
                         left: 60 + (dayIndex * ((100 - 8.5) / 7)) + '%',
                         width: (100 - 8.5) / 7 + '%',
-                        top: top + 40,
-                        height: Math.max(height, 30),
+                        top: top,
+                        height: height,
                         backgroundColor: event.type === 'booked-by-me' ? Colors.primary : Colors.success,
                       }
                     ]}
@@ -558,8 +557,8 @@ export default function ScheduleBuilderScreen() {
                   style={[
                     styles.dayEventBar,
                     {
-                      top: top + 20,
-                      height: Math.max(height, 60),
+                      top: top,
+                      height: height,
                       backgroundColor: event.type === 'booked-by-me' ? Colors.primary : Colors.success,
                     }
                   ]}
