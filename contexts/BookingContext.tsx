@@ -41,10 +41,67 @@ interface BookingContextType {
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
+const SAMPLE_ACCEPTED_BOOKING_ID = 'sample-accepted-booking-001';
+
 export function BookingProvider({ children }: { children: React.ReactNode }) {
   const [bookingRequests, setBookingRequests] = useState<BookingRequest[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const { user } = useAuth();
+  const [sampleDataAdded, setSampleDataAdded] = useState(false);
+
+  // Add sample accepted booking for demonstration
+  useEffect(() => {
+    if (user && !sampleDataAdded) {
+      setSampleDataAdded(true);
+      
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      
+      const nextWeek = new Date();
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      const nextWeekStr = nextWeek.toISOString().split('T')[0];
+      
+      const sampleBookings: BookingRequest[] = [
+        {
+          id: SAMPLE_ACCEPTED_BOOKING_ID,
+          mentorId: user.id === '1' ? '2' : '1',
+          mentorName: user.id === '1' ? 'Sarah Johnson' : user.name,
+          studentId: user.id === '1' ? user.id : '2',
+          studentName: user.id === '1' ? user.name : 'Sarah Johnson',
+          topic: 'Technical Help',
+          date: tomorrowStr,
+          time: '10:00',
+          description: 'Software and technical assistance',
+          amount: 75,
+          status: 'accepted',
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: 'sample-accepted-booking-002',
+          mentorId: user.id === '1' ? '3' : '1',
+          mentorName: user.id === '1' ? 'Michael Chen' : user.name,
+          studentId: user.id === '1' ? user.id : '3',
+          studentName: user.id === '1' ? user.name : 'Michael Chen',
+          topic: 'Career Advice',
+          date: nextWeekStr,
+          time: '14:00',
+          description: 'Professional development discussion',
+          amount: 25,
+          status: 'accepted',
+          createdAt: new Date().toISOString(),
+        },
+      ];
+      
+      setBookingRequests(prev => {
+        const hasExistingSample = prev.some(req => req.id === SAMPLE_ACCEPTED_BOOKING_ID);
+        if (!hasExistingSample) {
+          return [...prev, ...sampleBookings];
+        }
+        return prev;
+      });
+    }
+  }, [user, sampleDataAdded]);
 
   // Load data from storage on mount
   useEffect(() => {
