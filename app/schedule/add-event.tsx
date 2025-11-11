@@ -16,7 +16,7 @@ import { formatTimeTo12Hour } from '@/constants/timeUtils';
 import { useSchedule } from '@/contexts/ScheduleContext';
 
 export default function AddEventScreen() {
-  const { addEvent } = useSchedule();
+  const { addEvent, scheduleItems } = useSchedule();
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState<string>('09:00');
@@ -119,6 +119,32 @@ export default function AddEventScreen() {
   };
   const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
 
+  const checkForConflicts = () => {
+    const eventStart = new Date(`${date}T${time}:00`);
+    const eventEnd = new Date(eventStart.getTime() + (parseInt(duration) || 60) * 60000);
+
+    for (const item of scheduleItems) {
+      if (item.type === 'event' || (item.type === 'task' && item.time)) {
+        if (item.date === date) {
+          const itemTime = item.type === 'event' ? item.time : item.time!;
+          const itemStart = new Date(`${item.date}T${itemTime}:00`);
+          const itemDuration = item.type === 'event' ? item.duration : (item.duration || 0);
+          const itemEnd = new Date(itemStart.getTime() + itemDuration * 60000);
+
+          if (
+            (eventStart >= itemStart && eventStart < itemEnd) ||
+            (eventEnd > itemStart && eventEnd <= itemEnd) ||
+            (eventStart <= itemStart && eventEnd >= itemEnd)
+          ) {
+            return { hasConflict: true, conflictingItem: item };
+          }
+        }
+      }
+    }
+
+    return { hasConflict: false, conflictingItem: null };
+  };
+
   const handleSave = () => {
     if (!title.trim()) {
       Alert.alert('Required', 'Please enter an event title');
@@ -127,6 +153,36 @@ export default function AddEventScreen() {
 
     if (!date) {
       Alert.alert('Required', 'Please select a date');
+      return;
+    }
+
+    const { hasConflict, conflictingItem } = checkForConflicts();
+    if (hasConflict && conflictingItem) {
+      Alert.alert(
+        'Time Conflict',
+        `You already have "${conflictingItem.title}" scheduled at this time. Do you want to add this event anyway?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Add Anyway',
+            onPress: () => {
+              addEvent({
+                title,
+                date,
+                time,
+                duration: parseInt(duration) || 60,
+                location: location || undefined,
+                description: description || undefined,
+              });
+              Alert.alert(
+                'Event Created',
+                `${title} has been added to your schedule on ${new Date(date).toLocaleDateString()}`,
+                [{ text: 'OK', onPress: () => router.back() }]
+              );
+            },
+          },
+        ]
+      );
       return;
     }
 

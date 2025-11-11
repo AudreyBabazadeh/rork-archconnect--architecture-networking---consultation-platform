@@ -18,7 +18,7 @@ import { useSchedule } from '@/contexts/ScheduleContext';
 type Priority = 'low' | 'medium' | 'high';
 
 export default function AddTaskScreen() {
-  const { addTask } = useSchedule();
+  const { addTask, scheduleItems } = useSchedule();
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [hasSpecificTime, setHasSpecificTime] = useState<boolean>(false);
@@ -164,6 +164,36 @@ export default function AddTaskScreen() {
     );
   };
 
+  const checkForConflicts = () => {
+    if (!hasSpecificTime || !time) {
+      return { hasConflict: false, conflictingItem: null };
+    }
+
+    const taskStart = new Date(`${date}T${time}:00`);
+    const taskEnd = new Date(taskStart.getTime() + (parseInt(duration) || 0) * 60000);
+
+    for (const item of scheduleItems) {
+      if (item.type === 'event' || (item.type === 'task' && item.time)) {
+        if (item.date === date) {
+          const itemTime = item.type === 'event' ? item.time : item.time!;
+          const itemStart = new Date(`${item.date}T${itemTime}:00`);
+          const itemDuration = item.type === 'event' ? item.duration : (item.duration || 0);
+          const itemEnd = new Date(itemStart.getTime() + itemDuration * 60000);
+
+          if (
+            (taskStart >= itemStart && taskStart < itemEnd) ||
+            (taskEnd > itemStart && taskEnd <= itemEnd) ||
+            (taskStart <= itemStart && taskEnd >= itemEnd)
+          ) {
+            return { hasConflict: true, conflictingItem: item };
+          }
+        }
+      }
+    }
+
+    return { hasConflict: false, conflictingItem: null };
+  };
+
   const handleSave = () => {
     if (!title.trim()) {
       Alert.alert('Required', 'Please enter a task title');
@@ -177,6 +207,36 @@ export default function AddTaskScreen() {
 
     if (hasSpecificTime && (!time || !duration)) {
       Alert.alert('Required', 'Please select time and duration');
+      return;
+    }
+
+    const { hasConflict, conflictingItem } = checkForConflicts();
+    if (hasConflict && conflictingItem) {
+      Alert.alert(
+        'Time Conflict',
+        `You already have "${conflictingItem.title}" scheduled at this time. Do you want to add this task anyway?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Add Anyway',
+            onPress: () => {
+              addTask({
+                title,
+                date,
+                priority,
+                description: description || undefined,
+                time: hasSpecificTime ? time : undefined,
+                duration: hasSpecificTime ? parseInt(duration) : undefined,
+              });
+              Alert.alert(
+                'Task Created',
+                `${title} has been added to your tasks for ${new Date(date).toLocaleDateString()}`,
+                [{ text: 'OK', onPress: () => router.back() }]
+              );
+            },
+          },
+        ]
+      );
       return;
     }
 
