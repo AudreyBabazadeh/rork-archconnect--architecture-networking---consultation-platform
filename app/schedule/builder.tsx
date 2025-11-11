@@ -273,7 +273,7 @@ export default function ScheduleBuilderScreen() {
               ? (parseInt(period.endTime.split(':')[0]) * 60 + parseInt(period.endTime.split(':')[1])) - 
                 (parseInt(period.startTime.split(':')[0]) * 60 + parseInt(period.startTime.split(':')[1]))
               : 1440,
-            participantName: 'Out of Office',
+            participantName: 'Unavailability',
             type: 'booked-by-me',
             amount: 0,
             description: period.reason,
@@ -797,7 +797,7 @@ export default function ScheduleBuilderScreen() {
               <View style={styles.fabMenuIconContainer}>
                 <CalendarOff size={20} color={Colors.white} />
               </View>
-              <Text style={styles.fabMenuText}>Out of office</Text>
+              <Text style={styles.fabMenuText}>Unavailability</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>

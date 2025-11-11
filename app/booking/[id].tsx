@@ -5,11 +5,12 @@ import { Plus } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { Colors } from '@/constants/colors';
-import { formatTimeTo24Hour } from '@/constants/timeUtils';
+import { formatTimeTo24Hour, formatTimeTo12Hour } from '@/constants/timeUtils';
 import { Topic } from '@/types/user';
 import { getFilteredSuggestions } from '@/constants/topicSuggestions';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBooking } from '@/contexts/BookingContext';
+import { useSchedule } from '@/contexts/ScheduleContext';
 
 const defaultTopics: Topic[] = [
   { id: 'portfolio', name: 'Portfolio Review', duration: 60, description: 'Comprehensive review of your work', price: 50, isActive: true },
@@ -27,6 +28,7 @@ export default function BookingScreen() {
   const router = useRouter();
   const { getUserById, user } = useAuth();
   const { sendBookingRequest } = useBooking();
+  const { isTimeUnavailable } = useSchedule();
   const [consultant, setConsultant] = useState<any>(null);
   const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
@@ -198,6 +200,15 @@ export default function BookingScreen() {
 
     if (!user) {
       Alert.alert('Error', 'You must be logged in to book a session.');
+      return;
+    }
+
+    const time24 = formatTimeTo24Hour(selectedTime);
+    if (isTimeUnavailable(consultant.id, selectedDate, time24)) {
+      Alert.alert(
+        'Time Unavailable',
+        `${consultant.name} has marked ${formatTimeTo12Hour(time24)} on ${new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} as unavailable. Please select another time.`
+      );
       return;
     }
 

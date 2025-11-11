@@ -163,7 +163,7 @@ export default function MarkUnavailableScreen() {
       ).toLocaleDateString()} to ${new Date(endDate).toLocaleDateString()}`;
     }
 
-    Alert.alert('Out of Office Set', message, [{ text: 'OK', onPress: () => router.back() }]);
+    Alert.alert('Unavailability Set', message, [{ text: 'OK', onPress: () => router.back() }]);
   };
 
   const durationTypes: { value: DurationType; label: string; description: string }[] = [
@@ -186,7 +186,7 @@ export default function MarkUnavailableScreen() {
 
   const commonReasons = [
     'Vacation',
-    'Out of office',
+    'Unavailability',
     'Personal time',
     'Business trip',
     'Meeting',
@@ -253,7 +253,7 @@ export default function MarkUnavailableScreen() {
           <View style={styles.iconCircle}>
             <CalendarOff size={32} color={Colors.primary} />
           </View>
-          <Text style={styles.iconHeaderText}>Mark out of office</Text>
+          <Text style={styles.iconHeaderText}>Mark unavailability</Text>
           <Text style={styles.iconHeaderSubtext}>
             Block time when you're unavailable for bookings
           </Text>

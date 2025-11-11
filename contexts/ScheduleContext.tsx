@@ -44,6 +44,7 @@ interface ScheduleContextType {
   addUnavailablePeriod: (period: Omit<UnavailablePeriod, 'id' | 'type'>) => void;
   toggleTaskComplete: (taskId: string) => void;
   deleteScheduleItem: (itemId: string) => void;
+  isTimeUnavailable: (userId: string, date: string, time: string) => boolean;
 }
 
 const ScheduleContext = createContext<ScheduleContextType | undefined>(undefined);
@@ -127,6 +128,40 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     setScheduleItems((prev) => prev.filter((item) => item.id !== itemId));
   }, []);
 
+  const isTimeUnavailable = useCallback((userId: string, date: string, time: string) => {
+    const unavailablePeriods = scheduleItems.filter(
+      (item): item is UnavailablePeriod => item.type === 'unavailable'
+    );
+
+    for (const period of unavailablePeriods) {
+      const periodStart = new Date(period.startDate);
+      const periodEnd = period.endDate ? new Date(period.endDate) : periodStart;
+      const checkDate = new Date(date);
+
+      if (checkDate >= periodStart && checkDate <= periodEnd) {
+        if (period.durationType === 'full-day') {
+          return true;
+        }
+
+        if (period.durationType === 'partial-day' && period.startTime && period.endTime) {
+          const [checkHour, checkMinute] = time.split(':').map(Number);
+          const [startHour, startMinute] = period.startTime.split(':').map(Number);
+          const [endHour, endMinute] = period.endTime.split(':').map(Number);
+
+          const checkMinutes = checkHour * 60 + checkMinute;
+          const startMinutes = startHour * 60 + startMinute;
+          const endMinutes = endHour * 60 + endMinute;
+
+          if (checkMinutes >= startMinutes && checkMinutes < endMinutes) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }, [scheduleItems]);
+
   const value = useMemo(
     () => ({
       scheduleItems,
@@ -135,8 +170,9 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
       addUnavailablePeriod,
       toggleTaskComplete,
       deleteScheduleItem,
+      isTimeUnavailable,
     }),
-    [scheduleItems, addEvent, addTask, addUnavailablePeriod, toggleTaskComplete, deleteScheduleItem]
+    [scheduleItems, addEvent, addTask, addUnavailablePeriod, toggleTaskComplete, deleteScheduleItem, isTimeUnavailable]
   );
 
   return (
