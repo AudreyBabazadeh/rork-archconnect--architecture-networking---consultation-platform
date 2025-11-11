@@ -12,9 +12,11 @@ import {
 import { Stack, router } from 'expo-router';
 import { Calendar, Clock, MapPin, AlignLeft, Save } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
-import { formatTimeTo12Hour, formatTimeTo24Hour } from '@/constants/timeUtils';
+import { formatTimeTo12Hour } from '@/constants/timeUtils';
+import { useSchedule } from '@/contexts/ScheduleContext';
 
 export default function AddEventScreen() {
+  const { addEvent } = useSchedule();
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState<string>('09:00');
@@ -127,6 +129,15 @@ export default function AddEventScreen() {
       Alert.alert('Required', 'Please select a date');
       return;
     }
+
+    addEvent({
+      title,
+      date,
+      time,
+      duration: parseInt(duration) || 60,
+      location: location || undefined,
+      description: description || undefined,
+    });
 
     Alert.alert(
       'Event Created',

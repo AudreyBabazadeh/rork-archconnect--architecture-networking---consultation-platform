@@ -12,10 +12,12 @@ import {
 import { Stack, router } from 'expo-router';
 import { Calendar, Flag, AlignLeft, Save, CheckSquare } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
+import { useSchedule } from '@/contexts/ScheduleContext';
 
 type Priority = 'low' | 'medium' | 'high';
 
 export default function AddTaskScreen() {
+  const { addTask } = useSchedule();
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [priority, setPriority] = useState<Priority>('medium');
@@ -125,6 +127,13 @@ export default function AddTaskScreen() {
       Alert.alert('Required', 'Please select a date');
       return;
     }
+
+    addTask({
+      title,
+      date,
+      priority,
+      description: description || undefined,
+    });
 
     Alert.alert(
       'Task Created',

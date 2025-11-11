@@ -13,10 +13,12 @@ import { Stack, router } from 'expo-router';
 import { Calendar, Clock, AlignLeft, Save, CalendarOff } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { formatTimeTo12Hour } from '@/constants/timeUtils';
+import { useSchedule } from '@/contexts/ScheduleContext';
 
 type DurationType = 'full-day' | 'partial-day' | 'date-range';
 
 export default function MarkUnavailableScreen() {
+  const { addUnavailablePeriod } = useSchedule();
   const [durationType, setDurationType] = useState<DurationType>('full-day');
   const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -136,6 +138,15 @@ export default function MarkUnavailableScreen() {
       Alert.alert('Required', 'Please select an end date');
       return;
     }
+
+    addUnavailablePeriod({
+      startDate,
+      endDate: durationType === 'date-range' ? endDate : undefined,
+      startTime: durationType === 'partial-day' ? startTime : undefined,
+      endTime: durationType === 'partial-day' ? endTime : undefined,
+      durationType,
+      reason: reason || undefined,
+    });
 
     let message = '';
     if (durationType === 'full-day') {

@@ -31,6 +31,7 @@ import { Colors } from '@/constants/colors';
 import { formatTimeTo12Hour, generateTimeSlots12Hour } from '@/constants/timeUtils';
 import { useBooking, BookingRequest } from '@/contexts/BookingContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSchedule, Event as ScheduleItemEvent, Task, UnavailablePeriod } from '@/contexts/ScheduleContext';
 
 type ViewMode = 'month' | 'week' | 'day';
 type FilterType = 'all' | 'booked-by-me' | 'booked-with-me';
@@ -197,11 +198,12 @@ export default function ScheduleBuilderScreen() {
   
   const { bookingRequests } = useBooking();
   const { user } = useAuth();
+  const { scheduleItems } = useSchedule();
 
   const scheduleEvents = useMemo<ScheduleEvent[]>(() => {
     if (!user) return [];
     
-    return bookingRequests
+    const bookingEvents = bookingRequests
       .filter((request: BookingRequest) => request.status === 'accepted')
       .map((request: BookingRequest): ScheduleEvent => {
         const isBookedByMe = request.studentId === user.id;
@@ -219,7 +221,66 @@ export default function ScheduleBuilderScreen() {
           location: 'Video Call',
         };
       });
-  }, [bookingRequests, user]);
+
+    const customEvents = scheduleItems
+      .filter((item): item is ScheduleItemEvent => item.type === 'event')
+      .map((event): ScheduleEvent => ({
+        id: event.id,
+        title: event.title,
+        time: event.time,
+        date: event.date,
+        duration: event.duration,
+        participantName: 'Personal Event',
+        type: 'booked-by-me',
+        amount: 0,
+        description: event.description,
+        location: event.location,
+      }));
+
+    const tasks = scheduleItems
+      .filter((item): item is Task => item.type === 'task')
+      .map((task): ScheduleEvent => ({
+        id: task.id,
+        title: `📋 ${task.title}`,
+        time: '09:00',
+        date: task.date,
+        duration: 30,
+        participantName: 'Task',
+        type: 'booked-by-me',
+        amount: 0,
+        description: task.description,
+        location: `Priority: ${task.priority}`,
+      }));
+
+    const unavailable = scheduleItems
+      .filter((item): item is UnavailablePeriod => item.type === 'unavailable')
+      .flatMap((period): ScheduleEvent[] => {
+        const events: ScheduleEvent[] = [];
+        const start = new Date(period.startDate);
+        const end = period.endDate ? new Date(period.endDate) : start;
+        
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          events.push({
+            id: `${period.id}-${d.toISOString().split('T')[0]}`,
+            title: `🚫 ${period.reason || 'Unavailable'}`,
+            time: period.startTime || '00:00',
+            date: d.toISOString().split('T')[0],
+            duration: period.endTime && period.startTime 
+              ? (parseInt(period.endTime.split(':')[0]) * 60 + parseInt(period.endTime.split(':')[1])) - 
+                (parseInt(period.startTime.split(':')[0]) * 60 + parseInt(period.startTime.split(':')[1]))
+              : 1440,
+            participantName: 'Out of Office',
+            type: 'booked-by-me',
+            amount: 0,
+            description: period.reason,
+          });
+        }
+        
+        return events;
+      });
+
+    return [...bookingEvents, ...customEvents, ...tasks, ...unavailable];
+  }, [bookingRequests, user, scheduleItems]);
 
   const filteredEvents = useMemo<ScheduleEvent[]>(() => {
     if (filter === 'all') return scheduleEvents;
