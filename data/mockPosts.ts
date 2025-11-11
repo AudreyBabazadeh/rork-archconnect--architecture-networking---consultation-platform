@@ -3,7 +3,7 @@ import { Post } from '@/types/user';
 export const mockPosts: Post[] = [
   {
     id: '1',
-    authorId: 'user1',
+    authorId: '1',
     authorName: 'Sarah Chen',
     authorAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face',
     authorTitle: 'Architecture Student at MIT',
@@ -21,7 +21,7 @@ export const mockPosts: Post[] = [
   },
   {
     id: '2',
-    authorId: 'user2',
+    authorId: '2',
     authorName: 'Prof. Michael Rodriguez',
     authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
     authorTitle: 'Professor of Architecture at Stanford',
@@ -35,7 +35,7 @@ export const mockPosts: Post[] = [
   },
   {
     id: '3',
-    authorId: 'user3',
+    authorId: '3',
     authorName: 'Alex Thompson',
     authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
     authorTitle: 'Senior Architect at Foster + Partners',
@@ -49,7 +49,7 @@ export const mockPosts: Post[] = [
   },
   {
     id: '4',
-    authorId: 'user4',
+    authorId: '4',
     authorName: 'Emma Wilson',
     authorAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
     authorTitle: 'Architecture Student at Harvard GSD',
@@ -63,7 +63,7 @@ export const mockPosts: Post[] = [
   },
   {
     id: '5',
-    authorId: 'user5',
+    authorId: '5',
     authorName: 'Dr. Priya Patel',
     authorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop&crop=face',
     authorTitle: 'Sustainable Design Consultant',
@@ -80,7 +80,7 @@ export const mockPosts: Post[] = [
   },
   {
     id: '6',
-    authorId: 'user6',
+    authorId: '6',
     authorName: 'James Park',
     authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
     authorTitle: 'Architecture Student at UC Berkeley',
@@ -94,7 +94,7 @@ export const mockPosts: Post[] = [
   },
   {
     id: '7',
-    authorId: 'user7',
+    authorId: '7',
     authorName: 'Prof. Lisa Anderson',
     authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face',
     authorTitle: 'Professor of Urban Planning at Yale',
@@ -108,7 +108,7 @@ export const mockPosts: Post[] = [
   },
   {
     id: '8',
-    authorId: 'user8',
+    authorId: '8',
     authorName: 'Carlos Mendez',
     authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
     authorTitle: 'Landscape Architect & Mentor',
