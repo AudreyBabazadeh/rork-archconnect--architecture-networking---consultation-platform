@@ -517,7 +517,7 @@ export default function ScheduleBuilderScreen() {
                     ]}
                     onPress={() => handleEventPress(event)}
                   >
-                    <Text style={styles.weekEventTitle} numberOfLines={1}>
+                    <Text style={[styles.weekEventTitle, isHalfHour && { fontSize: 10 }]} numberOfLines={isHalfHour ? 2 : 1}>
                       {event.title}
                     </Text>
                     {!isHalfHour && (
@@ -583,7 +583,7 @@ export default function ScheduleBuilderScreen() {
                   onPress={() => handleEventPress(event)}
                 >
                   <View style={styles.dayEventContent}>
-                    <Text style={styles.dayEventTitle} numberOfLines={1}>
+                    <Text style={[styles.dayEventTitle, isHalfHour && { fontSize: 12, marginBottom: 0 }]} numberOfLines={isHalfHour ? 2 : 1}>
                       {event.title}
                     </Text>
                     {!isHalfHour && (
@@ -1016,6 +1016,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: Colors.white,
+    flexWrap: 'wrap',
   },
   weekEventTime: {
     fontSize: 9,
@@ -1070,6 +1071,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.white,
     marginBottom: 4,
+    flexWrap: 'wrap',
   },
   dayEventDetails: {
     flexDirection: 'row',
