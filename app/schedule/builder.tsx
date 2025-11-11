@@ -56,9 +56,10 @@ interface EventDetailsModalProps {
   visible: boolean;
   event: ScheduleEvent | null;
   onClose: () => void;
+  onDelete?: () => void;
 }
 
-function EventDetailsModal({ visible, event, onClose }: EventDetailsModalProps) {
+function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsModalProps) {
   if (!event) return null;
 
   const handleJoin = () => {
@@ -85,7 +86,10 @@ function EventDetailsModal({ visible, event, onClose }: EventDetailsModalProps) 
       [
         { text: 'No', style: 'cancel' },
         { text: 'Yes, Cancel', style: 'destructive', onPress: () => {
-          Alert.alert('Session Cancelled', 'The session has been cancelled and both parties have been notified.');
+          if (onDelete) {
+            onDelete();
+          }
+          Alert.alert('Session Cancelled', 'The session has been cancelled and removed from your calendar.');
           onClose();
         }}
       ]
@@ -198,7 +202,7 @@ export default function ScheduleBuilderScreen() {
   
   const { bookingRequests } = useBooking();
   const { user } = useAuth();
-  const { scheduleItems } = useSchedule();
+  const { scheduleItems, deleteScheduleItem } = useSchedule();
 
   const scheduleEvents = useMemo<ScheduleEvent[]>(() => {
     if (!user) return [];
@@ -302,6 +306,14 @@ export default function ScheduleBuilderScreen() {
   const handleEventPress = (event: ScheduleEvent) => {
     setSelectedEvent(event);
     setShowEventDetails(true);
+  };
+
+  const handleDeleteEvent = () => {
+    if (selectedEvent) {
+      deleteScheduleItem(selectedEvent.id.split('-')[0]);
+      setShowEventDetails(false);
+      setSelectedEvent(null);
+    }
   };
 
   const handleAddEvent = () => {
@@ -488,6 +500,8 @@ export default function ScheduleBuilderScreen() {
               
               return dayEvents.map(event => {
                 const { top, height } = getEventPosition(event.time, event.duration);
+                const isHalfHour = event.duration === 30;
+                const isTask = event.title.startsWith('📋');
                 return (
                   <TouchableOpacity
                     key={event.id}
@@ -506,9 +520,11 @@ export default function ScheduleBuilderScreen() {
                     <Text style={styles.weekEventTitle} numberOfLines={1}>
                       {event.title}
                     </Text>
-                    <Text style={styles.weekEventTime} numberOfLines={1}>
-                      {formatTimeTo12Hour(event.time)} • {event.participantName}
-                    </Text>
+                    {!isHalfHour && (
+                      <Text style={styles.weekEventTime} numberOfLines={1}>
+                        {formatTimeTo12Hour(event.time)} • {isTask ? event.participantName : event.participantName}
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 );
               });
@@ -551,6 +567,8 @@ export default function ScheduleBuilderScreen() {
             
             {sortedEvents.map(event => {
               const { top, height } = getEventPosition(event.time, event.duration);
+              const isHalfHour = event.duration === 30;
+              const isTask = event.title.startsWith('📋');
               return (
                 <TouchableOpacity
                   key={event.id}
@@ -568,29 +586,35 @@ export default function ScheduleBuilderScreen() {
                     <Text style={styles.dayEventTitle} numberOfLines={1}>
                       {event.title}
                     </Text>
-                    <View style={styles.dayEventDetails}>
-                      <View style={styles.dayEventParticipant}>
-                        <View style={styles.dayEventAvatar}>
-                          <User size={12} color={Colors.white} />
+                    {!isHalfHour && (
+                      <>
+                        <View style={styles.dayEventDetails}>
+                          <View style={styles.dayEventParticipant}>
+                            <View style={styles.dayEventAvatar}>
+                              <User size={12} color={Colors.white} />
+                            </View>
+                            <Text style={styles.dayEventParticipantName} numberOfLines={1}>
+                              {event.participantName}
+                            </Text>
+                          </View>
+                          {!isTask && (
+                            <View style={styles.dayEventBadge}>
+                              <Text style={styles.dayEventBadgeText}>
+                                {event.type === 'booked-by-me' ? 'Booked by Me' : 'Booked with Me'}
+                              </Text>
+                            </View>
+                          )}
                         </View>
-                        <Text style={styles.dayEventParticipantName} numberOfLines={1}>
-                          {event.participantName}
-                        </Text>
-                      </View>
-                      <View style={styles.dayEventBadge}>
-                        <Text style={styles.dayEventBadgeText}>
-                          {event.type === 'booked-by-me' ? 'Booked by Me' : 'Booked with Me'}
-                        </Text>
-                      </View>
-                    </View>
-                    <View style={styles.dayEventMeta}>
-                      <Text style={styles.dayEventTime}>
-                        {formatTimeTo12Hour(event.time)} • {event.duration}min
-                      </Text>
-                      <Text style={styles.dayEventLocation}>
-                        {event.location}
-                      </Text>
-                    </View>
+                        <View style={styles.dayEventMeta}>
+                          <Text style={styles.dayEventTime}>
+                            {formatTimeTo12Hour(event.time)} • {event.duration}min
+                          </Text>
+                          <Text style={styles.dayEventLocation}>
+                            {event.location}
+                          </Text>
+                        </View>
+                      </>
+                    )}
                   </View>
                 </TouchableOpacity>
               );
@@ -683,6 +707,7 @@ export default function ScheduleBuilderScreen() {
         visible={showEventDetails}
         event={selectedEvent}
         onClose={() => setShowEventDetails(false)}
+        onDelete={handleDeleteEvent}
       />
       
       {showFABMenu && (
