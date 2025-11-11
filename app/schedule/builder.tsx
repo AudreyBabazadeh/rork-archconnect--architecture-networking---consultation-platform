@@ -245,17 +245,17 @@ export default function ScheduleBuilderScreen() {
 
   const handleAddEvent = () => {
     setShowFABMenu(false);
-    Alert.alert('Add Event', 'Event creation coming soon');
+    router.push('/schedule/add-event');
   };
 
   const handleAddTask = () => {
     setShowFABMenu(false);
-    Alert.alert('Add Task', 'Task creation coming soon');
+    router.push('/schedule/add-task');
   };
 
   const handleMarkOffDay = () => {
     setShowFABMenu(false);
-    Alert.alert('Mark Off Day', 'Off day marking coming soon');
+    router.push('/schedule/mark-unavailable');
   };
 
   const navigateMonth = (direction: 'prev' | 'next') => {
