@@ -4,6 +4,7 @@ export const mockUsers: User[] = [
   {
     id: '1',
     name: 'Sarah Chen',
+    username: 'sarahchen',
     title: 'Senior Architect & Professor',
     university: 'MIT School of Architecture',
     location: 'Boston, MA',
@@ -43,6 +44,7 @@ export const mockUsers: User[] = [
   {
     id: '2',
     name: 'Marcus Rodriguez',
+    username: 'marcusr',
     title: 'Architecture Graduate Student',
     university: 'Harvard GSD',
     location: 'Cambridge, MA',
@@ -70,6 +72,7 @@ export const mockUsers: User[] = [
   {
     id: '3',
     name: 'Dr. Elena Kowalski',
+    username: 'elenakowalski',
     title: 'Professor of Architecture',
     university: 'Columbia GSAPP',
     location: 'New York, NY',
@@ -98,6 +101,7 @@ export const mockUsers: User[] = [
   {
     id: '4',
     name: 'James Park',
+    username: 'jamespark',
     title: 'Senior Architect',
     university: 'UC Berkeley',
     location: 'San Francisco, CA',
@@ -126,6 +130,7 @@ export const mockUsers: User[] = [
   {
     id: '5',
     name: 'Priya Sharma',
+    username: 'priyasharma',
     title: 'Landscape Architect & Professor',
     university: 'University of Pennsylvania',
     location: 'Philadelphia, PA',
@@ -154,6 +159,7 @@ export const mockUsers: User[] = [
   {
     id: '6',
     name: 'Ahmed Hassan',
+    username: 'ahmedh',
     title: 'Architecture Graduate Student',
     university: 'Princeton University',
     location: 'Princeton, NJ',
@@ -182,6 +188,7 @@ export const mockUsers: User[] = [
   {
     id: '7',
     name: 'Lisa Thompson',
+    username: 'lisathompson',
     title: 'Historic Preservation Specialist',
     location: 'Charleston, SC',
     avatar: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=face',
@@ -209,6 +216,7 @@ export const mockUsers: User[] = [
   {
     id: '8',
     name: 'Carlos Mendez',
+    username: 'carlosm',
     title: 'Construction Technology Specialist',
     university: 'Texas A&M University',
     location: 'Austin, TX',

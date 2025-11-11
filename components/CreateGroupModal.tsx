@@ -28,11 +28,17 @@ export default function CreateGroupModal({
   const [groupName, setGroupName] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchingByUsername, setIsSearchingByUsername] = useState(false);
 
   const availableUsers = mockUsers.filter((u) => u.id !== '1');
-  const filteredUsers = availableUsers.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  
+  const normalizedQuery = searchQuery.startsWith('@') ? searchQuery.slice(1).toLowerCase() : searchQuery.toLowerCase();
+  const filteredUsers = availableUsers.filter((user) => {
+    if (searchQuery.startsWith('@')) {
+      return user.username.toLowerCase().includes(normalizedQuery);
+    }
+    return user.name.toLowerCase().includes(normalizedQuery) || user.username.toLowerCase().includes(normalizedQuery);
+  });
 
   const toggleUserSelection = (userId: string) => {
     setSelectedUsers((prev) =>
@@ -126,8 +132,10 @@ export default function CreateGroupModal({
               style={styles.input}
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholder="Search users..."
+              placeholder="Search by name or @username"
               placeholderTextColor={Colors.textLight}
+              autoCapitalize="none"
+              autoCorrect={false}
             />
           </View>
 
@@ -149,6 +157,7 @@ export default function CreateGroupModal({
                   />
                   <View style={styles.userInfo}>
                     <Text style={styles.userName}>{item.name}</Text>
+                    <Text style={styles.userUsername}>@{item.username}</Text>
                     <Text style={styles.userTitle} numberOfLines={1}>
                       {item.title}
                     </Text>
@@ -303,6 +312,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: Colors.text,
+    marginBottom: 2,
+  },
+  userUsername: {
+    fontSize: 13,
+    color: Colors.primary,
     marginBottom: 2,
   },
   userTitle: {

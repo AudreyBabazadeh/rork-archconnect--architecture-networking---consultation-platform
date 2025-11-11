@@ -20,7 +20,7 @@ interface AuthState {
 
 interface AuthActions {
   signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (userData: Partial<AuthUser> & { email: string; password: string; name: string; userType: 'student' | 'professor' }) => Promise<boolean>;
+  signUp: (userData: Partial<AuthUser> & { email: string; password: string; name: string; username: string; userType: 'student' | 'professor' }) => Promise<boolean>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<AuthUser>) => Promise<void>;
   searchUsers: (query: string) => Promise<AuthUser[]>;
@@ -77,7 +77,7 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     }
   }, []);
 
-  const signUp = useCallback(async (userData: Partial<AuthUser> & { email: string; password: string; name: string; userType: 'student' | 'professor' }): Promise<boolean> => {
+  const signUp = useCallback(async (userData: Partial<AuthUser> & { email: string; password: string; name: string; username: string; userType: 'student' | 'professor' }): Promise<boolean> => {
     try {
       setIsLoading(true);
       
@@ -87,6 +87,11 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
       const existingUser = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
       if (existingUser) {
         throw new Error('User already exists');
+      }
+      
+      const existingUsername = users.find(u => u.username.toLowerCase() === userData.username.toLowerCase());
+      if (existingUsername) {
+        throw new Error('Username already taken');
       }
       
       // Generate unique ID
@@ -103,6 +108,7 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
         // AuthUser specific properties
         id: userId,
         name: userData.name,
+        username: userData.username,
         location: userData.location || '',
         experience: userData.experience || '',
         hourlyRate: userData.hourlyRate || (userData.userType === 'professor' ? 50 : 25),
@@ -169,6 +175,7 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
       const queryLower = query.toLowerCase();
       const filteredUsers = users.filter(u => 
         u.name.toLowerCase().includes(queryLower) ||
+        u.username.toLowerCase().includes(queryLower) ||
         u.email.toLowerCase().includes(queryLower) ||
         (u.university && u.university.toLowerCase().includes(queryLower)) ||
         (u.specialties && u.specialties.some(s => s.toLowerCase().includes(queryLower)))

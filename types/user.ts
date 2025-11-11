@@ -3,6 +3,7 @@ export type LoyaltyBadge = 'silver' | 'gold';
 export interface User {
   id: string;
   name: string;
+  username: string;
   title: string;
   university?: string;
   location: string;

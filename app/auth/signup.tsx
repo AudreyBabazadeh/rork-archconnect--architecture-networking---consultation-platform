@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Eye, EyeOff, Mail, Lock, User, Building, ArrowLeft } from 'lucide-react-native';
+import { Eye, EyeOff, Mail, Lock, User, Building, ArrowLeft, AtSign } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -18,6 +18,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function SignUpScreen() {
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -31,8 +32,18 @@ export default function SignUpScreen() {
   const { signUp } = useAuth();
 
   const handleSignUp = async () => {
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
       Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+
+    if (formData.username.length < 3) {
+      Alert.alert('Error', 'Username must be at least 3 characters long');
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      Alert.alert('Error', 'Username can only contain letters, numbers, and underscores');
       return;
     }
 
@@ -50,6 +61,7 @@ export default function SignUpScreen() {
     try {
       const success = await signUp({
         name: formData.name,
+        username: formData.username,
         email: formData.email,
         password: formData.password,
         userType: formData.userType,
@@ -75,6 +87,8 @@ export default function SignUpScreen() {
             }
           ]
         );
+      } else if (error?.message === 'Username already taken') {
+        Alert.alert('Error', 'This username is already taken. Please choose a different one.');
       } else {
         Alert.alert('Error', 'Something went wrong. Please try again.');
       }
@@ -113,6 +127,19 @@ export default function SignUpScreen() {
               onChangeText={(value) => updateFormData('name', value)}
               autoCapitalize="words"
               testID="name-input"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <AtSign size={20} color={Colors.textLight} style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Username (e.g. johndoe)"
+              value={formData.username}
+              onChangeText={(value) => updateFormData('username', value.toLowerCase())}
+              autoCapitalize="none"
+              autoCorrect={false}
+              testID="username-input"
             />
           </View>
 
