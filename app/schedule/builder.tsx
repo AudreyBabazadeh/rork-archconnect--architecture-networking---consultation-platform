@@ -460,7 +460,11 @@ export default function ScheduleBuilderScreen() {
       return { widthPercent: 100, leftPercent: 0 };
     }
 
-    const sortedOverlapping = overlapping.sort((a, b) => a.id.localeCompare(b.id));
+    const sortedOverlapping = overlapping.sort((a, b) => {
+      const aTimestamp = parseInt(a.id.split('-')[0] || '0');
+      const bTimestamp = parseInt(b.id.split('-')[0] || '0');
+      return aTimestamp - bTimestamp;
+    });
     const eventIndex = sortedOverlapping.findIndex(e => e.id === event.id);
     const widthPercent = 100 / totalOverlapping;
     const leftPercent = widthPercent * eventIndex;
