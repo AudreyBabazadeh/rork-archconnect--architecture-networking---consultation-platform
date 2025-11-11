@@ -474,12 +474,13 @@ export default function ScheduleBuilderScreen() {
 
   const renderWeekView = () => {
     const startOfWeek = new Date(selectedDate);
-    startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
+    const dayOffset = startOfWeek.getDay();
+    startOfWeek.setDate(startOfWeek.getDate() - dayOffset);
     
     const weekDays: Date[] = [];
     for (let i = 0; i < 7; i++) {
       const day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
+      day.setDate(day.getDate() + i);
       weekDays.push(day);
     }
     
