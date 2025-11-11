@@ -17,6 +17,8 @@ export interface Task {
   type: 'task';
   title: string;
   date: string;
+  time?: string;
+  duration?: number;
   priority: 'low' | 'medium' | 'high';
   description?: string;
   completed: boolean;

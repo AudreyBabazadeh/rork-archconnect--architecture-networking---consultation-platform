@@ -8,9 +8,10 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Switch,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
-import { Calendar, Flag, AlignLeft, Save, CheckSquare } from 'lucide-react-native';
+import { Calendar, Flag, AlignLeft, Save, CheckSquare, Clock } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { useSchedule } from '@/contexts/ScheduleContext';
 
@@ -20,9 +21,13 @@ export default function AddTaskScreen() {
   const { addTask } = useSchedule();
   const [title, setTitle] = useState<string>('');
   const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [hasSpecificTime, setHasSpecificTime] = useState<boolean>(false);
+  const [time, setTime] = useState<string>('09:00');
+  const [duration, setDuration] = useState<string>('30');
   const [priority, setPriority] = useState<Priority>('medium');
   const [description, setDescription] = useState<string>('');
   const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
 
   const handleDateSelect = (selectedDate: string) => {
     setDate(selectedDate);
@@ -117,6 +122,48 @@ export default function AddTaskScreen() {
     );
   };
 
+  const generateTimeOptions = () => {
+    const times = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const hour = String(h).padStart(2, '0');
+        const minute = String(m).padStart(2, '0');
+        times.push(`${hour}:${minute}`);
+      }
+    }
+    return times;
+  };
+
+  const renderTimePicker = () => {
+    const times = generateTimeOptions();
+    return (
+      <ScrollView style={styles.timePickerContainer}>
+        {times.map((t) => (
+          <TouchableOpacity
+            key={t}
+            style={[
+              styles.timeOption,
+              time === t && styles.timeOptionSelected,
+            ]}
+            onPress={() => {
+              setTime(t);
+              setShowTimePicker(false);
+            }}
+          >
+            <Text
+              style={[
+                styles.timeOptionText,
+                time === t && styles.timeOptionTextSelected,
+              ]}
+            >
+              {t}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    );
+  };
+
   const handleSave = () => {
     if (!title.trim()) {
       Alert.alert('Required', 'Please enter a task title');
@@ -128,11 +175,18 @@ export default function AddTaskScreen() {
       return;
     }
 
+    if (hasSpecificTime && (!time || !duration)) {
+      Alert.alert('Required', 'Please select time and duration');
+      return;
+    }
+
     addTask({
       title,
       date,
       priority,
       description: description || undefined,
+      time: hasSpecificTime ? time : undefined,
+      duration: hasSpecificTime ? parseInt(duration) : undefined,
     });
 
     Alert.alert(
@@ -197,6 +251,51 @@ export default function AddTaskScreen() {
           </TouchableOpacity>
 
           {showDatePicker && renderCalendar()}
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.switchRow}>
+            <View style={styles.switchLabel}>
+              <Clock size={20} color={Colors.text} />
+              <Text style={styles.label}>Schedule specific time</Text>
+            </View>
+            <Switch
+              value={hasSpecificTime}
+              onValueChange={setHasSpecificTime}
+              trackColor={{ false: Colors.border, true: Colors.primary }}
+              thumbColor={Colors.white}
+            />
+          </View>
+          {hasSpecificTime && (
+            <View style={styles.timeSection}>
+              <View style={styles.timeRow}>
+                <View style={styles.timeInputContainer}>
+                  <Text style={styles.timeLabel}>Time</Text>
+                  <TouchableOpacity
+                    style={styles.inputButton}
+                    onPress={() => setShowTimePicker(!showTimePicker)}
+                  >
+                    <Clock size={20} color={Colors.textSecondary} />
+                    <Text style={styles.inputButtonText}>{time}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.timeInputContainer}>
+                  <Text style={styles.timeLabel}>Duration (mins)</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="30"
+                    placeholderTextColor={Colors.textSecondary}
+                    value={duration}
+                    onChangeText={setDuration}
+                    keyboardType="number-pad"
+                  />
+                </View>
+              </View>
+
+              {showTimePicker && renderTimePicker()}
+            </View>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -509,6 +608,57 @@ const styles = StyleSheet.create({
   },
   calendarDayTextToday: {
     color: Colors.primary,
+    fontWeight: '600',
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  switchLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  timeSection: {
+    marginTop: 16,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  timeInputContainer: {
+    flex: 1,
+  },
+  timeLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  timePickerContainer: {
+    marginTop: 12,
+    maxHeight: 200,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+  },
+  timeOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  timeOptionSelected: {
+    backgroundColor: Colors.primary,
+  },
+  timeOptionText: {
+    fontSize: 16,
+    color: Colors.text,
+  },
+  timeOptionTextSelected: {
+    color: Colors.white,
     fontWeight: '600',
   },
 });
