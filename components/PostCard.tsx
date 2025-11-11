@@ -37,31 +37,7 @@ export const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
-  const getAuthorTypeColor = (type: string) => {
-    switch (type) {
-      case 'student':
-        return Colors.success;
-      case 'mentor':
-        return Colors.primary;
-      case 'professor':
-        return Colors.warning;
-      default:
-        return Colors.textLight;
-    }
-  };
 
-  const getAuthorTypeBadge = (type: string) => {
-    switch (type) {
-      case 'student':
-        return 'Student';
-      case 'mentor':
-        return 'Mentor';
-      case 'professor':
-        return 'Professor';
-      default:
-        return '';
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -73,12 +49,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         >
           <Image source={{ uri: post.authorAvatar }} style={styles.avatar} />
           <View style={styles.authorDetails}>
-            <View style={styles.nameRow}>
-              <Text style={styles.authorName}>{post.authorName}</Text>
-              <View style={[styles.badge, { backgroundColor: getAuthorTypeColor(post.authorType) }]}>
-                <Text style={styles.badgeText}>{getAuthorTypeBadge(post.authorType)}</Text>
-              </View>
-            </View>
+            <Text style={styles.authorName}>{post.authorName}</Text>
             <Text style={styles.authorTitle}>{post.authorTitle}</Text>
             <Text style={styles.timestamp}>{formatTimeAgo(post.timestamp)}</Text>
           </View>
@@ -204,27 +175,11 @@ const styles = StyleSheet.create({
   authorDetails: {
     flex: 1,
   },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
   authorName: {
     fontSize: 16,
     fontWeight: '600',
     color: Colors.text,
-    marginRight: 8,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: Colors.white,
-    textTransform: 'uppercase',
+    marginBottom: 2,
   },
   authorTitle: {
     fontSize: 14,
