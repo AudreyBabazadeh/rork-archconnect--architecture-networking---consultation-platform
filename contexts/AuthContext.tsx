@@ -38,8 +38,16 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     const loadStoredUser = async () => {
       try {
         const storedUser = await AsyncStorage.getItem(STORAGE_KEY);
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
+        if (storedUser && storedUser !== 'ok' && storedUser !== 'null') {
+          try {
+            const parsed = JSON.parse(storedUser);
+            if (parsed && typeof parsed === 'object') {
+              setUser(parsed);
+            }
+          } catch (parseError) {
+            console.error('Error parsing stored user, clearing storage:', parseError);
+            await AsyncStorage.removeItem(STORAGE_KEY);
+          }
         }
       } catch (error) {
         console.error('Error loading stored user:', error);
@@ -56,7 +64,15 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
       setIsLoading(true);
       
       const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
-      const users: AuthUser[] = storedUsers ? JSON.parse(storedUsers) : [];
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
       
       const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
       
@@ -82,7 +98,15 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
       setIsLoading(true);
       
       const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
-      const users: AuthUser[] = storedUsers ? JSON.parse(storedUsers) : [];
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
       
       const existingUser = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
       if (existingUser) {
@@ -154,7 +178,15 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
       
       const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
-      const users: AuthUser[] = storedUsers ? JSON.parse(storedUsers) : [];
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
       
       const userIndex = users.findIndex(u => u.id === user.id);
       if (userIndex !== -1) {
@@ -170,7 +202,15 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
   const searchUsers = useCallback(async (query: string): Promise<AuthUser[]> => {
     try {
       const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
-      const users: AuthUser[] = storedUsers ? JSON.parse(storedUsers) : [];
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
       
       const queryLower = query.toLowerCase();
       const filteredUsers = users.filter(u => 
@@ -192,7 +232,15 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
   const getUserById = useCallback(async (id: string): Promise<AuthUser | null> => {
     try {
       const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
-      const users: AuthUser[] = storedUsers ? JSON.parse(storedUsers) : [];
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
       
       const user = users.find(u => u.id === id) || null;
       if (user) {

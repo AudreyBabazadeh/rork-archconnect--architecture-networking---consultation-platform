@@ -108,21 +108,34 @@ export const [MessagingProvider, useMessaging] = createContextHook(() => {
     const loadConversations = async () => {
       try {
         const stored = await AsyncStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          // Convert timestamp strings back to Date objects
-          const conversationsWithDates = parsed.map((conv: any) => ({
-            ...conv,
-            lastMessage: {
-              ...conv.lastMessage,
-              timestamp: new Date(conv.lastMessage.timestamp),
-            },
-            messages: conv.messages.map((msg: any) => ({
-              ...msg,
-              timestamp: new Date(msg.timestamp),
-            })),
-          }));
-          setConversations(conversationsWithDates);
+        if (stored && stored !== 'ok' && stored !== 'null') {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+              // Convert timestamp strings back to Date objects
+              const conversationsWithDates = parsed.map((conv: any) => ({
+                ...conv,
+                lastMessage: {
+                  ...conv.lastMessage,
+                  timestamp: new Date(conv.lastMessage.timestamp),
+                },
+                messages: conv.messages.map((msg: any) => ({
+                  ...msg,
+                  timestamp: new Date(msg.timestamp),
+                })),
+              }));
+              setConversations(conversationsWithDates);
+            } else {
+              // Data is not an array, use mock data
+              setConversations(mockConversations);
+              await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(mockConversations));
+            }
+          } catch (parseError) {
+            console.error('Error parsing conversations, using mock data:', parseError);
+            await AsyncStorage.removeItem(STORAGE_KEY);
+            setConversations(mockConversations);
+            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(mockConversations));
+          }
         } else {
           // First time, use mock data
           setConversations(mockConversations);

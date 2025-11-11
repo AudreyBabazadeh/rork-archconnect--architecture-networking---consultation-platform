@@ -51,8 +51,16 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     const loadBookingRequests = async () => {
       try {
         const stored = await AsyncStorage.getItem('booking_requests');
-        if (stored) {
-          setBookingRequests(JSON.parse(stored));
+        if (stored && stored !== 'ok' && stored !== 'null') {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+              setBookingRequests(parsed);
+            }
+          } catch (parseError) {
+            console.error('Error parsing booking requests, clearing storage:', parseError);
+            await AsyncStorage.removeItem('booking_requests');
+          }
         }
       } catch (error) {
         console.error('Error loading booking requests:', error);
@@ -62,8 +70,16 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
     const loadNotifications = async () => {
       try {
         const stored = await AsyncStorage.getItem('notifications');
-        if (stored) {
-          setNotifications(JSON.parse(stored));
+        if (stored && stored !== 'ok' && stored !== 'null') {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+              setNotifications(parsed);
+            }
+          } catch (parseError) {
+            console.error('Error parsing notifications, clearing storage:', parseError);
+            await AsyncStorage.removeItem('notifications');
+          }
         }
       } catch (error) {
         console.error('Error loading notifications:', error);

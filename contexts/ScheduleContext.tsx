@@ -59,8 +59,16 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     const loadScheduleItems = async () => {
       try {
         const stored = await AsyncStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          setScheduleItems(JSON.parse(stored));
+        if (stored && stored !== 'ok' && stored !== 'null') {
+          try {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+              setScheduleItems(parsed);
+            }
+          } catch (parseError) {
+            console.error('Failed to parse schedule items, clearing storage:', parseError);
+            await AsyncStorage.removeItem(STORAGE_KEY);
+          }
         }
       } catch (error) {
         console.error('Failed to load schedule items:', error);
