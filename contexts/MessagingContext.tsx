@@ -20,6 +20,13 @@ export interface Conversation {
   lastMessage: Message;
   unreadCount: number;
   messages: Message[];
+  isGroup?: boolean;
+  participants?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  }[];
+  groupName?: string;
 }
 
 const STORAGE_KEY = 'messaging_data';
@@ -224,6 +231,41 @@ export const [MessagingProvider, useMessaging] = createContextHook(() => {
     return newConversation.id;
   };
 
+  const createGroupConversation = async (
+    groupName: string,
+    participantIds: string[],
+    allUsers: { id: string; name: string; avatar?: string }[]
+  ): Promise<string> => {
+    const participants = participantIds
+      .map(id => allUsers.find(u => u.id === id))
+      .filter((u): u is { id: string; name: string; avatar?: string } => u !== undefined);
+
+    const newConversation: Conversation = {
+      id: Date.now().toString(),
+      participantId: 'group',
+      participantName: groupName,
+      isGroup: true,
+      participants,
+      groupName,
+      unreadCount: 0,
+      messages: [],
+      lastMessage: {
+        id: 'initial',
+        senderId: '1',
+        senderName: 'You',
+        content: 'Group created',
+        timestamp: new Date(),
+        isRead: true,
+      },
+    };
+
+    const updatedConversations = [...conversations, newConversation];
+    setConversations(updatedConversations);
+    await saveConversations(updatedConversations);
+
+    return newConversation.id;
+  };
+
   return {
     conversations,
     isLoading,
@@ -231,5 +273,6 @@ export const [MessagingProvider, useMessaging] = createContextHook(() => {
     markAsRead,
     getTotalUnreadCount,
     getOrCreateConversation,
+    createGroupConversation,
   };
 });

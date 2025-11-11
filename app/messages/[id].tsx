@@ -52,6 +52,7 @@ export default function ChatScreen() {
 
   const renderMessage = ({ item }: { item: Message }) => {
     const isCurrentUser = item.senderId === '1';
+    const isGroupChat = conversation?.isGroup;
     
     return (
       <View style={[
@@ -60,7 +61,7 @@ export default function ChatScreen() {
       ]}>
         {!isCurrentUser && (
           <Image
-            source={{ uri: conversation?.participantAvatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' }}
+            source={{ uri: item.senderAvatar || conversation?.participantAvatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' }}
             style={styles.messageAvatar}
           />
         )}
@@ -68,6 +69,9 @@ export default function ChatScreen() {
           styles.messageBubble,
           isCurrentUser ? styles.currentUserBubble : styles.otherUserBubble,
         ]}>
+          {isGroupChat && !isCurrentUser && (
+            <Text style={styles.senderName}>{item.senderName}</Text>
+          )}
           <Text style={[
             styles.messageText,
             isCurrentUser ? styles.currentUserText : styles.otherUserText,
@@ -115,11 +119,43 @@ export default function ChatScreen() {
           <ArrowLeft size={24} color={Colors.text} />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
-          <Image
-            source={{ uri: conversation.participantAvatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' }}
-            style={styles.headerAvatar}
-          />
-          <Text style={styles.headerTitle}>{conversation.participantName}</Text>
+          {conversation.isGroup && conversation.participants ? (
+            <View style={styles.groupHeaderAvatars}>
+              {conversation.participants.slice(0, 2).map((participant, index) => (
+                <Image
+                  key={participant.id}
+                  source={{
+                    uri:
+                      participant.avatar ||
+                      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+                  }}
+                  style={[
+                    styles.headerAvatar,
+                    index === 1 && styles.headerAvatarSecond,
+                  ]}
+                />
+              ))}
+            </View>
+          ) : (
+            <Image
+              source={{
+                uri:
+                  conversation.participantAvatar ||
+                  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+              }}
+              style={styles.headerAvatar}
+            />
+          )}
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTitle}>
+              {conversation.groupName || conversation.participantName}
+            </Text>
+            {conversation.isGroup && conversation.participants && (
+              <Text style={styles.headerSubtitle} numberOfLines={1}>
+                {conversation.participants.length} members
+              </Text>
+            )}
+          </View>
         </View>
         <View style={styles.placeholder} />
       </View>
@@ -192,16 +228,41 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  groupHeaderAvatars: {
+    width: 32,
+    height: 32,
+    position: 'relative',
+    marginRight: 8,
+  },
   headerAvatar: {
     width: 32,
     height: 32,
     borderRadius: 16,
     marginRight: 8,
   },
+  headerAvatarSecond: {
+    position: 'absolute',
+    bottom: -4,
+    right: 4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: Colors.white,
+  },
+  headerTextContainer: {
+    alignItems: 'center',
+    maxWidth: '60%',
+  },
   headerTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: Colors.text,
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    color: Colors.textLight,
+    marginTop: 2,
   },
   placeholder: {
     width: 40,
@@ -247,6 +308,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
+  },
+  senderName: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.primary,
+    marginBottom: 4,
   },
   currentUserBubble: {
     backgroundColor: Colors.primary,
