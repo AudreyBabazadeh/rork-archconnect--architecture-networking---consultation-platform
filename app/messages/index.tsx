@@ -191,7 +191,10 @@ export default function MessagesScreen() {
         </View>
       ) : (
         <FlatList
-          data={conversations}
+          data={[...conversations].sort(
+            (a, b) =>
+              b.lastMessage.timestamp.getTime() - a.lastMessage.timestamp.getTime()
+          )}
           renderItem={renderConversation}
           keyExtractor={(item) => item.id}
           style={styles.list}
