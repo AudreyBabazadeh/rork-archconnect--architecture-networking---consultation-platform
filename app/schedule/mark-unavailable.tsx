@@ -297,7 +297,7 @@ export default function MarkUnavailableScreen() {
             >
               <Calendar size={20} color={Colors.textSecondary} />
               <Text style={styles.inputButtonText}>
-                {new Date(startDate).toLocaleDateString('en-US', {
+                {new Date(startDate + 'T00:00:00').toLocaleDateString('en-US', {
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
@@ -320,7 +320,7 @@ export default function MarkUnavailableScreen() {
               >
                 <Calendar size={20} color={Colors.textSecondary} />
                 <Text style={styles.inputButtonText}>
-                  {new Date(startDate).toLocaleDateString('en-US', {
+                  {new Date(startDate + 'T00:00:00').toLocaleDateString('en-US', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
@@ -369,7 +369,7 @@ export default function MarkUnavailableScreen() {
                 >
                   <Calendar size={20} color={Colors.textSecondary} />
                   <Text style={styles.inputButtonText}>
-                    {new Date(startDate).toLocaleDateString('en-US', {
+                    {new Date(startDate + 'T00:00:00').toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                     })}
@@ -389,7 +389,7 @@ export default function MarkUnavailableScreen() {
                 >
                   <Calendar size={20} color={Colors.textSecondary} />
                   <Text style={styles.inputButtonText}>
-                    {new Date(endDate).toLocaleDateString('en-US', {
+                    {new Date(endDate + 'T00:00:00').toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                     })}

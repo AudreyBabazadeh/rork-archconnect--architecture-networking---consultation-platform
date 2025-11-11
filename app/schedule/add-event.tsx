@@ -212,7 +212,7 @@ export default function AddEventScreen() {
           >
             <Calendar size={20} color={Colors.textSecondary} />
             <Text style={styles.inputButtonText}>
-              {new Date(date).toLocaleDateString('en-US', {
+              {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
