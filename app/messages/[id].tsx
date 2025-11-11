@@ -118,7 +118,15 @@ export default function ChatScreen() {
         >
           <ArrowLeft size={24} color={Colors.text} />
         </TouchableOpacity>
-        <View style={styles.headerInfo}>
+        <TouchableOpacity 
+          style={styles.headerInfo}
+          onPress={() => {
+            if (!conversation.isGroup && conversation.participantId) {
+              router.push(`/consultant/${conversation.participantId}`);
+            }
+          }}
+          disabled={conversation.isGroup}
+        >
           {conversation.isGroup && conversation.participants ? (
             <View style={styles.groupHeaderAvatars}>
               {conversation.participants.slice(0, 2).map((participant, index) => (
@@ -156,7 +164,7 @@ export default function ChatScreen() {
               </Text>
             )}
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.placeholder} />
       </View>
 
