@@ -158,7 +158,7 @@ export default function ConsultantProfile() {
         consultant.name,
         consultant.avatar
       );
-      router.push(`/chat/${conversationId}` as any);
+      router.push(`/messages/${conversationId}` as any);
     } catch (error) {
       console.error('Error creating conversation:', error);
     }
