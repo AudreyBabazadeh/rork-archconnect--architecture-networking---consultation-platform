@@ -100,6 +100,7 @@ export default function EditProfileScreen() {
     location: user?.location || '',
     hourlyRate: user?.hourlyRate || 0,
     profileImage: user?.profileImage || '',
+    coverImage: user?.coverImage || '',
     expertiseTags: user?.specialties || [],
     portfolioImages: [] as PortfolioImage[],
     teachingFocus: '',
@@ -111,7 +112,6 @@ export default function EditProfileScreen() {
     externalPortfolio: '',
 
     pricingTier: 'Moderate',
-    coverImage: '',
     accentColor: Colors.primary,
   });
 

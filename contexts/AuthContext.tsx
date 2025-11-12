@@ -9,6 +9,7 @@ export interface AuthUser extends User {
   university?: string;
   specialization?: string;
   profileImage?: string;
+  coverImage?: string;
   createdAt: string;
   hasCompletedOnboarding?: boolean;
 }
