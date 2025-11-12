@@ -1270,7 +1270,7 @@ const styles = StyleSheet.create({
   priceTag: {
     fontSize: 16,
     fontWeight: '700',
-    marginLeft: 12,
+    marginLeft: 8,
     flexShrink: 0,
   },
   priceEarned: {
