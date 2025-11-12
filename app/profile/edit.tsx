@@ -680,40 +680,43 @@ export default function EditProfileScreen() {
           {expandedSections.teaching && (
             <View style={styles.sectionContent}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>What I can help with</Text>
+                <Text style={styles.label}>My Mentoring Approach</Text>
+                <Text style={styles.helpText}>How do you guide students? Be specific and personal</Text>
                 <TextInput
                   style={[styles.input, styles.textArea]}
                   value={formData.teachingFocus}
                   onChangeText={(value) => updateFormData('teachingFocus', value)}
-                  placeholder="Describe the areas where you excel..."
+                  placeholder="e.g., I focus on iterative feedback through sketching sessions. I help students find their design voice by reviewing work-in-progress, not just final presentations..."
                   multiline
-                  numberOfLines={3}
+                  numberOfLines={4}
                   textAlignVertical="top"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>How I teach</Text>
+                <Text style={styles.label}>Topics I'm Passionate About</Text>
+                <Text style={styles.helpText}>What excites you most in architecture? What do you love teaching?</Text>
                 <TextInput
                   style={[styles.input, styles.textArea]}
                   value={formData.howITeach}
                   onChangeText={(value) => updateFormData('howITeach', value)}
-                  placeholder="Your teaching style and approach..."
+                  placeholder="e.g., Adaptive reuse, material experimentation, spatial narrative, parametric workflows, hand-drawing techniques, climate-responsive design..."
                   multiline
-                  numberOfLines={3}
+                  numberOfLines={4}
                   textAlignVertical="top"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Ideal mentees</Text>
+                <Text style={styles.label}>What Mentees Can Expect from Sessions</Text>
+                <Text style={styles.helpText}>Paint a picture: what does a typical session look like?</Text>
                 <TextInput
                   style={[styles.input, styles.textArea]}
                   value={formData.idealMentees}
                   onChangeText={(value) => updateFormData('idealMentees', value)}
-                  placeholder="Who would benefit most from your guidance..."
+                  placeholder="e.g., Expect honest, constructive critique and actionable next steps. I ask questions to challenge your assumptions, share real project examples, and help you build confidence in presenting your ideas..."
                   multiline
-                  numberOfLines={3}
+                  numberOfLines={4}
                   textAlignVertical="top"
                 />
               </View>
@@ -952,19 +955,19 @@ export default function EditProfileScreen() {
                   <Text style={styles.previewSectionTitle}>Mentorship Approach</Text>
                   {formData.teachingFocus && (
                     <View style={styles.previewSubSection}>
-                      <Text style={styles.previewSubTitle}>What I can help with</Text>
+                      <Text style={styles.previewSubTitle}>My Mentoring Approach</Text>
                       <Text style={styles.previewText}>{formData.teachingFocus}</Text>
                     </View>
                   )}
                   {formData.howITeach && (
                     <View style={styles.previewSubSection}>
-                      <Text style={styles.previewSubTitle}>How I teach</Text>
+                      <Text style={styles.previewSubTitle}>Topics I'm Passionate About</Text>
                       <Text style={styles.previewText}>{formData.howITeach}</Text>
                     </View>
                   )}
                   {formData.idealMentees && (
                     <View style={styles.previewSubSection}>
-                      <Text style={styles.previewSubTitle}>Ideal mentees</Text>
+                      <Text style={styles.previewSubTitle}>What Mentees Can Expect</Text>
                       <Text style={styles.previewText}>{formData.idealMentees}</Text>
                     </View>
                   )}
