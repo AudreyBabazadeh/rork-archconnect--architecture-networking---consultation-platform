@@ -118,7 +118,7 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
                 <View style={styles.avatarPlaceholder}>
                   <User size={20} color={Colors.textSecondary} />
                 </View>
-                <View>
+                <View style={{ flex: 1 }}>
                   <Text style={styles.participantName}>{event.participantName}</Text>
                   <View style={[styles.typeBadge, { backgroundColor: event.type === 'booked-by-me' ? `${Colors.primary}20` : `${Colors.success}20` }]}>
                     <Text style={[styles.typeBadgeText, { color: event.type === 'booked-by-me' ? Colors.primary : Colors.success }]}>
@@ -130,15 +130,15 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
               <Text style={styles.amountText}>${event.amount}</Text>
             </View>
             
-            <Text style={styles.eventTitle}>{event.title}</Text>
-            
             <View style={styles.eventDetails}>
               <View style={styles.detailRow}>
-                <Calendar size={16} color={Colors.textSecondary} />
-                <Text style={styles.detailText}>{new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</Text>
+                <Calendar size={16} color={Colors.textSecondary} style={{ flexShrink: 0 }} />
+                <Text style={styles.detailText} numberOfLines={2}>
+                  {new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                </Text>
               </View>
               <View style={styles.detailRow}>
-                <Clock size={16} color={Colors.textSecondary} />
+                <Clock size={16} color={Colors.textSecondary} style={{ flexShrink: 0 }} />
                 <Text style={styles.detailText}>{formatTimeTo12Hour(event.time)} ({event.duration} min)</Text>
               </View>
               {event.timezone && (
@@ -148,14 +148,14 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
               )}
               {event.location && (
                 <View style={styles.detailRow}>
-                  <MapPin size={16} color={Colors.textSecondary} />
+                  <MapPin size={16} color={Colors.textSecondary} style={{ flexShrink: 0 }} />
                   <Text style={styles.detailText}>{event.location}</Text>
                 </View>
               )}
               {event.meetingLink && (
                 <View style={styles.detailRow}>
-                  <Video size={16} color={Colors.textSecondary} />
-                  <Text style={styles.detailText}>Video call link available</Text>
+                  <Video size={16} color={Colors.textSecondary} style={{ flexShrink: 0 }} />
+                  <Text style={styles.detailText} numberOfLines={1}>Video call link available</Text>
                 </View>
               )}
             </View>
@@ -1230,7 +1230,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   eventCard: {
-    flexDirection: 'row',
     backgroundColor: Colors.surface,
     marginHorizontal: 20,
     marginVertical: 6,
@@ -1267,8 +1266,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.text,
-    flex: 1,
-    marginRight: 8,
+    marginBottom: 12,
   },
   typeBadge: {
     paddingHorizontal: 8,
@@ -1362,13 +1360,15 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 8,
   },
   detailText: {
     fontSize: 14,
     color: Colors.text,
     marginLeft: 8,
+    flex: 1,
+    flexWrap: 'wrap',
   },
   timezoneChip: {
     alignSelf: 'flex-start',
@@ -1453,7 +1453,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   eventDetails: {
-    marginTop: 16,
+    marginTop: 12,
   },
   fab: {
     position: 'absolute',
