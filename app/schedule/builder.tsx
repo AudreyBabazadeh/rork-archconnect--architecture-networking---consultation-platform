@@ -550,7 +550,7 @@ export default function ScheduleBuilderScreen() {
               const columnWidth = (100 - 8.5) / 7;
               const columnLeft = 8.5 + (dayIndex * columnWidth);
               const eventWidth = (columnWidth * widthPercent) / 100;
-              const eventLeft = columnLeft + (columnWidth * leftPercent) / 100;
+              const eventLeft = columnLeft + (columnWidth * leftPercent) / 100 + 0.5;
               
               const getEventColor = () => {
                 if (event.type === 'event' || event.type === 'task') return '#FFFFFF';
