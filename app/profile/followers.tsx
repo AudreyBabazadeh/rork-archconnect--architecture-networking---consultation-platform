@@ -7,28 +7,31 @@ import { useFollow } from '@/contexts/FollowContext';
 
 export default function FollowersScreen() {
   const { getUserById } = useAuth();
-  const { getFollowerList } = useFollow();
+  const { followerIds } = useFollow();
   const [followerUsers, setFollowerUsers] = useState<AuthUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadFollowerUsers = async () => {
-      const followerIds = getFollowerList();
+      setIsLoading(true);
+      const followerIdsArray = Array.from(followerIds);
+      console.log('Loading follower users, IDs:', followerIdsArray);
       const users: AuthUser[] = [];
       
-      for (const id of followerIds) {
+      for (const id of followerIdsArray) {
         const user = await getUserById(id);
         if (user) {
           users.push(user);
         }
       }
       
+      console.log('Loaded follower users:', users.length);
       setFollowerUsers(users);
       setIsLoading(false);
     };
 
     loadFollowerUsers();
-  }, []);
+  }, [followerIds, getUserById]);
 
   const renderUser = ({ item }: { item: AuthUser }) => (
     <TouchableOpacity
