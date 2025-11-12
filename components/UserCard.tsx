@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Star, MapPin } from 'lucide-react-native';
+import { Star, MapPin, UserPlus, UserMinus } from 'lucide-react-native';
 import { User } from '@/types/user';
 import { Colors } from '@/constants/colors';
 import { LoyaltyBadge } from './LoyaltyBadge';
+import { useFollow } from '@/contexts/FollowContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface UserCardProps {
   user: User;
@@ -11,6 +13,19 @@ interface UserCardProps {
 }
 
 export function UserCard({ user, onPress }: UserCardProps) {
+  const { followUser, unfollowUser, isFollowing } = useFollow();
+  const { user: currentUser } = useAuth();
+  const isCurrentUser = currentUser?.id === user.id;
+  const following = isFollowing(user.id);
+
+  const handleFollowToggle = (e: any) => {
+    e.stopPropagation();
+    if (following) {
+      unfollowUser(user.id);
+    } else {
+      followUser(user.id);
+    }
+  };
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.header}>
@@ -55,11 +70,26 @@ export function UserCard({ user, onPress }: UserCardProps) {
           <Text style={styles.ratingText}>{user.rating}</Text>
           <Text style={styles.reviewCount}>({user.reviewCount} reviews)</Text>
         </View>
-        <View style={styles.availability}>
-          <View style={[styles.statusDot, { backgroundColor: user.isAvailable ? Colors.success : Colors.textLight }]} />
-          <Text style={styles.availabilityText}>
-            {user.isAvailable ? 'Available' : 'Busy'}
-          </Text>
+        <View style={styles.footerRight}>
+          <View style={styles.availability}>
+            <View style={[styles.statusDot, { backgroundColor: user.isAvailable ? Colors.success : Colors.textLight }]} />
+            <Text style={styles.availabilityText}>
+              {user.isAvailable ? 'Available' : 'Busy'}
+            </Text>
+          </View>
+          {!isCurrentUser && (
+            <TouchableOpacity
+              style={[styles.followButton, following && styles.followingButton]}
+              onPress={handleFollowToggle}
+              activeOpacity={0.7}
+            >
+              {following ? (
+                <UserMinus size={16} color={Colors.textSecondary} />
+              ) : (
+                <UserPlus size={16} color={Colors.white} />
+              )}
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -192,5 +222,23 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textSecondary,
     fontWeight: '500',
+  },
+  footerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  followButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 20,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  followingButton: {
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
 });

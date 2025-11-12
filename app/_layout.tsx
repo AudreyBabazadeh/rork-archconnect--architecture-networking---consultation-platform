@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { BookingProvider } from "@/contexts/BookingContext";
 import { MessagingProvider } from "@/contexts/MessagingContext";
 import { ScheduleProvider } from "@/contexts/ScheduleContext";
+import { FollowProvider } from "@/contexts/FollowContext";
 import { trpc, trpcClient } from "@/lib/trpc";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -40,15 +41,17 @@ export default function RootLayout() {
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <BookingProvider>
-            <MessagingProvider>
-              <ScheduleProvider>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                  <RootLayoutNav />
-                </GestureHandlerRootView>
-              </ScheduleProvider>
-            </MessagingProvider>
-          </BookingProvider>
+          <FollowProvider>
+            <BookingProvider>
+              <MessagingProvider>
+                <ScheduleProvider>
+                  <GestureHandlerRootView style={{ flex: 1 }}>
+                    <RootLayoutNav />
+                  </GestureHandlerRootView>
+                </ScheduleProvider>
+              </MessagingProvider>
+            </BookingProvider>
+          </FollowProvider>
         </AuthProvider>
       </QueryClientProvider>
     </trpc.Provider>

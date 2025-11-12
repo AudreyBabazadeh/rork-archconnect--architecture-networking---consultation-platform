@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Dimensions } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { Star, MapPin, Clock, MessageCircle, Calendar } from 'lucide-react-native';
+import { Star, MapPin, Clock, MessageCircle, Calendar, UserPlus, UserMinus } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
@@ -9,6 +9,7 @@ import { LoyaltyBadge } from '@/components/LoyaltyBadge';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMessaging } from '@/contexts/MessagingContext';
+import { useFollow } from '@/contexts/FollowContext';
 
 const { width } = Dimensions.get('window');
 
@@ -18,6 +19,7 @@ export default function ConsultantProfile() {
   const router = useRouter();
   const { user: currentUser, getUserById } = useAuth();
   const { getOrCreateConversation } = useMessaging();
+  const { followUser, unfollowUser, isFollowing } = useFollow();
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [consultant, setConsultant] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -284,6 +286,24 @@ export default function ConsultantProfile() {
       </ScrollView>
 
       <View style={styles.bottomActions}>
+        {currentUser?.id !== consultant.id && (
+          <TouchableOpacity 
+            style={[styles.followActionButton, isFollowing(consultant.id) && styles.followingActionButton]} 
+            onPress={() => {
+              if (isFollowing(consultant.id)) {
+                unfollowUser(consultant.id);
+              } else {
+                followUser(consultant.id);
+              }
+            }}
+          >
+            {isFollowing(consultant.id) ? (
+              <UserMinus size={20} color={Colors.textSecondary} />
+            ) : (
+              <UserPlus size={20} color={Colors.white} />
+            )}
+          </TouchableOpacity>
+        )}
         <TouchableOpacity 
           style={styles.messageButton} 
           onPress={handleMessage}
@@ -297,7 +317,7 @@ export default function ConsultantProfile() {
           disabled={!consultant.isAvailable}
         >
           <Calendar size={20} color={Colors.white} />
-          <Text style={styles.bookButtonText}>Book Session</Text>
+          <Text style={styles.bookButtonText}>Book</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -560,5 +580,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-
+  followActionButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: Colors.primary,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  followingActionButton: {
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
 });

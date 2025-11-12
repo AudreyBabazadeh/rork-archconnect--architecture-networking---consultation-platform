@@ -4,9 +4,11 @@ import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award } from 'lu
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFollow } from '@/contexts/FollowContext';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
+  const { getFollowingCount, getFollowerCount } = useFollow();
 
   const handleSignOut = () => {
     Alert.alert(
@@ -89,10 +91,23 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{(user as any).totalConsultations || 0}</Text>
-            <Text style={styles.statLabel}>Consultations</Text>
-          </View>
+          <TouchableOpacity 
+            style={styles.statItem}
+            onPress={() => router.push('/profile/followers')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.statNumber}>{getFollowerCount()}</Text>
+            <Text style={styles.statLabel}>Followers</Text>
+          </TouchableOpacity>
+          <View style={styles.statDivider} />
+          <TouchableOpacity 
+            style={styles.statItem}
+            onPress={() => router.push('/profile/following')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.statNumber}>{getFollowingCount()}</Text>
+            <Text style={styles.statLabel}>Following</Text>
+          </TouchableOpacity>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <View style={styles.ratingRow}>
@@ -100,11 +115,6 @@ export default function ProfileScreen() {
               <Text style={styles.statNumber}>{user.rating || 0}</Text>
             </View>
             <Text style={styles.statLabel}>Rating</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>${user.hourlyRate || 0}</Text>
-            <Text style={styles.statLabel}>Hourly Rate</Text>
           </View>
         </View>
 
