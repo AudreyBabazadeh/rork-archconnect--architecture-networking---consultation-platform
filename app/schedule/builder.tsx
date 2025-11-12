@@ -113,6 +113,12 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
         
         <ScrollView style={styles.modalContent}>
           <View style={styles.eventCard}>
+            <Text style={[
+              styles.priceTag,
+              event.type === 'booked-with-me' ? styles.priceEarned : styles.priceSpent
+            ]}>
+              ${event.amount}
+            </Text>
             <View style={styles.eventHeader}>
               <View style={styles.participantInfo}>
                 <View style={styles.avatarPlaceholder}>
@@ -127,12 +133,6 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
                   </View>
                 </View>
               </View>
-              <Text style={[
-                styles.amountText,
-                event.type === 'booked-with-me' ? styles.amountEarned : styles.amountSpent
-              ]}>
-                ${event.amount}
-              </Text>
             </View>
             
             <View style={styles.eventDetails}>
@@ -1264,8 +1264,24 @@ const styles = StyleSheet.create({
   eventHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: 8,
+  },
+  priceTag: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  priceEarned: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#00C853',
+  },
+  priceSpent: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.textSecondary,
   },
   eventTitle: {
     fontSize: 16,
