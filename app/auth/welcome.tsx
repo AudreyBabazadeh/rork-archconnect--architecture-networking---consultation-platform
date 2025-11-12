@@ -92,10 +92,10 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 20,
     color: '#6B7280',
     textAlign: 'center',
-    lineHeight: 26,
+    lineHeight: 30,
     paddingHorizontal: 20,
     fontWeight: '400' as const,
   },
@@ -124,11 +124,11 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   messageTitle: {
-    fontSize: 17,
+    fontSize: 19,
     fontWeight: '500' as const,
     color: '#374151',
     flex: 1,
-    lineHeight: 24,
+    lineHeight: 28,
   },
   buttons: {
     gap: 16,
