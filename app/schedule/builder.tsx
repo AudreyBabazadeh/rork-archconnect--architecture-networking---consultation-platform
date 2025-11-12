@@ -127,7 +127,12 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
                   </View>
                 </View>
               </View>
-              <Text style={styles.amountText}>${event.amount}</Text>
+              <Text style={[
+                styles.amountText,
+                event.type === 'booked-with-me' ? styles.amountEarned : styles.amountSpent
+              ]}>
+                ${event.amount}
+              </Text>
             </View>
             
             <View style={styles.eventDetails}>
@@ -1313,6 +1318,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: Colors.primary,
+  },
+  amountEarned: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#00C853',
+  },
+  amountSpent: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: Colors.textSecondary,
   },
   emptyDay: {
     flex: 1,
