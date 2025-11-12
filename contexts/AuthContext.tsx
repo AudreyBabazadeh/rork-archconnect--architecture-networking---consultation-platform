@@ -74,7 +74,7 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
         }
       }
       
-      const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      const existingUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase());
       
       if (existingUser) {
         setUser(existingUser);
@@ -108,12 +108,12 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
         }
       }
       
-      const existingUser = users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
+      const existingUser = users.find(u => u.email?.toLowerCase() === userData.email.toLowerCase());
       if (existingUser) {
         throw new Error('User already exists');
       }
       
-      const existingUsername = users.find(u => u.username.toLowerCase() === userData.username.toLowerCase());
+      const existingUsername = users.find(u => u.username?.toLowerCase() === userData.username.toLowerCase());
       if (existingUsername) {
         throw new Error('Username already taken');
       }
@@ -214,11 +214,11 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
       
       const queryLower = query.toLowerCase();
       const filteredUsers = users.filter(u => 
-        u.name.toLowerCase().includes(queryLower) ||
-        u.username.toLowerCase().includes(queryLower) ||
-        u.email.toLowerCase().includes(queryLower) ||
+        u.name?.toLowerCase().includes(queryLower) ||
+        u.username?.toLowerCase().includes(queryLower) ||
+        u.email?.toLowerCase().includes(queryLower) ||
         (u.university && u.university.toLowerCase().includes(queryLower)) ||
-        (u.specialties && u.specialties.some(s => s.toLowerCase().includes(queryLower)))
+        (u.specialties && u.specialties.some(s => s?.toLowerCase().includes(queryLower)))
       );
       
       console.log(`Found ${filteredUsers.length} users matching "${query}"`);
