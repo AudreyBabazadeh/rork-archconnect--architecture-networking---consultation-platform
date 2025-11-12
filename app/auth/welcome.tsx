@@ -14,7 +14,7 @@ export default function WelcomeScreen() {
         
         {/* Hero Section */}
         <View style={styles.hero}>
-          <Text style={styles.title}>Welcome to Arcal</Text>
+          <Text style={styles.title}>Welcome to Archal</Text>
           <Text style={styles.subtitle}>
             Connect, learn, and grow with a community that cares about your success
           </Text>
