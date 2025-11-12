@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     paddingHorizontal: 20,
     fontWeight: '400' as const,
+    marginTop: 8,
   },
   keyMessages: {
     gap: 20,
