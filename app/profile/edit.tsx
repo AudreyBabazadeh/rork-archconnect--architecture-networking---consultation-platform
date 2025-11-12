@@ -52,8 +52,7 @@ const COMMON_EXPERTISE_TAGS = [
   'Concept Development',
 ];
 
-const SESSION_TYPES = ['1-on-1 Video Call', 'Portfolio Review', 'Q&A Session', 'Async Feedback'];
-const SESSION_DURATIONS = ['30 min', '60 min', '90 min'];
+
 const PRICING_TIERS = ['Free', 'Moderate', 'Premium', 'Enterprise'];
 
 interface PortfolioImage {
@@ -110,8 +109,7 @@ export default function EditProfileScreen() {
     website: '',
     instagram: '',
     externalPortfolio: '',
-    sessionTypes: [] as string[],
-    preferredDuration: '60 min',
+
     pricingTier: 'Moderate',
     coverImage: '',
     accentColor: Colors.primary,
@@ -127,7 +125,6 @@ export default function EditProfileScreen() {
     if (formData.expertiseTags?.length > 0) completed++;
     if (formData.portfolioImages?.length > 0) completed++;
     if (formData.teachingFocus?.trim()) completed++;
-    if (formData.sessionTypes?.length > 0) completed++;
     if (formData.linkedIn?.trim() || formData.website?.trim()) completed++;
 
     return Math.round((completed / total) * 100);
@@ -137,7 +134,6 @@ export default function EditProfileScreen() {
     formData.expertiseTags,
     formData.portfolioImages,
     formData.teachingFocus,
-    formData.sessionTypes,
     formData.linkedIn,
     formData.website,
   ]);
@@ -331,14 +327,7 @@ export default function EditProfileScreen() {
     );
   };
 
-  const toggleSessionType = (type: string) => {
-    const types = formData.sessionTypes || [];
-    if (types.includes(type)) {
-      updateFormData('sessionTypes', types.filter((t: string) => t !== type));
-    } else {
-      updateFormData('sessionTypes', [...types, type]);
-    }
-  };
+
 
   if (!user) {
     return (
@@ -799,56 +788,7 @@ export default function EditProfileScreen() {
           </TouchableOpacity>
           {expandedSections.preferences && (
             <View style={styles.sectionContent}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Session Types</Text>
-                <View style={styles.tagsContainer}>
-                  {SESSION_TYPES.map((type) => (
-                    <TouchableOpacity
-                      key={type}
-                      style={[
-                        styles.tagChip,
-                        formData.sessionTypes.includes(type) && styles.tagChipSelected,
-                      ]}
-                      onPress={() => toggleSessionType(type)}
-                    >
-                      <Text
-                        style={[
-                          styles.tagChipText,
-                          formData.sessionTypes.includes(type) && styles.tagChipTextSelected,
-                        ]}
-                      >
-                        {type}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Preferred Session Duration</Text>
-                <View style={styles.durationContainer}>
-                  {SESSION_DURATIONS.map((duration) => (
-                    <TouchableOpacity
-                      key={duration}
-                      style={[
-                        styles.durationButton,
-                        formData.preferredDuration === duration && styles.durationButtonSelected,
-                      ]}
-                      onPress={() => updateFormData('preferredDuration', duration)}
-                    >
-                      <Text
-                        style={[
-                          styles.durationButtonText,
-                          formData.preferredDuration === duration && styles.durationButtonTextSelected,
-                        ]}
-                      >
-                        {duration}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
+              <Text style={styles.helpText}>All sessions on Arcall are video-based</Text>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Pricing Tier</Text>
                 <Text style={styles.helpText}>General pricing level for your sessions</Text>
@@ -974,31 +914,13 @@ export default function EditProfileScreen() {
                 </View>
               )}
 
-              {formData.sessionTypes.length > 0 && (
+              {formData.pricingTier && (
                 <View style={styles.previewSection}>
                   <Text style={styles.previewSectionTitle}>Session Preferences</Text>
                   <View style={styles.previewPreferenceRow}>
-                    <Text style={styles.previewPreferenceLabel}>Session Types:</Text>
-                    <View style={styles.previewSessionTypes}>
-                      {formData.sessionTypes.map((type: string) => (
-                        <View key={type} style={styles.previewSessionType}>
-                          <Text style={styles.previewSessionTypeText}>{type}</Text>
-                        </View>
-                      ))}
-                    </View>
+                    <Text style={styles.previewPreferenceLabel}>Pricing Tier:</Text>
+                    <Text style={styles.previewPreferenceValue}>{formData.pricingTier}</Text>
                   </View>
-                  {formData.preferredDuration && (
-                    <View style={styles.previewPreferenceRow}>
-                      <Text style={styles.previewPreferenceLabel}>Preferred Duration:</Text>
-                      <Text style={styles.previewPreferenceValue}>{formData.preferredDuration}</Text>
-                    </View>
-                  )}
-                  {formData.pricingTier && (
-                    <View style={styles.previewPreferenceRow}>
-                      <Text style={styles.previewPreferenceLabel}>Pricing Tier:</Text>
-                      <Text style={styles.previewPreferenceValue}>{formData.pricingTier}</Text>
-                    </View>
-                  )}
                 </View>
               )}
 

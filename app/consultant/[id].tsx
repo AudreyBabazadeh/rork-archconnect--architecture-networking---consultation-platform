@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Linking, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { Star, MapPin, Clock, MessageCircle, Calendar, UserPlus, UserMinus, Share2 } from 'lucide-react-native';
+import { Star, MapPin, Clock, MessageCircle, Calendar, UserPlus, UserMinus, Share2, ExternalLink, Linkedin, Globe, Instagram } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
@@ -53,6 +53,10 @@ export default function ConsultantProfile() {
                   reviewCount: (cloudUser as any).totalConsultations || 0,
                   bio: cloudUser.bio || 'Architecture professional ready to help with your projects.',
                   isAvailable: true,
+                  linkedIn: (cloudUser as any).linkedIn || '',
+                  website: (cloudUser as any).website || '',
+                  instagram: (cloudUser as any).instagram || '',
+                  externalPortfolio: (cloudUser as any).externalPortfolio || '',
                   portfolio: Array.isArray((cloudUser as any).portfolio) ? (cloudUser as any).portfolio.map((item: string, index: number) => ({
                     id: `portfolio-${index}`,
                     title: `Project ${index + 1}`,
@@ -93,6 +97,10 @@ export default function ConsultantProfile() {
                 reviewCount: realUser.totalConsultations || 0,
                 bio: realUser.bio || 'Architecture professional ready to help with your projects.',
                 isAvailable: true,
+                linkedIn: realUser.linkedIn || '',
+                website: realUser.website || '',
+                instagram: realUser.instagram || '',
+                externalPortfolio: realUser.externalPortfolio || '',
                 portfolio: Array.isArray(realUser.portfolio) ? realUser.portfolio.map((item: string, index: number) => ({
                   id: `portfolio-${index}`,
                   title: `Project ${index + 1}`,
@@ -167,6 +175,27 @@ export default function ConsultantProfile() {
 
   const handleShare = () => {
     setShareModalVisible(true);
+  };
+
+  const openLink = async (url: string, label: string) => {
+    if (!url) return;
+    
+    let finalUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      finalUrl = 'https://' + url;
+    }
+    
+    try {
+      const canOpen = await Linking.canOpenURL(finalUrl);
+      if (canOpen) {
+        await Linking.openURL(finalUrl);
+      } else {
+        Alert.alert('Error', `Cannot open ${label}`);
+      }
+    } catch (error) {
+      console.error('Error opening link:', error);
+      Alert.alert('Error', `Failed to open ${label}`);
+    }
   };
 
   return (
@@ -254,15 +283,67 @@ export default function ConsultantProfile() {
           </View>
         )}
 
-        <View style={styles.portfolioProjects}>
-          {consultant.portfolio.map((project: any, index: number) => (
-            <View key={project.id || index} style={styles.projectCard}>
-              <Text style={styles.projectTitle}>{project.title}</Text>
-              <Text style={styles.projectCategory}>{project.category} • {project.year}</Text>
-              <Text style={styles.projectDescription}>{project.description}</Text>
-            </View>
-          ))}
-        </View>
+        {consultant.portfolio && consultant.portfolio.length > 0 && (
+          <View style={styles.portfolioProjects}>
+            {consultant.portfolio.map((project: any, index: number) => (
+              <View key={project.id || index} style={styles.projectCard}>
+                <Text style={styles.projectTitle}>{project.title}</Text>
+                <Text style={styles.projectCategory}>{project.category} • {project.year}</Text>
+                <Text style={styles.projectDescription}>{project.description}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {(consultant.linkedIn || consultant.website || consultant.instagram || consultant.externalPortfolio) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Connect</Text>
+            {consultant.linkedIn && (
+              <TouchableOpacity 
+                style={styles.linkRow} 
+                onPress={() => openLink(consultant.linkedIn, 'LinkedIn')}
+                activeOpacity={0.7}
+              >
+                <Linkedin size={20} color={Colors.primary} />
+                <Text style={styles.linkText} numberOfLines={1}>LinkedIn</Text>
+                <ExternalLink size={16} color={Colors.textLight} />
+              </TouchableOpacity>
+            )}
+            {consultant.website && (
+              <TouchableOpacity 
+                style={styles.linkRow} 
+                onPress={() => openLink(consultant.website, 'Website')}
+                activeOpacity={0.7}
+              >
+                <Globe size={20} color={Colors.primary} />
+                <Text style={styles.linkText} numberOfLines={1}>Website</Text>
+                <ExternalLink size={16} color={Colors.textLight} />
+              </TouchableOpacity>
+            )}
+            {consultant.instagram && (
+              <TouchableOpacity 
+                style={styles.linkRow} 
+                onPress={() => openLink(consultant.instagram, 'Instagram')}
+                activeOpacity={0.7}
+              >
+                <Instagram size={20} color={Colors.primary} />
+                <Text style={styles.linkText} numberOfLines={1}>Instagram</Text>
+                <ExternalLink size={16} color={Colors.textLight} />
+              </TouchableOpacity>
+            )}
+            {consultant.externalPortfolio && (
+              <TouchableOpacity 
+                style={styles.linkRow} 
+                onPress={() => openLink(consultant.externalPortfolio, 'Portfolio')}
+                activeOpacity={0.7}
+              >
+                <ExternalLink size={20} color={Colors.primary} />
+                <Text style={styles.linkText} numberOfLines={1}>External Portfolio</Text>
+                <ExternalLink size={16} color={Colors.textLight} />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Reviews</Text>
@@ -572,5 +653,21 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 8,
+    marginBottom: 8,
+    gap: 12,
+  },
+  linkText: {
+    flex: 1,
+    fontSize: 16,
+    color: Colors.text,
+    fontWeight: '500',
   },
 });
