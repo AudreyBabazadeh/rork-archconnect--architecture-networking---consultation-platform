@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
-import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon } from 'lucide-react-native';
+import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon, Linkedin, Globe, Instagram } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -101,15 +101,112 @@ export default function ProfileScreen() {
           )}
 
           {user.bio && <Text style={styles.bio}>{user.bio}</Text>}
+        </View>
 
-          {user.specialization && (
+        {user.specialties && user.specialties.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Expertise & Skills</Text>
             <View style={styles.specialties}>
-              <View style={styles.specialtyTag}>
-                <Text style={styles.specialtyText}>{user.specialization}</Text>
+              {user.specialties.map((specialty) => (
+                <View key={specialty} style={styles.specialtyTag}>
+                  <Text style={styles.specialtyText}>{specialty}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {(user as any).portfolioImages && (user as any).portfolioImages.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Portfolio</Text>
+            <View style={styles.portfolioGrid}>
+              {(user as any).portfolioImages.map((img: any) => (
+                <View key={img.id} style={styles.portfolioCard}>
+                  <Image source={{ uri: img.uri }} style={styles.portfolioImageView} />
+                  {img.caption && (
+                    <Text style={styles.portfolioCaption}>{img.caption}</Text>
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {((user as any).teachingFocus || (user as any).howITeach || (user as any).idealMentees) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Mentorship Approach</Text>
+            {(user as any).teachingFocus && (
+              <View style={styles.approachSection}>
+                <Text style={styles.approachTitle}>What I can help with</Text>
+                <Text style={styles.approachText}>{(user as any).teachingFocus}</Text>
+              </View>
+            )}
+            {(user as any).howITeach && (
+              <View style={styles.approachSection}>
+                <Text style={styles.approachTitle}>How I teach</Text>
+                <Text style={styles.approachText}>{(user as any).howITeach}</Text>
+              </View>
+            )}
+            {(user as any).idealMentees && (
+              <View style={styles.approachSection}>
+                <Text style={styles.approachTitle}>Ideal mentees</Text>
+                <Text style={styles.approachText}>{(user as any).idealMentees}</Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {(user as any).sessionTypes && (user as any).sessionTypes.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Session Preferences</Text>
+            <View style={styles.sessionPreferences}>
+              <Text style={styles.preferenceLabel}>Session Types:</Text>
+              <View style={styles.sessionTypesContainer}>
+                {(user as any).sessionTypes.map((type: string) => (
+                  <View key={type} style={styles.sessionTypeTag}>
+                    <Text style={styles.sessionTypeText}>{type}</Text>
+                  </View>
+                ))}
               </View>
             </View>
-          )}
-        </View>
+            {(user as any).preferredDuration && (
+              <View style={styles.sessionPreferences}>
+                <Text style={styles.preferenceLabel}>Preferred Duration:</Text>
+                <Text style={styles.preferenceValue}>{(user as any).preferredDuration}</Text>
+              </View>
+            )}
+            {(user as any).pricingTier && (
+              <View style={styles.sessionPreferences}>
+                <Text style={styles.preferenceLabel}>Pricing Tier:</Text>
+                <Text style={styles.preferenceValue}>{(user as any).pricingTier}</Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {((user as any).linkedIn || (user as any).website || (user as any).instagram || (user as any).externalPortfolio) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Connect</Text>
+            {(user as any).linkedIn && (
+              <View style={styles.linkRow}>
+                <Linkedin size={18} color={Colors.primary} />
+                <Text style={styles.linkText}>{(user as any).linkedIn}</Text>
+              </View>
+            )}
+            {(user as any).website && (
+              <View style={styles.linkRow}>
+                <Globe size={18} color={Colors.primary} />
+                <Text style={styles.linkText}>{(user as any).website}</Text>
+              </View>
+            )}
+            {(user as any).instagram && (
+              <View style={styles.linkRow}>
+                <Instagram size={18} color={Colors.primary} />
+                <Text style={styles.linkText}>{(user as any).instagram}</Text>
+              </View>
+            )}
+          </View>
+        )}
 
         <View style={styles.statsContainer}>
           <TouchableOpacity 
@@ -285,7 +382,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    justifyContent: 'center',
   },
   specialtyTag: {
     backgroundColor: Colors.surface,
@@ -379,6 +475,83 @@ const styles = StyleSheet.create({
   actionSubtitle: {
     fontSize: 14,
     color: Colors.textSecondary,
+  },
+  portfolioGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 12,
+  },
+  portfolioCard: {
+    width: '48%',
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  portfolioImageView: {
+    width: '100%',
+    aspectRatio: 1,
+    resizeMode: 'cover',
+  },
+  portfolioCaption: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    padding: 8,
+  },
+  approachSection: {
+    marginBottom: 16,
+  },
+  approachTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  approachText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+  },
+  sessionPreferences: {
+    marginBottom: 12,
+  },
+  preferenceLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  preferenceValue: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
+  sessionTypesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
+  },
+  sessionTypeTag: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: Colors.primary + '15',
+  },
+  sessionTypeText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  linkText: {
+    fontSize: 14,
+    color: Colors.primary,
+    flex: 1,
   },
   errorContainer: {
     flex: 1,

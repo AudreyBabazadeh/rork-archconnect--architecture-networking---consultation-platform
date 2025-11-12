@@ -899,20 +899,28 @@ export default function EditProfileScreen() {
                 <X size={24} color={Colors.text} />
               </TouchableOpacity>
             </View>
-            <ScrollView style={styles.previewContent}>
+            <ScrollView style={styles.previewContent} showsVerticalScrollIndicator={false}>
               <View style={styles.previewProfileHeader}>
                 <Image
                   source={{ uri: formData.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' }}
                   style={styles.previewProfileImage}
                 />
                 <Text style={styles.previewName}>{formData.name || 'Your Name'}</Text>
-                <Text style={styles.previewTitle}>{formData.occupation || 'Your Title'}</Text>
-                <Text style={styles.previewLocation}>{formData.location || 'Location'}</Text>
+                {formData.occupation && <Text style={styles.previewTitle}>{formData.occupation}</Text>}
+                {formData.university && <Text style={styles.previewUniversity}>{formData.university}</Text>}
+                {formData.location && <Text style={styles.previewLocation}>{formData.location}</Text>}
               </View>
+
+              {formData.bio && (
+                <View style={styles.previewSection}>
+                  <Text style={styles.previewSectionTitle}>About</Text>
+                  <Text style={styles.previewText}>{formData.bio}</Text>
+                </View>
+              )}
 
               {formData.expertiseTags.length > 0 && (
                 <View style={styles.previewSection}>
-                  <Text style={styles.previewSectionTitle}>Expertise</Text>
+                  <Text style={styles.previewSectionTitle}>Expertise & Skills</Text>
                   <View style={styles.tagsContainer}>
                     {formData.expertiseTags.map((tag: string) => (
                       <View key={tag} style={styles.previewTag}>
@@ -923,25 +931,93 @@ export default function EditProfileScreen() {
                 </View>
               )}
 
-              {formData.bio && (
-                <View style={styles.previewSection}>
-                  <Text style={styles.previewSectionTitle}>About</Text>
-                  <Text style={styles.previewText}>{formData.bio}</Text>
-                </View>
-              )}
-
               {formData.portfolioImages.length > 0 && (
                 <View style={styles.previewSection}>
                   <Text style={styles.previewSectionTitle}>Portfolio</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.previewPortfolioGrid}>
                     {formData.portfolioImages.map((img: PortfolioImage) => (
-                      <View key={img.id} style={styles.previewPortfolioItem}>
+                      <View key={img.id} style={styles.previewPortfolioCard}>
                         <Image source={{ uri: img.uri }} style={styles.previewPortfolioImage} />
+                        {img.caption && (
+                          <Text style={styles.previewPortfolioCaption}>{img.caption}</Text>
+                        )}
                       </View>
                     ))}
-                  </ScrollView>
+                  </View>
                 </View>
               )}
+
+              {(formData.teachingFocus || formData.howITeach || formData.idealMentees) && (
+                <View style={styles.previewSection}>
+                  <Text style={styles.previewSectionTitle}>Mentorship Approach</Text>
+                  {formData.teachingFocus && (
+                    <View style={styles.previewSubSection}>
+                      <Text style={styles.previewSubTitle}>What I can help with</Text>
+                      <Text style={styles.previewText}>{formData.teachingFocus}</Text>
+                    </View>
+                  )}
+                  {formData.howITeach && (
+                    <View style={styles.previewSubSection}>
+                      <Text style={styles.previewSubTitle}>How I teach</Text>
+                      <Text style={styles.previewText}>{formData.howITeach}</Text>
+                    </View>
+                  )}
+                  {formData.idealMentees && (
+                    <View style={styles.previewSubSection}>
+                      <Text style={styles.previewSubTitle}>Ideal mentees</Text>
+                      <Text style={styles.previewText}>{formData.idealMentees}</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {formData.sessionTypes.length > 0 && (
+                <View style={styles.previewSection}>
+                  <Text style={styles.previewSectionTitle}>Session Preferences</Text>
+                  <View style={styles.previewPreferenceRow}>
+                    <Text style={styles.previewPreferenceLabel}>Session Types:</Text>
+                    <View style={styles.previewSessionTypes}>
+                      {formData.sessionTypes.map((type: string) => (
+                        <View key={type} style={styles.previewSessionType}>
+                          <Text style={styles.previewSessionTypeText}>{type}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                  {formData.preferredDuration && (
+                    <View style={styles.previewPreferenceRow}>
+                      <Text style={styles.previewPreferenceLabel}>Preferred Duration:</Text>
+                      <Text style={styles.previewPreferenceValue}>{formData.preferredDuration}</Text>
+                    </View>
+                  )}
+                  {formData.pricingTier && (
+                    <View style={styles.previewPreferenceRow}>
+                      <Text style={styles.previewPreferenceLabel}>Pricing Tier:</Text>
+                      <Text style={styles.previewPreferenceValue}>{formData.pricingTier}</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {(formData.linkedIn || formData.website || formData.instagram || formData.externalPortfolio) && (
+                <View style={styles.previewSection}>
+                  <Text style={styles.previewSectionTitle}>Connect</Text>
+                  {formData.linkedIn && (
+                    <Text style={styles.previewLink}>LinkedIn: {formData.linkedIn}</Text>
+                  )}
+                  {formData.website && (
+                    <Text style={styles.previewLink}>Website: {formData.website}</Text>
+                  )}
+                  {formData.instagram && (
+                    <Text style={styles.previewLink}>Instagram: {formData.instagram}</Text>
+                  )}
+                  {formData.externalPortfolio && (
+                    <Text style={styles.previewLink}>Portfolio: {formData.externalPortfolio}</Text>
+                  )}
+                </View>
+              )}
+
+              <View style={{ height: 40 }} />
             </ScrollView>
           </View>
         </Modal>
@@ -1352,17 +1428,77 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: '500',
   },
-  previewPortfolioItem: {
-    width: 200,
-    height: 200,
+  previewUniversity: {
+    fontSize: 14,
+    color: Colors.primary,
+    marginBottom: 4,
+  },
+  previewPortfolioGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 8,
+  },
+  previewPortfolioCard: {
+    width: '48%',
+    backgroundColor: Colors.background,
     borderRadius: 12,
-    marginRight: 12,
     overflow: 'hidden',
+    marginBottom: 12,
   },
   previewPortfolioImage: {
     width: '100%',
-    height: '100%',
+    aspectRatio: 1,
     resizeMode: 'cover',
+  },
+  previewPortfolioCaption: {
+    fontSize: 12,
+    color: Colors.textLight,
+    padding: 8,
+  },
+  previewSubSection: {
+    marginBottom: 16,
+  },
+  previewSubTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  previewPreferenceRow: {
+    marginBottom: 12,
+  },
+  previewPreferenceLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 6,
+  },
+  previewPreferenceValue: {
+    fontSize: 14,
+    color: Colors.textLight,
+  },
+  previewSessionTypes: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
+  },
+  previewSessionType: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: Colors.primary + '15',
+  },
+  previewSessionTypeText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  previewLink: {
+    fontSize: 14,
+    color: Colors.primary,
+    marginBottom: 8,
   },
   selectedTagsSection: {
     marginTop: 20,

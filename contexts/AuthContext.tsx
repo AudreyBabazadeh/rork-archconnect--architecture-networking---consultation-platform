@@ -172,7 +172,13 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     try {
       if (!user) return;
       
-      const updatedUser = { ...user, ...updates };
+      const processedUpdates = { ...updates };
+      
+      if ((updates as any).expertiseTags) {
+        processedUpdates.specialties = (updates as any).expertiseTags;
+      }
+      
+      const updatedUser = { ...user, ...processedUpdates };
       
       setUser(updatedUser);
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
