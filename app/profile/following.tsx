@@ -13,7 +13,9 @@ export default function FollowingScreen() {
 
   useEffect(() => {
     const loadFollowingUsers = async () => {
+      setIsLoading(true);
       const followingIds = getFollowingList();
+      console.log('Loading following users, IDs:', followingIds);
       const users: AuthUser[] = [];
       
       for (const id of followingIds) {
@@ -23,12 +25,13 @@ export default function FollowingScreen() {
         }
       }
       
+      console.log('Loaded following users:', users.length);
       setFollowingUsers(users);
       setIsLoading(false);
     };
 
     loadFollowingUsers();
-  }, []);
+  }, [getFollowingList, getUserById]);
 
   const renderUser = ({ item }: { item: AuthUser }) => (
     <TouchableOpacity
