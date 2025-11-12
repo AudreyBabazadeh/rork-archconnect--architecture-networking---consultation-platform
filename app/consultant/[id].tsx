@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Dimensions } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { Star, MapPin, Clock, MessageCircle, Calendar, UserPlus, UserMinus } from 'lucide-react-native';
+import { Star, MapPin, Clock, MessageCircle, Calendar, UserPlus, UserMinus, Share2 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
@@ -10,6 +10,7 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMessaging } from '@/contexts/MessagingContext';
 import { useFollow } from '@/contexts/FollowContext';
+import { ShareModal } from '@/components/ShareModal';
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +24,7 @@ export default function ConsultantProfile() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [consultant, setConsultant] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [shareModalVisible, setShareModalVisible] = useState(false);
   
   // Load consultant data from cloud, local storage, and mock users
   useEffect(() => {
@@ -166,6 +168,10 @@ export default function ConsultantProfile() {
     }
   };
 
+  const handleShare = () => {
+    setShareModalVisible(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen 
@@ -173,6 +179,11 @@ export default function ConsultantProfile() {
           headerShown: true,
           title: consultant.name,
           headerBackTitle: 'Back',
+          headerRight: () => (
+            <TouchableOpacity onPress={handleShare} style={{ marginRight: 8 }}>
+              <Share2 size={24} color={Colors.primary} />
+            </TouchableOpacity>
+          ),
         }} 
       />
       
@@ -284,6 +295,16 @@ export default function ConsultantProfile() {
           totalReviews={consultant.reviewCount} 
         />
       </ScrollView>
+
+      <ShareModal
+        visible={shareModalVisible}
+        onClose={() => setShareModalVisible(false)}
+        shareContent={{
+          title: `Check out ${consultant.name}'s profile`,
+          message: `${consultant.name}${consultant.title ? ` - ${consultant.title}` : ''}${consultant.bio ? `\n${consultant.bio}` : ''}\n\nConnect with them!`,
+        }}
+        type="profile"
+      />
 
       <View style={styles.bottomActions}>
         {currentUser?.id !== consultant.id && (

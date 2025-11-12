@@ -1,14 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert, Share } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
 import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFollow } from '@/contexts/FollowContext';
+import { ShareModal } from '@/components/ShareModal';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const { getFollowingCount, getFollowerCount } = useFollow();
+  const [shareModalVisible, setShareModalVisible] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -28,15 +30,8 @@ export default function ProfileScreen() {
     );
   };
 
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        title: `Check out ${user.name}'s profile`,
-        message: `${user.name}${user.occupation ? ` - ${user.occupation}` : ''}${user.bio ? `\n${user.bio}` : ''}\n\nConnect with them!`,
-      });
-    } catch (error: any) {
-      Alert.alert('Error', 'Failed to share profile');
-    }
+  const handleShare = () => {
+    setShareModalVisible(true);
   };
 
   if (!user) {
@@ -51,6 +46,16 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ShareModal
+        visible={shareModalVisible}
+        onClose={() => setShareModalVisible(false)}
+        shareContent={{
+          title: `Check out ${user.name}'s profile`,
+          message: `${user.name}${user.occupation ? ` - ${user.occupation}` : ''}${user.bio ? `\n${user.bio}` : ''}\n\nConnect with them!`,
+        }}
+        type="profile"
+      />
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
