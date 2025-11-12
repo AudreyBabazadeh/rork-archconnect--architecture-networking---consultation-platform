@@ -1263,13 +1263,15 @@ const styles = StyleSheet.create({
   },
   eventHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
   priceTag: {
     fontSize: 16,
     fontWeight: '700',
-    marginLeft: 8,
+    marginLeft: 12,
+    flexShrink: 0,
   },
   priceEarned: {
     fontSize: 18,
