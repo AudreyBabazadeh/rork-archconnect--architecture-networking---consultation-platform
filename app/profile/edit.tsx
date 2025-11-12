@@ -269,6 +269,76 @@ export default function EditProfileScreen() {
     }
   };
 
+  const pickCoverImageFromCamera = async () => {
+    const hasPermissions = await requestPermissions();
+    if (!hasPermissions) return;
+
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        updateFormData('coverImage', result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking cover image from camera:', error);
+      Alert.alert('Error', 'Failed to take photo. Please try again.');
+    }
+  };
+
+  const pickCoverImageFromGallery = async () => {
+    const hasPermissions = await requestPermissions();
+    if (!hasPermissions) return;
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        updateFormData('coverImage', result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking cover image from gallery:', error);
+      Alert.alert('Error', 'Failed to select photo. Please try again.');
+    }
+  };
+
+  const showCoverImagePickerOptions = () => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Take Photo', 'Choose from Gallery'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) {
+            pickCoverImageFromCamera();
+          } else if (buttonIndex === 2) {
+            pickCoverImageFromGallery();
+          }
+        }
+      );
+    } else {
+      Alert.alert(
+        'Change Cover Image',
+        'Choose an option',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Take Photo', onPress: pickCoverImageFromCamera },
+          { text: 'Choose from Gallery', onPress: pickCoverImageFromGallery },
+        ]
+      );
+    }
+  };
+
   const updateFormData = (key: string, value: any) => {
     setFormData((prev: any) => ({ ...prev, [key]: value }));
   };
@@ -395,6 +465,22 @@ export default function EditProfileScreen() {
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.coverImageContainer}>
+          <Image
+            source={{ uri: formData.coverImage || 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1200&h=400&fit=crop' }}
+            style={styles.coverImageStyle}
+            resizeMode="cover"
+          />
+          <TouchableOpacity 
+            style={styles.changeCoverButton} 
+            onPress={showCoverImagePickerOptions}
+            testID="change-cover-button"
+          >
+            <Camera size={16} color={Colors.white} />
+            <Text style={styles.changeCoverText}>Change Cover</Text>
+          </TouchableOpacity>
+        </View>
+        
         <View style={styles.profileImageContainer}>
           <Image
             source={{ uri: formData.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' }}
@@ -992,9 +1078,38 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  coverImageContainer: {
+    position: 'relative',
+    height: 200,
+    backgroundColor: Colors.border,
+    marginBottom: 0,
+  },
+  coverImageStyle: {
+    width: '100%',
+    height: '100%',
+  },
+  changeCoverButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  changeCoverText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+  },
   profileImageContainer: {
     alignItems: 'center',
-    paddingVertical: 32,
+    paddingTop: 0,
+    marginTop: -60,
+    paddingBottom: 32,
     backgroundColor: Colors.white,
     marginBottom: 16,
   },
