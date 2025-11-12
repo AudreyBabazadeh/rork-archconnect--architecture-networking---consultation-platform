@@ -76,25 +76,7 @@ export default function HomeScreen() {
     router.push(`/post/${postId}`);
   };
 
-  const handleShare = async (postId: string) => {
-    const post = mockPosts.find(p => p.id === postId);
-    if (!post) return;
 
-    try {
-      const { Share } = await import('react-native');
-      const result = await Share.share({
-        title: `Check out this post by ${post.authorName}`,
-        message: `${post.content}\n\n- ${post.authorName}, ${post.authorTitle}`,
-        url: `https://rork.app/post/${post.id}`,
-      });
-
-      if (result.action === Share.sharedAction) {
-        console.log('Post shared successfully');
-      }
-    } catch (error: any) {
-      console.error('Error sharing:', error.message);
-    }
-  };
 
   const handleAuthorPress = (authorId: string) => {
     // Navigate to author profile
@@ -114,7 +96,6 @@ export default function HomeScreen() {
       post={item}
       onLike={handleLike}
       onComment={handleComment}
-      onShare={handleShare}
       onAuthorPress={handleAuthorPress}
     />
   );

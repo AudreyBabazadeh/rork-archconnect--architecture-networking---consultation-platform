@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
-import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award } from 'lucide-react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert, Share } from 'react-native';
+import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -28,6 +28,17 @@ export default function ProfileScreen() {
     );
   };
 
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        title: `Check out ${user.name}'s profile`,
+        message: `${user.name}${user.occupation ? ` - ${user.occupation}` : ''}${user.bio ? `\n${user.bio}` : ''}\n\nConnect with them!`,
+      });
+    } catch (error: any) {
+      Alert.alert('Error', 'Failed to share profile');
+    }
+  };
+
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
@@ -44,9 +55,14 @@ export default function ProfileScreen() {
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <Text style={styles.title}>Profile</Text>
-            <TouchableOpacity style={styles.settingsButton} onPress={handleSignOut}>
-              <LogOut size={24} color={Colors.text} />
-            </TouchableOpacity>
+            <View style={styles.headerButtons}>
+              <TouchableOpacity style={styles.headerButton} onPress={handleShare}>
+                <ShareIcon size={24} color={Colors.text} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.headerButton} onPress={handleSignOut}>
+                <LogOut size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -189,7 +205,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.text,
   },
-  settingsButton: {
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerButton: {
     padding: 8,
   },
   profileCard: {

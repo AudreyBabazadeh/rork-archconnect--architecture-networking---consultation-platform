@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Star, MapPin, UserPlus, UserMinus } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Share, Alert } from 'react-native';
+import { Star, MapPin, UserPlus, UserMinus, Share as ShareIcon } from 'lucide-react-native';
 import { User } from '@/types/user';
 import { Colors } from '@/constants/colors';
 import { LoyaltyBadge } from './LoyaltyBadge';
@@ -24,6 +24,18 @@ export function UserCard({ user, onPress }: UserCardProps) {
       unfollowUser(user.id);
     } else {
       followUser(user.id);
+    }
+  };
+
+  const handleShare = async (e: any) => {
+    e.stopPropagation();
+    try {
+      await Share.share({
+        title: `Check out ${user.name}'s profile`,
+        message: `${user.name} - ${user.title}\n${user.bio}\n\nConnect with them!`,
+      });
+    } catch (error: any) {
+      Alert.alert('Error', 'Failed to share profile');
     }
   };
   return (
@@ -77,6 +89,13 @@ export function UserCard({ user, onPress }: UserCardProps) {
               {user.isAvailable ? 'Available' : 'Busy'}
             </Text>
           </View>
+          <TouchableOpacity
+            style={styles.shareButton}
+            onPress={handleShare}
+            activeOpacity={0.7}
+          >
+            <ShareIcon size={16} color={Colors.textSecondary} />
+          </TouchableOpacity>
           {!isCurrentUser && (
             <TouchableOpacity
               style={[styles.followButton, following && styles.followingButton]}
@@ -227,6 +246,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  shareButton: {
+    backgroundColor: Colors.surface,
+    borderRadius: 20,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   followButton: {
     backgroundColor: Colors.primary,

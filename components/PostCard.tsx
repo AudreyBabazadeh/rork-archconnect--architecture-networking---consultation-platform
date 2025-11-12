@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
-import { Heart, MessageCircle, Share, MoreHorizontal } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Share, Alert } from 'react-native';
+import { Heart, MessageCircle, Share as ShareIcon, MoreHorizontal } from 'lucide-react-native';
 import { Post } from '@/types/user';
 import { Colors } from '@/constants/colors';
 
@@ -8,7 +8,6 @@ interface PostCardProps {
   post: Post;
   onLike: (postId: string) => void;
   onComment: (postId: string) => void;
-  onShare: (postId: string) => void;
   onAuthorPress: (authorId: string) => void;
 }
 
@@ -19,7 +18,6 @@ export const PostCard: React.FC<PostCardProps> = ({
   post,
   onLike,
   onComment,
-  onShare,
   onAuthorPress,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -34,6 +32,21 @@ export const PostCard: React.FC<PostCardProps> = ({
       return `${Math.floor(diffInMinutes / 60)}h`;
     } else {
       return `${Math.floor(diffInMinutes / 1440)}d`;
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const result = await Share.share({
+        title: `Check out this post by ${post.authorName}`,
+        message: `${post.content}\n\n- ${post.authorName}, ${post.authorTitle}`,
+      });
+
+      if (result.action === Share.sharedAction) {
+        console.log('Post shared successfully');
+      }
+    } catch (error: any) {
+      Alert.alert('Error', 'Failed to share post');
     }
   };
 
@@ -140,9 +153,9 @@ export const PostCard: React.FC<PostCardProps> = ({
 
         <TouchableOpacity 
           style={styles.actionButton}
-          onPress={() => onShare(post.id)}
+          onPress={handleShare}
         >
-          <Share size={20} color={Colors.textLight} />
+          <ShareIcon size={20} color={Colors.textLight} />
         </TouchableOpacity>
       </View>
     </View>
