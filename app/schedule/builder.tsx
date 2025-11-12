@@ -33,7 +33,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSchedule, Event as ScheduleItemEvent, Task, UnavailablePeriod } from '@/contexts/ScheduleContext';
 
 type ViewMode = 'month' | 'week' | 'day';
-type FilterType = 'all' | 'booked-by-me' | 'booked-with-me';
+type FilterType = 'all' | 'booked-by-me' | 'booked-with-me' | 'event' | 'task';
 
 interface ScheduleEvent {
   id: string;
@@ -45,7 +45,7 @@ interface ScheduleEvent {
   participantAvatar?: string;
   location?: string;
   meetingLink?: string;
-  type: 'booked-by-me' | 'booked-with-me';
+  type: 'booked-by-me' | 'booked-with-me' | 'event' | 'task';
   amount: number;
   description?: string;
   timezone?: string;
@@ -234,7 +234,7 @@ export default function ScheduleBuilderScreen() {
         date: event.date,
         duration: event.duration,
         participantName: 'Personal Event',
-        type: 'booked-by-me',
+        type: 'event' as any,
         amount: 0,
         description: event.description,
         location: event.location,
@@ -249,7 +249,7 @@ export default function ScheduleBuilderScreen() {
         date: task.date,
         duration: 30,
         participantName: 'Task',
-        type: 'booked-by-me',
+        type: 'task' as any,
         amount: 0,
         description: task.description,
         location: `Priority: ${task.priority}`,
@@ -541,6 +541,18 @@ export default function ScheduleBuilderScreen() {
                 const eventWidth = (columnWidth * widthPercent) / 100;
                 const eventLeft = columnLeft + (columnWidth * leftPercent) / 100;
                 
+                const getEventColor = () => {
+                  if (event.type === 'event' || event.type === 'task') return '#FFFFFF';
+                  if (event.type === 'booked-by-me') return '#000000';
+                  if (event.type === 'booked-with-me') return '#00C853';
+                  return Colors.primary;
+                };
+
+                const getEventTextColor = () => {
+                  if (event.type === 'event' || event.type === 'task') return Colors.text;
+                  return Colors.white;
+                };
+
                 return (
                   <TouchableOpacity
                     key={event.id}
@@ -551,16 +563,18 @@ export default function ScheduleBuilderScreen() {
                         width: eventWidth + '%',
                         top: top,
                         height: height,
-                        backgroundColor: event.type === 'booked-by-me' ? Colors.primary : Colors.success,
+                        backgroundColor: getEventColor(),
+                        borderWidth: (event.type === 'event' || event.type === 'task') ? 1 : 0,
+                        borderColor: Colors.border,
                       }
                     ]}
                     onPress={() => handleEventPress(event)}
                   >
-                    <Text style={[styles.weekEventTitle, isHalfHour && { fontSize: 10 }]} numberOfLines={isHalfHour ? 2 : 1}>
+                    <Text style={[styles.weekEventTitle, isHalfHour && { fontSize: 10 }, { color: getEventTextColor() }]} numberOfLines={isHalfHour ? 2 : 1}>
                       {event.title}
                     </Text>
                     {!isHalfHour && widthPercent > 50 && (
-                      <Text style={styles.weekEventTime} numberOfLines={1}>
+                      <Text style={[styles.weekEventTime, { color: getEventTextColor() }]} numberOfLines={1}>
                         {formatTimeTo12Hour(event.time)} • {isTask ? event.participantName : event.participantName}
                       </Text>
                     )}
@@ -582,11 +596,15 @@ export default function ScheduleBuilderScreen() {
       <View style={styles.dayView}>
         <View style={styles.legend}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: Colors.primary }]} />
+            <View style={[styles.legendColor, { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: Colors.border }]} />
+            <Text style={styles.legendText}>Events & Tasks</Text>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: '#000000' }]} />
             <Text style={styles.legendText}>Booked by Me</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: Colors.success }]} />
+            <View style={[styles.legendColor, { backgroundColor: '#00C853' }]} />
             <Text style={styles.legendText}>Booked with Me</Text>
           </View>
         </View>
@@ -611,6 +629,18 @@ export default function ScheduleBuilderScreen() {
               const isTask = event.title.startsWith('📋');
               const hasMultipleOverlaps = widthPercent < 100;
               
+              const getEventColor = () => {
+                if (event.type === 'event' || event.type === 'task') return '#FFFFFF';
+                if (event.type === 'booked-by-me') return '#000000';
+                if (event.type === 'booked-with-me') return '#00C853';
+                return Colors.primary;
+              };
+
+              const getEventTextColor = () => {
+                if (event.type === 'event' || event.type === 'task') return Colors.text;
+                return Colors.white;
+              };
+
               return (
                 <TouchableOpacity
                   key={event.id}
@@ -621,39 +651,41 @@ export default function ScheduleBuilderScreen() {
                       height: height,
                       left: hasMultipleOverlaps ? `${62 + leftPercent * 0.85}%` : 62,
                       right: hasMultipleOverlaps ? `${8 + (100 - leftPercent - widthPercent) * 0.85}%` : 8,
-                      backgroundColor: event.type === 'booked-by-me' ? Colors.primary : Colors.success,
+                      backgroundColor: getEventColor(),
+                      borderWidth: (event.type === 'event' || event.type === 'task') ? 1 : 0,
+                      borderColor: Colors.border,
                     }
                   ]}
                   onPress={() => handleEventPress(event)}
                 >
                   <View style={styles.dayEventContent}>
-                    <Text style={[styles.dayEventTitle, (isHalfHour || hasMultipleOverlaps) && { fontSize: 12, marginBottom: 0 }]} numberOfLines={isHalfHour || hasMultipleOverlaps ? 2 : 1}>
+                    <Text style={[styles.dayEventTitle, (isHalfHour || hasMultipleOverlaps) && { fontSize: 12, marginBottom: 0 }, { color: getEventTextColor() }]} numberOfLines={isHalfHour || hasMultipleOverlaps ? 2 : 1}>
                       {event.title}
                     </Text>
                     {!isHalfHour && !hasMultipleOverlaps && (
                       <>
                         <View style={styles.dayEventDetails}>
                           <View style={styles.dayEventParticipant}>
-                            <View style={styles.dayEventAvatar}>
-                              <User size={12} color={Colors.white} />
+                            <View style={[styles.dayEventAvatar, { backgroundColor: event.type === 'event' || event.type === 'task' ? Colors.border : 'rgba(255,255,255,0.3)' }]}>
+                              <User size={12} color={event.type === 'event' || event.type === 'task' ? Colors.textSecondary : Colors.white} />
                             </View>
-                            <Text style={styles.dayEventParticipantName} numberOfLines={1}>
+                            <Text style={[styles.dayEventParticipantName, { color: getEventTextColor() }]} numberOfLines={1}>
                               {event.participantName}
                             </Text>
                           </View>
                           {!isTask && (
-                            <View style={styles.dayEventBadge}>
-                              <Text style={styles.dayEventBadgeText}>
-                                {event.type === 'booked-by-me' ? 'Booked by Me' : 'Booked with Me'}
+                            <View style={[styles.dayEventBadge, { backgroundColor: event.type === 'event' || event.type === 'task' ? Colors.border : 'rgba(255,255,255,0.2)' }]}>
+                              <Text style={[styles.dayEventBadgeText, { color: getEventTextColor() }]}>
+                                {event.type === 'booked-by-me' ? 'Booked by Me' : event.type === 'booked-with-me' ? 'Booked with Me' : 'Event'}
                               </Text>
                             </View>
                           )}
                         </View>
                         <View style={styles.dayEventMeta}>
-                          <Text style={styles.dayEventTime}>
+                          <Text style={[styles.dayEventTime, { color: getEventTextColor(), opacity: event.type === 'event' || event.type === 'task' ? 1 : 0.9 }]}>
                             {formatTimeTo12Hour(event.time)} • {event.duration}min
                           </Text>
-                          <Text style={styles.dayEventLocation}>
+                          <Text style={[styles.dayEventLocation, { color: getEventTextColor(), opacity: event.type === 'event' || event.type === 'task' ? 1 : 0.9 }]}>
                             {event.location}
                           </Text>
                         </View>
