@@ -42,6 +42,7 @@ interface ScheduleEvent {
   date: string;
   duration: number;
   participantName: string;
+  participantId?: string;
   participantAvatar?: string;
   location?: string;
   meetingLink?: string;
@@ -70,7 +71,11 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
   };
 
   const handleMessage = () => {
-    router.push('/messages');
+    if (event.participantId) {
+      router.push(`/messages/${event.participantId}`);
+    } else {
+      router.push('/messages');
+    }
     onClose();
   };
 
@@ -217,6 +222,7 @@ export default function ScheduleBuilderScreen() {
           date: request.date,
           duration: 60,
           participantName: isBookedByMe ? request.mentorName : request.studentName,
+          participantId: isBookedByMe ? request.mentorId : request.studentId,
           type: isBookedByMe ? 'booked-by-me' : 'booked-with-me',
           amount: request.amount,
           description: request.description,

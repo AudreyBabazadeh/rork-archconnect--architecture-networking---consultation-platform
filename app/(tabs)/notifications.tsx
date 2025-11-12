@@ -212,7 +212,7 @@ export default function NotificationsScreen() {
   };
   
   const handleMessage = (userId: string) => {
-    router.push('/messages');
+    router.push(`/messages/${userId}`);
   };
   
   const handleScheduleBuilder = () => {
