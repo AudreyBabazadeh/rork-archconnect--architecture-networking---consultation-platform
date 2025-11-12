@@ -1,4 +1,5 @@
 export type LoyaltyBadge = 'silver' | 'gold';
+export type PricingTier = 'Free' | 'Moderate' | 'Premium' | 'Enterprise';
 
 export interface User {
   id: string;
@@ -11,6 +12,7 @@ export interface User {
   specialties: string[];
   experience: string;
   hourlyRate: number;
+  pricingTier?: PricingTier;
   rating: number;
   reviewCount: number;
   bio: string;

@@ -4,6 +4,7 @@ import { Star, MapPin, UserPlus, UserMinus, Share as ShareIcon } from 'lucide-re
 import { User } from '@/types/user';
 import { Colors } from '@/constants/colors';
 import { LoyaltyBadge } from './LoyaltyBadge';
+import { PricingTierBadge } from './PricingTierBadge';
 import { useFollow } from '@/contexts/FollowContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -58,10 +59,11 @@ export function UserCard({ user, onPress }: UserCardProps) {
             <Text style={styles.location}>{user.location}</Text>
           </View>
         </View>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>${user.hourlyRate}</Text>
-          <Text style={styles.priceLabel}>per hour</Text>
-        </View>
+        {user.pricingTier && (
+          <View style={styles.tierBadgeContainer}>
+            <PricingTierBadge tier={user.pricingTier} size={8} />
+          </View>
+        )}
       </View>
 
       <View style={styles.specialties}>
@@ -171,17 +173,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.textLight,
   },
-  priceContainer: {
-    alignItems: 'flex-end',
-  },
-  price: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.primary,
-  },
-  priceLabel: {
-    fontSize: 12,
-    color: Colors.textLight,
+  tierBadgeContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: 8,
   },
   specialties: {
     flexDirection: 'row',

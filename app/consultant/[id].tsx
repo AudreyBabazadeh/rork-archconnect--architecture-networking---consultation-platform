@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
 import { LoyaltyBadge } from '@/components/LoyaltyBadge';
+import { PricingTierBadge } from '@/components/PricingTierBadge';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMessaging } from '@/contexts/MessagingContext';
@@ -49,6 +50,7 @@ export default function ConsultantProfile() {
                   specialties: cloudUser.specialization ? [cloudUser.specialization] : ['General Architecture'],
                   experience: cloudUser.experience || '1 year',
                   hourlyRate: cloudUser.hourlyRate || 25,
+                  pricingTier: (cloudUser as any).pricingTier || 'Moderate',
                   rating: cloudUser.rating || 4.5,
                   reviewCount: (cloudUser as any).totalConsultations || 0,
                   bio: cloudUser.bio || 'Architecture professional ready to help with your projects.',
@@ -93,6 +95,7 @@ export default function ConsultantProfile() {
                 specialties: realUser.specialization ? [realUser.specialization] : ['General Architecture'],
                 experience: realUser.experience || '1 year',
                 hourlyRate: realUser.hourlyRate || 25,
+                pricingTier: realUser.pricingTier || 'Moderate',
                 rating: realUser.rating || 4.5,
                 reviewCount: realUser.totalConsultations || 0,
                 bio: realUser.bio || 'Architecture professional ready to help with your projects.',
@@ -237,9 +240,12 @@ export default function ConsultantProfile() {
               <Text style={styles.reviewCount}>({consultant.reviewCount} reviews)</Text>
             </View>
           </View>
-          <View style={styles.priceContainer}>
-            <Text style={styles.price}>${consultant.hourlyRate}</Text>
-            <Text style={styles.priceLabel}>per hour</Text>
+          <View style={styles.tierContainer}>
+            {consultant.pricingTier && (
+              <View style={styles.tierBadgeWrapper}>
+                <PricingTierBadge tier={consultant.pricingTier} size={10} />
+              </View>
+            )}
             <View style={[styles.statusBadge, { backgroundColor: consultant.isAvailable ? Colors.success : Colors.textLight }]}>
               <Text style={styles.statusText}>
                 {consultant.isAvailable ? 'Available' : 'Busy'}
@@ -470,18 +476,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textLight,
   },
-  priceContainer: {
+  tierContainer: {
     alignItems: 'flex-end',
+    justifyContent: 'center',
+    gap: 8,
   },
-  price: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: Colors.primary,
-  },
-  priceLabel: {
-    fontSize: 12,
-    color: Colors.textLight,
-    marginBottom: 8,
+  tierBadgeWrapper: {
+    paddingVertical: 4,
   },
   statusBadge: {
     paddingHorizontal: 8,
