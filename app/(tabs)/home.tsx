@@ -73,13 +73,27 @@ export default function HomeScreen() {
   };
 
   const handleComment = (postId: string) => {
-    // Navigate to post detail with comments
-    console.log('Comment on post:', postId);
+    router.push(`/post/${postId}`);
   };
 
-  const handleShare = (postId: string) => {
-    // Handle share functionality
-    console.log('Share post:', postId);
+  const handleShare = async (postId: string) => {
+    const post = mockPosts.find(p => p.id === postId);
+    if (!post) return;
+
+    try {
+      const { Share } = await import('react-native');
+      const result = await Share.share({
+        title: `Check out this post by ${post.authorName}`,
+        message: `${post.content}\n\n- ${post.authorName}, ${post.authorTitle}`,
+        url: `https://rork.app/post/${post.id}`,
+      });
+
+      if (result.action === Share.sharedAction) {
+        console.log('Post shared successfully');
+      }
+    } catch (error: any) {
+      console.error('Error sharing:', error.message);
+    }
   };
 
   const handleAuthorPress = (authorId: string) => {
