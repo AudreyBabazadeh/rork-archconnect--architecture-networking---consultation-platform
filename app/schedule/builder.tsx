@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { 
@@ -547,10 +548,13 @@ export default function ScheduleBuilderScreen() {
               const isHalfHour = event.duration === 30;
               const isTask = event.title.startsWith('📋');
               
-              const columnWidth = (100 - 8.5) / 7;
-              const columnLeft = 8.5 + (dayIndex * columnWidth);
+              const screenWidth = Dimensions.get('window').width;
+              const timeColumnWidth = 60;
+              const availableWidth = screenWidth - timeColumnWidth;
+              const columnWidth = availableWidth / 7;
+              const columnLeft = timeColumnWidth + (dayIndex * columnWidth);
               const eventWidth = (columnWidth * widthPercent) / 100;
-              const eventLeft = columnLeft + (columnWidth * leftPercent) / 100 + 0.5;
+              const eventLeftPos = columnLeft + (columnWidth * leftPercent) / 100;
               
               const getEventColor = () => {
                 if (event.type === 'event' || event.type === 'task') return '#FFFFFF';
@@ -570,8 +574,8 @@ export default function ScheduleBuilderScreen() {
                   style={[
                     styles.weekEventBar,
                     {
-                      left: eventLeft + '%',
-                      width: eventWidth + '%',
+                      left: eventLeftPos,
+                      width: eventWidth,
                       top: top,
                       height: height,
                       backgroundColor: getEventColor(),
