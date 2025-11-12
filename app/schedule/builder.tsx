@@ -113,12 +113,6 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
         
         <ScrollView style={styles.modalContent}>
           <View style={styles.eventCard}>
-            <Text style={[
-              styles.priceTag,
-              event.type === 'booked-with-me' ? styles.priceEarned : styles.priceSpent
-            ]}>
-              ${event.amount}
-            </Text>
             <View style={styles.eventHeader}>
               <View style={styles.participantInfo}>
                 <View style={styles.avatarPlaceholder}>
@@ -126,13 +120,19 @@ function EventDetailsModal({ visible, event, onClose, onDelete }: EventDetailsMo
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.participantName}>{event.participantName}</Text>
-                  <View style={[styles.typeBadge, { backgroundColor: event.type === 'booked-by-me' ? `${Colors.primary}20` : `${Colors.success}20` }]}>
+                  <View style={[styles.typeBadge, { backgroundColor: event.type === 'booked-by-me' ? `${Colors.primary}20` : `${Colors.success}20`, alignSelf: 'flex-start' }]}>
                     <Text style={[styles.typeBadgeText, { color: event.type === 'booked-by-me' ? Colors.primary : Colors.success }]}>
                       {event.type === 'booked-by-me' ? 'Booked by Me' : 'Booked with Me'}
                     </Text>
                   </View>
                 </View>
               </View>
+              <Text style={[
+                styles.priceTag,
+                event.type === 'booked-with-me' ? styles.priceEarned : styles.priceSpent
+              ]}>
+                ${event.amount}
+              </Text>
             </View>
             
             <View style={styles.eventDetails}>
@@ -1267,14 +1267,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   priceTag: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
     fontSize: 16,
     fontWeight: '700',
+    marginLeft: 8,
   },
   priceEarned: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '800',
     color: '#00C853',
   },
