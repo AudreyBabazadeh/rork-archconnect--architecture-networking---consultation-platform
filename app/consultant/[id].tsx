@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Linking, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { Star, MapPin, Clock, MessageCircle, Calendar, UserPlus, UserMinus, Share2, ExternalLink, Linkedin, Globe, Instagram } from 'lucide-react-native';
+import { Star, MapPin, MessageCircle, Calendar, UserPlus, UserMinus, Share2, ExternalLink, Linkedin, Globe, Instagram, Award, Briefcase, GraduationCap } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
@@ -13,6 +13,7 @@ import { useMessaging } from '@/contexts/MessagingContext';
 import { useFollow } from '@/contexts/FollowContext';
 import { ShareModal } from '@/components/ShareModal';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ConsultantProfile() {
   const { id } = useLocalSearchParams();
@@ -201,164 +202,209 @@ export default function ConsultantProfile() {
     }
   };
 
+  const accentColor = Colors.primary;
+  const coverImage = 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1200&h=400&fit=crop';
+
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen 
         options={{ 
-          headerShown: true,
-          title: consultant.name,
-          headerBackTitle: 'Back',
-          headerRight: () => (
-            <TouchableOpacity onPress={handleShare} style={{ marginRight: 8 }}>
-              <Share2 size={24} color={Colors.primary} />
-            </TouchableOpacity>
-          ),
+          headerShown: false,
         }} 
       />
       
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Image source={{ uri: consultant.avatar }} style={styles.avatar} />
-          <View style={styles.headerInfo}>
-            <View style={styles.nameRow}>
-              <Text style={styles.name}>{consultant.name}</Text>
-              {consultant.loyaltyBadge && (
-                <LoyaltyBadge badge={consultant.loyaltyBadge} size={18} />
-              )}
-            </View>
-            <Text style={styles.title}>{consultant.title}</Text>
-            {consultant.university && (
-              <Text style={styles.university}>{consultant.university}</Text>
-            )}
-            <View style={styles.locationRow}>
-              <MapPin size={16} color={Colors.textLight} />
-              <Text style={styles.location}>{consultant.location}</Text>
-            </View>
-            <View style={styles.ratingRow}>
-              <Star size={16} color={Colors.secondary} fill={Colors.secondary} />
-              <Text style={styles.rating}>{consultant.rating}</Text>
-              <Text style={styles.reviewCount}>({consultant.reviewCount} reviews)</Text>
-            </View>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+        <View style={styles.heroSection}>
+          <Image 
+            source={{ uri: coverImage }} 
+            style={styles.coverImage}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.4)']}
+            style={styles.coverGradient}
+          />
+          <View style={styles.heroActions}>
+            <TouchableOpacity style={styles.heroButton} onPress={() => router.back()}>
+              <Share2 size={20} color={Colors.white} style={{ transform: [{ rotate: '180deg' }] }} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.heroButton} onPress={handleShare}>
+              <Share2 size={20} color={Colors.white} />
+            </TouchableOpacity>
           </View>
-          <View style={styles.tierContainer}>
+        </View>
+
+        <View style={styles.profileHeaderSection}>
+          <View style={styles.avatarContainer}>
+            <Image 
+              source={{ uri: consultant.avatar }} 
+              style={styles.avatar} 
+            />
+            <View style={[styles.avatarBorder, { borderColor: accentColor }]} />
+          </View>
+        </View>
+
+        <View style={styles.profileInfoCard}>
+          <View style={styles.nameRow}>
+            <Text style={styles.name}>{consultant.name}</Text>
+            {consultant.loyaltyBadge && (
+              <LoyaltyBadge badge={consultant.loyaltyBadge} size={18} />
+            )}
+          </View>
+          {consultant.title && <Text style={styles.userTitle}>{consultant.title}</Text>}
+          
+          <View style={styles.metaInfoRow}>
+            {consultant.university && (
+              <View style={styles.metaItem}>
+                <GraduationCap size={16} color={accentColor} />
+                <Text style={styles.metaText}>{consultant.university}</Text>
+              </View>
+            )}
+            {consultant.location && (
+              <View style={styles.metaItem}>
+                <MapPin size={16} color={accentColor} />
+                <Text style={styles.metaText}>{consultant.location}</Text>
+              </View>
+            )}
+          </View>
+
+          {consultant.bio && (
+            <Text style={styles.bio}>{consultant.bio}</Text>
+          )}
+
+          <View style={styles.statusRow}>
             {consultant.pricingTier && (
-              <View style={styles.tierBadgeWrapper}>
+              <View style={styles.tierBadgeContainer}>
                 <PricingTierBadge tier={consultant.pricingTier} size={10} />
+                <Text style={styles.tierLabel}>{consultant.pricingTier}</Text>
               </View>
             )}
             <View style={[styles.statusBadge, { backgroundColor: consultant.isAvailable ? Colors.success : Colors.textLight }]}>
               <Text style={styles.statusText}>
-                {consultant.isAvailable ? 'Available' : 'Busy'}
+                {consultant.isAvailable ? 'Available' : 'Unavailable'}
               </Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Specialties</Text>
-          <View style={styles.specialties}>
-            {consultant.specialties.map((specialty: string, index: number) => (
-              <View key={index} style={styles.specialtyTag}>
-                <Text style={styles.specialtyText}>{specialty}</Text>
+        <View style={styles.statsCard}>
+          <View style={styles.statsGrid}>
+            <View style={styles.statBox}>
+              <View style={styles.ratingRow}>
+                <Star size={18} color={Colors.secondary} fill={Colors.secondary} />
+                <Text style={[styles.statNumber, { color: accentColor }]}>{consultant.rating}</Text>
               </View>
-            ))}
+              <Text style={styles.statLabel}>Rating</Text>
+            </View>
+            <View style={styles.statDividerVertical} />
+            <View style={styles.statBox}>
+              <Text style={[styles.statNumber, { color: accentColor }]}>{consultant.reviewCount}</Text>
+              <Text style={styles.statLabel}>Reviews</Text>
+            </View>
+            <View style={styles.statDividerVertical} />
+            <View style={styles.statBox}>
+              <Text style={[styles.statNumber, { color: accentColor }]}>{consultant.experience}</Text>
+              <Text style={styles.statLabel}>Experience</Text>
+            </View>
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <Text style={styles.bio}>{consultant.bio}</Text>
-          <View style={styles.experienceRow}>
-            <Clock size={16} color={Colors.textLight} />
-            <Text style={styles.experience}>{consultant.experience} of experience</Text>
+        {consultant.specialties && consultant.specialties.length > 0 && (
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
+                <Award size={20} color={accentColor} />
+              </View>
+              <Text style={styles.sectionTitle}>Expertise & Skills</Text>
+            </View>
+            <View style={styles.specialties}>
+              {consultant.specialties.map((specialty: string) => (
+                <View key={specialty} style={[styles.specialtyTag, { borderColor: accentColor + '30' }]}>
+                  <Text style={[styles.specialtyText, { color: accentColor }]}>{specialty}</Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
+        )}
 
         {allImages.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Portfolio</Text>
+          <View style={styles.portfolioSection}>
+            <View style={styles.sectionHeader}>
+              <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
+                <Briefcase size={20} color={accentColor} />
+              </View>
+              <Text style={styles.sectionTitle}>Featured Work</Text>
+            </View>
             <PortfolioGallery
               images={allImages.map((image: string, index: number) => ({
                 id: `portfolio-image-${index}`,
                 uri: image,
                 caption: consultant.portfolio[Math.floor(index / consultant.portfolio[0]?.images?.length || 1)]?.title || '',
               }))}
-              accentColor={Colors.primary}
+              accentColor={accentColor}
               layout="grid"
             />
           </View>
         )}
 
-        {consultant.portfolio && consultant.portfolio.length > 0 && (
-          <View style={styles.portfolioProjects}>
-            {consultant.portfolio.map((project: any, index: number) => (
-              <View key={project.id || index} style={styles.projectCard}>
-                <Text style={styles.projectTitle}>{project.title}</Text>
-                <Text style={styles.projectCategory}>{project.category} • {project.year}</Text>
-                <Text style={styles.projectDescription}>{project.description}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
         {(consultant.linkedIn || consultant.website || consultant.instagram || consultant.externalPortfolio) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Connect</Text>
-            {consultant.linkedIn && (
-              <TouchableOpacity 
-                style={styles.linkRow} 
-                onPress={() => openLink(consultant.linkedIn, 'LinkedIn')}
-                activeOpacity={0.7}
-              >
-                <Linkedin size={20} color={Colors.primary} />
-                <Text style={styles.linkText} numberOfLines={1}>LinkedIn</Text>
-                <ExternalLink size={16} color={Colors.textLight} />
-              </TouchableOpacity>
-            )}
-            {consultant.website && (
-              <TouchableOpacity 
-                style={styles.linkRow} 
-                onPress={() => openLink(consultant.website, 'Website')}
-                activeOpacity={0.7}
-              >
-                <Globe size={20} color={Colors.primary} />
-                <Text style={styles.linkText} numberOfLines={1}>Website</Text>
-                <ExternalLink size={16} color={Colors.textLight} />
-              </TouchableOpacity>
-            )}
-            {consultant.instagram && (
-              <TouchableOpacity 
-                style={styles.linkRow} 
-                onPress={() => openLink(consultant.instagram, 'Instagram')}
-                activeOpacity={0.7}
-              >
-                <Instagram size={20} color={Colors.primary} />
-                <Text style={styles.linkText} numberOfLines={1}>Instagram</Text>
-                <ExternalLink size={16} color={Colors.textLight} />
-              </TouchableOpacity>
-            )}
-            {consultant.externalPortfolio && (
-              <TouchableOpacity 
-                style={styles.linkRow} 
-                onPress={() => openLink(consultant.externalPortfolio, 'Portfolio')}
-                activeOpacity={0.7}
-              >
-                <ExternalLink size={20} color={Colors.primary} />
-                <Text style={styles.linkText} numberOfLines={1}>External Portfolio</Text>
-                <ExternalLink size={16} color={Colors.textLight} />
-              </TouchableOpacity>
-            )}
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
+                <Globe size={20} color={accentColor} />
+              </View>
+              <Text style={styles.sectionTitle}>Connect</Text>
+            </View>
+            <View style={styles.linksGrid}>
+              {consultant.linkedIn && (
+                <TouchableOpacity 
+                  style={[styles.linkButton, { borderColor: accentColor + '30' }]}
+                  onPress={() => openLink(consultant.linkedIn, 'LinkedIn')}
+                  activeOpacity={0.7}
+                >
+                  <Linkedin size={20} color={accentColor} />
+                  <Text style={styles.linkButtonText} numberOfLines={1}>LinkedIn</Text>
+                </TouchableOpacity>
+              )}
+              {consultant.website && (
+                <TouchableOpacity 
+                  style={[styles.linkButton, { borderColor: accentColor + '30' }]}
+                  onPress={() => openLink(consultant.website, 'Website')}
+                  activeOpacity={0.7}
+                >
+                  <Globe size={20} color={accentColor} />
+                  <Text style={styles.linkButtonText} numberOfLines={1}>Website</Text>
+                </TouchableOpacity>
+              )}
+              {consultant.instagram && (
+                <TouchableOpacity 
+                  style={[styles.linkButton, { borderColor: accentColor + '30' }]}
+                  onPress={() => openLink(consultant.instagram, 'Instagram')}
+                  activeOpacity={0.7}
+                >
+                  <Instagram size={20} color={accentColor} />
+                  <Text style={styles.linkButtonText} numberOfLines={1}>Instagram</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Reviews</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
+              <Star size={20} color={accentColor} />
+            </View>
+            <Text style={styles.sectionTitle}>Reviews</Text>
+          </View>
+          <ReviewsComponent 
+            reviews={[]} 
+            averageRating={consultant.rating} 
+            totalReviews={consultant.reviewCount} 
+          />
         </View>
-        <ReviewsComponent 
-          reviews={[]} 
-          averageRating={consultant.rating} 
-          totalReviews={consultant.reviewCount} 
-        />
+
+        <View style={{ height: 100 }} />
       </ScrollView>
 
       <ShareModal
@@ -413,158 +459,268 @@ export default function ConsultantProfile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.surface,
+    backgroundColor: '#F5F5F7',
   },
-  header: {
+  scrollView: {
+    flex: 1,
+  },
+  heroSection: {
+    position: 'relative',
+    height: 200,
+    backgroundColor: Colors.border,
+  },
+  coverImage: {
+    width: '100%',
+    height: '100%',
+  },
+  coverGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+  },
+  heroActions: {
+    position: 'absolute',
+    top: 16,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+  },
+  heroButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileHeaderSection: {
     backgroundColor: Colors.white,
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    paddingBottom: 20,
+    alignItems: 'center',
+  },
+  avatarContainer: {
+    marginTop: -60,
+    position: 'relative',
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 16,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 5,
+    borderColor: Colors.white,
   },
-  headerInfo: {
-    flex: 1,
+  avatarBorder: {
+    position: 'absolute',
+    top: -4,
+    left: -4,
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    borderWidth: 3,
+    opacity: 0.3,
+  },
+  profileInfoCard: {
+    backgroundColor: Colors.white,
+    paddingHorizontal: 24,
+    paddingTop: 4,
+    paddingBottom: 24,
+    alignItems: 'center',
   },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 4,
+    marginBottom: 6,
   },
   name: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: '700',
     color: Colors.text,
+    textAlign: 'center',
   },
-  title: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-    marginBottom: 4,
+  userTitle: {
+    fontSize: 17,
+    color: Colors.textLight,
+    marginBottom: 16,
+    textAlign: 'center',
   },
-  university: {
-    fontSize: 14,
-    color: Colors.primary,
-    marginBottom: 8,
-  },
-  locationRow: {
+  metaInfoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginBottom: 8,
-  },
-  location: {
-    fontSize: 14,
-    color: Colors.textLight,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  rating: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  reviewCount: {
-    fontSize: 14,
-    color: Colors.textLight,
-  },
-  tierContainer: {
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  tierBadgeWrapper: {
-    paddingVertical: 4,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    color: Colors.white,
-    fontWeight: '500',
-  },
-  section: {
-    backgroundColor: Colors.white,
-    marginTop: 8,
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text,
+    gap: 20,
     marginBottom: 16,
   },
-  specialties: {
+  metaItem: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
+    gap: 6,
   },
-  specialtyTag: {
-    backgroundColor: Colors.surface,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  specialtyText: {
+  metaText: {
     fontSize: 14,
     color: Colors.textSecondary,
     fontWeight: '500',
   },
   bio: {
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.textSecondary,
-    lineHeight: 24,
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 8,
     marginBottom: 16,
   },
-  experienceRow: {
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  tierBadgeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: Colors.surface,
   },
-  experience: {
-    fontSize: 14,
-    color: Colors.textLight,
-  },
-
-  portfolioProjects: {
-    backgroundColor: Colors.white,
-    marginTop: 8,
-    padding: 20,
-  },
-  projectCard: {
-    marginBottom: 20,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  projectTitle: {
-    fontSize: 16,
+  tierLabel: {
+    fontSize: 13,
     fontWeight: '600',
-    color: Colors.text,
+    color: Colors.textSecondary,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  statusText: {
+    fontSize: 13,
+    color: Colors.white,
+    fontWeight: '600',
+  },
+  statsCard: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statDividerVertical: {
+    width: 1,
+    height: 48,
+    backgroundColor: Colors.border,
+  },
+  statNumber: {
+    fontSize: 26,
+    fontWeight: '700',
     marginBottom: 4,
   },
-  projectCategory: {
-    fontSize: 12,
+  statLabel: {
+    fontSize: 13,
     color: Colors.textLight,
-    marginBottom: 8,
+    fontWeight: '500',
   },
-  projectDescription: {
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  sectionCard: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 20,
+  },
+  sectionIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.text,
+    flex: 1,
+  },
+  specialties: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  specialtyTag: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    backgroundColor: Colors.white,
+  },
+  specialtyText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  portfolioSection: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  linksGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  linkButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    backgroundColor: Colors.white,
+    minWidth: '30%',
+  },
+  linkButtonText: {
     fontSize: 14,
-    color: Colors.textSecondary,
-    lineHeight: 20,
+    color: Colors.text,
+    fontWeight: '600',
   },
   bottomActions: {
     flexDirection: 'row',
