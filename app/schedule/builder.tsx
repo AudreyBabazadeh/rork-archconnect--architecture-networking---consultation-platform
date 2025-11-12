@@ -1266,12 +1266,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     marginBottom: 8,
+    position: 'relative',
   },
   priceTag: {
     fontSize: 16,
     fontWeight: '700',
-    marginLeft: 8,
     flexShrink: 0,
+    position: 'absolute',
+    top: 0,
+    right: 8,
   },
   priceEarned: {
     fontSize: 18,
