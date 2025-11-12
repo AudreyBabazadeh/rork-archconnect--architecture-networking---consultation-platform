@@ -526,9 +526,11 @@ export default function ScheduleBuilderScreen() {
             ))}
             
             {weekDays.map((day, dayIndex) => {
-              const dayEventsForDay = filteredEvents.filter(event => 
-                event.date.startsWith(day.toISOString().split('T')[0])
-              );
+              const dayDateStr = day.toISOString().split('T')[0];
+              const dayEventsForDay = filteredEvents.filter(event => {
+                const eventDateStr = event.date.split('T')[0];
+                return eventDateStr === dayDateStr;
+              });
               
               return dayEventsForDay.map(event => {
                 const { top, height } = getEventPosition(event.time, event.duration);
