@@ -15,17 +15,26 @@ export default function FollowingScreen() {
     const loadFollowingUsers = async () => {
       setIsLoading(true);
       const followingIdsArray = Array.from(followingIds);
-      console.log('Loading following users, IDs:', followingIdsArray);
+      console.log('===== Following Debug =====');
+      console.log('followingIds Set:', followingIds);
+      console.log('followingIds Array:', followingIdsArray);
+      console.log('followingIds length:', followingIdsArray.length);
+      
       const users: AuthUser[] = [];
       
       for (const id of followingIdsArray) {
+        console.log('Fetching user with ID:', id);
         const user = await getUserById(id);
         if (user) {
+          console.log('Found user:', user.name);
           users.push(user);
+        } else {
+          console.log('User not found for ID:', id);
         }
       }
       
-      console.log('Loaded following users:', users.length);
+      console.log('Total loaded following users:', users.length);
+      console.log('===========================');
       setFollowingUsers(users);
       setIsLoading(false);
     };

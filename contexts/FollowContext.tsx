@@ -36,17 +36,21 @@ export const [FollowProvider, useFollow] = createContextHook((): FollowState & F
   useEffect(() => {
     const loadFollows = async () => {
       if (!user) {
+        console.log('FollowContext: No user logged in');
         setIsLoading(false);
         return;
       }
 
       try {
+        console.log('FollowContext: Loading follows for user:', user.id);
         const storedFollows = await AsyncStorage.getItem(FOLLOWS_STORAGE_KEY);
+        console.log('FollowContext: Raw stored follows:', storedFollows);
         let follows: FollowRelation[] = [];
         
         if (storedFollows && storedFollows !== 'null') {
           try {
             follows = JSON.parse(storedFollows);
+            console.log('FollowContext: Parsed follows:', follows);
           } catch {
             console.log('Error parsing follows, resetting...');
             await AsyncStorage.removeItem(FOLLOWS_STORAGE_KEY);
@@ -64,6 +68,9 @@ export const [FollowProvider, useFollow] = createContextHook((): FollowState & F
             .filter(f => f.followingId === user.id)
             .map(f => f.followerId)
         );
+
+        console.log('FollowContext: Following IDs:', Array.from(following));
+        console.log('FollowContext: Follower IDs:', Array.from(followers));
 
         setFollowingIds(following);
         setFollowerIds(followers);

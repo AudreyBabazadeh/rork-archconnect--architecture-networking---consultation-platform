@@ -242,13 +242,31 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
         }
       }
       
-      const user = users.find(u => u.id === id) || null;
-      if (user) {
-        console.log('Found user:', user.name);
+      let foundUser = users.find(u => u.id === id) || null;
+      
+      if (!foundUser) {
+        const { mockUsers } = await import('@/data/mockUsers');
+        const mockUser = mockUsers.find(u => u.id === id);
+        if (mockUser) {
+          foundUser = {
+            ...mockUser,
+            email: `${mockUser.username}@example.com`,
+            occupation: mockUser.title,
+            university: mockUser.university || '',
+            specialization: mockUser.specialties?.[0] || '',
+            profileImage: mockUser.avatar,
+            createdAt: new Date().toISOString(),
+          } as AuthUser;
+          console.log('Found user in mockUsers:', foundUser.name);
+        }
+      }
+      
+      if (foundUser) {
+        console.log('Found user:', foundUser.name);
       } else {
         console.log('User not found with ID:', id);
       }
-      return user;
+      return foundUser;
     } catch (error) {
       console.error('Get user by ID error:', error);
       return null;
