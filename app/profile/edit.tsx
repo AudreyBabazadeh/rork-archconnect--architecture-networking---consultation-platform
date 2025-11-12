@@ -11,6 +11,7 @@ import {
   Linkedin,
   Globe,
   Instagram,
+  PlusCircle,
 } from 'lucide-react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
@@ -77,6 +78,8 @@ export default function EditProfileScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [customTagInput, setCustomTagInput] = useState('');
+  const [showCustomTagInput, setShowCustomTagInput] = useState(false);
   
   const [expandedSections, setExpandedSections] = useState<SectionState>({
     basic: true,
@@ -128,7 +131,16 @@ export default function EditProfileScreen() {
     if (formData.linkedIn?.trim() || formData.website?.trim()) completed++;
 
     return Math.round((completed / total) * 100);
-  }, [formData]);
+  }, [
+    formData.name,
+    formData.bio,
+    formData.expertiseTags,
+    formData.portfolioImages,
+    formData.teachingFocus,
+    formData.sessionTypes,
+    formData.linkedIn,
+    formData.website,
+  ]);
 
   const autoSave = useCallback(async () => {
     if (!user) return;
@@ -271,6 +283,15 @@ export default function EditProfileScreen() {
     }
   };
 
+  const addCustomTag = () => {
+    const trimmedTag = customTagInput.trim();
+    if (trimmedTag && !formData.expertiseTags.includes(trimmedTag)) {
+      updateFormData('expertiseTags', [...formData.expertiseTags, trimmedTag]);
+      setCustomTagInput('');
+      setShowCustomTagInput(false);
+    }
+  };
+
   const removeExpertiseTag = (tag: string) => {
     updateFormData('expertiseTags', formData.expertiseTags.filter((t: string) => t !== tag));
   };
@@ -369,7 +390,12 @@ export default function EditProfileScreen() {
       />
       <View style={styles.container}>
         <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: `${calculateProgress()}%` }]} />
+          <View 
+            style={[
+              styles.progressFill, 
+              { width: `${calculateProgress()}%` }
+            ]} 
+          />
         </View>
         <View style={styles.progressTextContainer}>
           <Text style={styles.progressText}>Profile {calculateProgress()}% complete</Text>
@@ -516,6 +542,65 @@ export default function EditProfileScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
+
+              {formData.expertiseTags.length > 0 && (
+                <View style={styles.selectedTagsSection}>
+                  <Text style={styles.selectedTagsLabel}>Your Selected Expertise:</Text>
+                  <View style={styles.tagsContainer}>
+                    {formData.expertiseTags.map((tag) => (
+                      <View key={tag} style={styles.selectedTag}>
+                        <Text style={styles.selectedTagText}>{tag}</Text>
+                        <TouchableOpacity
+                          onPress={() => removeExpertiseTag(tag)}
+                          style={styles.removeTagButton}
+                        >
+                          <X size={14} color={Colors.white} />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {showCustomTagInput ? (
+                <View style={styles.customTagInputContainer}>
+                  <TextInput
+                    style={styles.customTagInput}
+                    value={customTagInput}
+                    onChangeText={setCustomTagInput}
+                    placeholder="Enter custom expertise..."
+                    placeholderTextColor={Colors.textLight}
+                    autoFocus
+                  />
+                  <View style={styles.customTagActions}>
+                    <TouchableOpacity
+                      style={styles.customTagButton}
+                      onPress={addCustomTag}
+                      disabled={!customTagInput.trim()}
+                    >
+                      <Check size={18} color={Colors.white} />
+                      <Text style={styles.customTagButtonText}>Add</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.customTagButton, styles.cancelButton]}
+                      onPress={() => {
+                        setShowCustomTagInput(false);
+                        setCustomTagInput('');
+                      }}
+                    >
+                      <X size={18} color={Colors.text} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.addCustomTagButton}
+                  onPress={() => setShowCustomTagInput(true)}
+                >
+                  <PlusCircle size={20} color={Colors.primary} />
+                  <Text style={styles.addCustomTagText}>Add your own expertise</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
 
@@ -1013,6 +1098,7 @@ const styles = StyleSheet.create({
   progressFill: {
     height: '100%',
     backgroundColor: Colors.primary,
+    transition: 'width 0.3s ease',
   },
   progressTextContainer: {
     flexDirection: 'row',
@@ -1277,5 +1363,97 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+  },
+  selectedTagsSection: {
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  selectedTagsLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 8,
+  },
+  selectedTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.primary,
+  },
+  selectedTagText: {
+    fontSize: 14,
+    color: Colors.white,
+    fontWeight: '500',
+  },
+  removeTagButton: {
+    padding: 2,
+  },
+  customTagInputContainer: {
+    marginTop: 16,
+    padding: 16,
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+  customTagInput: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: Colors.text,
+    backgroundColor: Colors.white,
+    marginBottom: 12,
+  },
+  customTagActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  customTagButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+  },
+  customTagButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  cancelButton: {
+    flex: 0,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  addCustomTagButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: Colors.background,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    borderStyle: 'dashed',
+  },
+  addCustomTagText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
   },
 });
