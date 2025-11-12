@@ -495,10 +495,9 @@ export default function ScheduleBuilderScreen() {
             );
             
             return (
-              <TouchableOpacity
+              <View
                 key={index}
                 style={[styles.weekDayHeader, isToday && styles.weekDayHeaderToday]}
-                onPress={() => handleDateSelect(day)}
               >
                 <Text style={[styles.weekDayName, isToday && styles.weekDayNameToday]}>
                   {day.toLocaleDateString('en-US', { weekday: 'short' })}
@@ -511,7 +510,7 @@ export default function ScheduleBuilderScreen() {
                     <Text style={styles.weekEventCount}>{dayEvents.length}</Text>
                   </View>
                 )}
-              </TouchableOpacity>
+              </View>
             );
           })}
         </View>
@@ -531,64 +530,67 @@ export default function ScheduleBuilderScreen() {
               </View>
             ))}
             
-            {weekDays.map((day, dayIndex) => {
-              const dayDateStr = day.toISOString().split('T')[0];
-              const dayEventsForDay = filteredEvents.filter(event => {
-                const eventDateStr = event.date.includes('T') ? event.date.split('T')[0] : event.date;
-                return eventDateStr === dayDateStr;
+            {filteredEvents.map((event) => {
+              const eventDateStr = event.date.includes('T') ? event.date.split('T')[0] : event.date;
+              const dayIndex = weekDays.findIndex(day => day.toISOString().split('T')[0] === eventDateStr);
+              
+              if (dayIndex === -1) return null;
+              
+              const dayDateStr = weekDays[dayIndex].toISOString().split('T')[0];
+              const dayEventsForDay = filteredEvents.filter(e => {
+                const eDateStr = e.date.includes('T') ? e.date.split('T')[0] : e.date;
+                return eDateStr === dayDateStr;
               });
               
-              return dayEventsForDay.map(event => {
-                const { top, height } = getEventPosition(event.time, event.duration);
-                const { widthPercent, leftPercent } = getEventLayout(event, dayEventsForDay);
-                const isHalfHour = event.duration === 30;
-                const isTask = event.title.startsWith('📋');
-                
-                const columnWidth = (100 - 8.5) / 7;
-                const columnLeft = 60 + (dayIndex * columnWidth);
-                const eventWidth = (columnWidth * widthPercent) / 100;
-                const eventLeft = columnLeft + (columnWidth * leftPercent) / 100;
-                
-                const getEventColor = () => {
-                  if (event.type === 'event' || event.type === 'task') return '#FFFFFF';
-                  if (event.type === 'booked-by-me') return '#000000';
-                  if (event.type === 'booked-with-me') return '#00C853';
-                  return Colors.primary;
-                };
+              const { top, height } = getEventPosition(event.time, event.duration);
+              const { widthPercent, leftPercent } = getEventLayout(event, dayEventsForDay);
+              const isHalfHour = event.duration === 30;
+              const isTask = event.title.startsWith('📋');
+              
+              const columnWidth = (100 - 8.5) / 7;
+              const columnLeft = 8.5 + (dayIndex * columnWidth);
+              const eventWidth = (columnWidth * widthPercent) / 100;
+              const eventLeft = columnLeft + (columnWidth * leftPercent) / 100;
+              
+              const getEventColor = () => {
+                if (event.type === 'event' || event.type === 'task') return '#FFFFFF';
+                if (event.type === 'booked-by-me') return '#000000';
+                if (event.type === 'booked-with-me') return '#00C853';
+                return Colors.primary;
+              };
 
-                const getEventTextColor = () => {
-                  if (event.type === 'event' || event.type === 'task') return Colors.text;
-                  return Colors.white;
-                };
+              const getEventTextColor = () => {
+                if (event.type === 'event' || event.type === 'task') return Colors.text;
+                return Colors.white;
+              };
 
-                return (
-                  <TouchableOpacity
-                    key={event.id}
-                    style={[
-                      styles.weekEventBar,
-                      {
-                        left: eventLeft + '%',
-                        width: eventWidth + '%',
-                        top: top,
-                        height: height,
-                        backgroundColor: getEventColor(),
-                        borderWidth: (event.type === 'event' || event.type === 'task') ? 1 : 0,
-                        borderColor: Colors.border,
-                      }
-                    ]}
-                    onPress={() => handleEventPress(event)}
-                  >
-                    <Text style={[styles.weekEventTitle, isHalfHour && { fontSize: 10 }, { color: getEventTextColor() }]} numberOfLines={isHalfHour ? 2 : 1}>
-                      {event.title}
+              return (
+                <TouchableOpacity
+                  key={event.id}
+                  style={[
+                    styles.weekEventBar,
+                    {
+                      left: eventLeft + '%',
+                      width: eventWidth + '%',
+                      top: top,
+                      height: height,
+                      backgroundColor: getEventColor(),
+                      borderWidth: (event.type === 'event' || event.type === 'task') ? 1 : 0,
+                      borderColor: Colors.border,
+                    }
+                  ]}
+                  onPress={() => handleEventPress(event)}
+                >
+                  <Text style={[styles.weekEventTitle, isHalfHour && { fontSize: 10 }, { color: getEventTextColor() }]} numberOfLines={isHalfHour ? 2 : 1}>
+                    {event.title}
+                  </Text>
+                  {!isHalfHour && widthPercent > 50 && (
+                    <Text style={[styles.weekEventTime, { color: getEventTextColor() }]} numberOfLines={1}>
+                      {formatTimeTo12Hour(event.time)} • {isTask ? event.participantName : event.participantName}
                     </Text>
-                    {!isHalfHour && widthPercent > 50 && (
-                      <Text style={[styles.weekEventTime, { color: getEventTextColor() }]} numberOfLines={1}>
-                        {formatTimeTo12Hour(event.time)} • {isTask ? event.participantName : event.participantName}
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                );
-              });
+                  )}
+                </TouchableOpacity>
+              );
             })}
           </View>
         </ScrollView>
