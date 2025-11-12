@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Star, MapPin, Clock, MessageCircle, Calendar, UserPlus, UserMinus, Share2 } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,9 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMessaging } from '@/contexts/MessagingContext';
 import { useFollow } from '@/contexts/FollowContext';
 import { ShareModal } from '@/components/ShareModal';
-
-const { width } = Dimensions.get('window');
-
+import { PortfolioGallery } from '@/components/PortfolioGallery';
 
 export default function ConsultantProfile() {
   const { id } = useLocalSearchParams();
@@ -21,7 +19,6 @@ export default function ConsultantProfile() {
   const { user: currentUser, getUserById } = useAuth();
   const { getOrCreateConversation } = useMessaging();
   const { followUser, unfollowUser, isFollowing } = useFollow();
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [consultant, setConsultant] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shareModalVisible, setShareModalVisible] = useState(false);
@@ -245,34 +242,15 @@ export default function ConsultantProfile() {
         {allImages.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Portfolio</Text>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              pagingEnabled
-              onMomentumScrollEnd={(event) => {
-                const index = Math.round(event.nativeEvent.contentOffset.x / (width - 40));
-                setSelectedImageIndex(index);
-              }}
-            >
-              {allImages.map((image: string, index: number) => (
-                <Image 
-                  key={index}
-                  source={{ uri: image }} 
-                  style={styles.portfolioImage}
-                />
-              ))}
-            </ScrollView>
-            <View style={styles.imageIndicators}>
-              {allImages.map((_: string, index: number) => (
-                <View 
-                  key={index}
-                  style={[
-                    styles.indicator,
-                    index === selectedImageIndex && styles.activeIndicator
-                  ]} 
-                />
-              ))}
-            </View>
+            <PortfolioGallery
+              images={allImages.map((image: string, index: number) => ({
+                id: `portfolio-image-${index}`,
+                uri: image,
+                caption: consultant.portfolio[Math.floor(index / consultant.portfolio[0]?.images?.length || 1)]?.title || '',
+              }))}
+              accentColor={Colors.primary}
+              layout="grid"
+            />
           </View>
         )}
 
@@ -478,27 +456,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textLight,
   },
-  portfolioImage: {
-    width: width - 40,
-    height: 240,
-    borderRadius: 12,
-    marginRight: 16,
-  },
-  imageIndicators: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 16,
-    gap: 8,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.border,
-  },
-  activeIndicator: {
-    backgroundColor: Colors.primary,
-  },
+
   portfolioProjects: {
     backgroundColor: Colors.white,
     marginTop: 8,

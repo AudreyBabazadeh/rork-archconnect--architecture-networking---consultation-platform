@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFollow } from '@/contexts/FollowContext';
 import { ShareModal } from '@/components/ShareModal';
 import { LinearGradient } from 'expo-linear-gradient';
+import { PortfolioGallery } from '@/components/PortfolioGallery';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
@@ -150,18 +151,11 @@ export default function ProfileScreen() {
               </View>
               <Text style={styles.sectionTitle}>Featured Work</Text>
             </View>
-            <View style={styles.portfolioGrid}>
-              {(user as any).portfolioImages.map((img: any, index: number) => (
-                <View key={img.id} style={styles.portfolioCard}>
-                  <Image source={{ uri: img.uri }} style={styles.portfolioImageView} />
-                  <View style={styles.portfolioOverlay}>
-                    {img.caption && (
-                      <Text style={styles.portfolioCaption} numberOfLines={2}>{img.caption}</Text>
-                    )}
-                  </View>
-                </View>
-              ))}
-            </View>
+            <PortfolioGallery 
+              images={(user as any).portfolioImages}
+              accentColor={accentColor}
+              layout="grid"
+            />
           </View>
         )}
 
@@ -574,40 +568,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 3,
   },
-  portfolioGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  portfolioCard: {
-    width: '48%',
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: Colors.surface,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  portfolioImageView: {
-    width: '100%',
-    aspectRatio: 1,
-    resizeMode: 'cover',
-  },
-  portfolioOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    padding: 10,
-  },
-  portfolioCaption: {
-    fontSize: 11,
-    color: Colors.white,
-    fontWeight: '500',
-  },
+
   approachSection: {
     marginBottom: 20,
   },
