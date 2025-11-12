@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
 import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon, Linkedin, Globe, Instagram, MessageCircle } from 'lucide-react-native';
+import { ReviewsComponent } from '@/components/ReviewsComponent';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -278,6 +279,22 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               )}
             </View>
+          </View>
+        )}
+
+        {user.rating && user.rating > 0 && (
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
+                <Star size={20} color={accentColor} />
+              </View>
+              <Text style={styles.sectionTitle}>Reviews</Text>
+            </View>
+            <ReviewsComponent 
+              reviews={[]} 
+              averageRating={user.rating} 
+              totalReviews={(user as any).totalConsultations || 0} 
+            />
           </View>
         )}
 

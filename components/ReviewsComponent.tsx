@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Star } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
+import { ReviewDetailModal } from './ReviewDetailModal';
 
 interface Review {
   id: string;
@@ -46,6 +47,19 @@ const mockReviews: Review[] = [
 ];
 
 export function ReviewsComponent({ reviews = mockReviews, averageRating, totalReviews }: ReviewsComponentProps) {
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleReviewPress = (review: Review) => {
+    setSelectedReview(review);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setTimeout(() => setSelectedReview(null), 300);
+  };
+
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
       <Star
@@ -101,7 +115,12 @@ export function ReviewsComponent({ reviews = mockReviews, averageRating, totalRe
 
       <ScrollView style={styles.reviewsList} showsVerticalScrollIndicator={false}>
         {reviews.map((review) => (
-          <View key={review.id} style={styles.reviewCard}>
+          <TouchableOpacity 
+            key={review.id} 
+            style={styles.reviewCard}
+            onPress={() => handleReviewPress(review)}
+            activeOpacity={0.7}
+          >
             <View style={styles.reviewHeader}>
               <View style={styles.reviewerInfo}>
                 <Text style={styles.reviewerName}>{review.clientName}</Text>
@@ -114,10 +133,17 @@ export function ReviewsComponent({ reviews = mockReviews, averageRating, totalRe
                 <Text style={styles.reviewDate}>{review.date}</Text>
               </View>
             </View>
-            <Text style={styles.reviewComment}>{review.comment}</Text>
-          </View>
+            <Text style={styles.reviewComment} numberOfLines={3}>{review.comment}</Text>
+            <Text style={styles.tapToReadMore}>Tap to read full review</Text>
+          </TouchableOpacity>
         ))}
       </ScrollView>
+
+      <ReviewDetailModal
+        visible={modalVisible}
+        review={selectedReview}
+        onClose={handleCloseModal}
+      />
     </View>
   );
 }
@@ -228,5 +254,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
+  },
+  tapToReadMore: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '600',
+    marginTop: 8,
   },
 });
