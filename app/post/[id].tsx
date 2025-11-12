@@ -9,8 +9,6 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Share as RNShare,
-  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { Heart, MessageCircle, Send, ArrowLeft, Share } from 'lucide-react-native';
@@ -18,6 +16,7 @@ import { mockPosts } from '@/data/mockPosts';
 import { Comment } from '@/types/user';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { ShareModal } from '@/components/ShareModal';
 
 export default function PostDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -50,6 +49,7 @@ export default function PostDetailScreen() {
   ]);
   const [likedComments, setLikedComments] = useState<Set<string>>(new Set());
   const [isLiked, setIsLiked] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const post = useMemo(() => {
     return mockPosts.find((p) => p.id === id);
@@ -88,26 +88,8 @@ export default function PostDetailScreen() {
     }
   };
 
-  const handleShare = async () => {
-    try {
-      const result = await RNShare.share({
-        title: `Check out this post by ${post.authorName}`,
-        message: `${post.content}\n\n- ${post.authorName}, ${post.authorTitle}`,
-        url: `https://rork.app/post/${post.id}`,
-      });
-
-      if (result.action === RNShare.sharedAction) {
-        if (result.activityType) {
-          console.log('Shared via:', result.activityType);
-        } else {
-          console.log('Post shared successfully');
-        }
-      } else if (result.action === RNShare.dismissedAction) {
-        console.log('Share dismissed');
-      }
-    } catch (error: any) {
-      Alert.alert('Error', error.message);
-    }
+  const handleShare = () => {
+    setShowShareModal(true);
   };
 
   const handleSendComment = () => {
@@ -298,6 +280,17 @@ export default function PostDetailScreen() {
             ))}
           </View>
         </ScrollView>
+
+        <ShareModal
+          visible={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          shareContent={{
+            title: `Check out this post by ${post.authorName}`,
+            message: `${post.content}\n\n- ${post.authorName}, ${post.authorTitle}`,
+            url: `https://rork.app/post/${post.id}`,
+          }}
+          type="post"
+        />
 
         {/* Comment Input */}
         <View style={styles.commentInputContainer}>

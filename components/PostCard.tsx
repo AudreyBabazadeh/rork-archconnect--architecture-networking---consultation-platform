@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions, Share, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Dimensions } from 'react-native';
 import { Heart, MessageCircle, Share as ShareIcon, MoreHorizontal } from 'lucide-react-native';
 import { Post } from '@/types/user';
 import { Colors } from '@/constants/colors';
+import { ShareModal } from './ShareModal';
 
 interface PostCardProps {
   post: Post;
@@ -21,6 +22,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   onAuthorPress,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const formatTimeAgo = (timestamp: Date) => {
     const now = new Date();
@@ -35,19 +37,8 @@ export const PostCard: React.FC<PostCardProps> = ({
     }
   };
 
-  const handleShare = async () => {
-    try {
-      const result = await Share.share({
-        title: `Check out this post by ${post.authorName}`,
-        message: `${post.content}\n\n- ${post.authorName}, ${post.authorTitle}`,
-      });
-
-      if (result.action === Share.sharedAction) {
-        console.log('Post shared successfully');
-      }
-    } catch (error: any) {
-      Alert.alert('Error', 'Failed to share post');
-    }
+  const handleShare = () => {
+    setShowShareModal(true);
   };
 
 
@@ -158,6 +149,17 @@ export const PostCard: React.FC<PostCardProps> = ({
           <ShareIcon size={20} color={Colors.textLight} />
         </TouchableOpacity>
       </View>
+
+      <ShareModal
+        visible={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        shareContent={{
+          title: `Check out this post by ${post.authorName}`,
+          message: `${post.content}\n\n- ${post.authorName}, ${post.authorTitle}`,
+          url: `https://rork.app/post/${post.id}`,
+        }}
+        type="post"
+      />
     </View>
   );
 };
