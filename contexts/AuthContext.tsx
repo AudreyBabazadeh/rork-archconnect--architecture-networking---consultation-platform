@@ -10,12 +10,14 @@ export interface AuthUser extends User {
   specialization?: string;
   profileImage?: string;
   createdAt: string;
+  hasCompletedOnboarding?: boolean;
 }
 
 interface AuthState {
   user: AuthUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  hasCompletedOnboarding: boolean;
 }
 
 interface AuthActions {
@@ -25,6 +27,7 @@ interface AuthActions {
   updateProfile: (updates: Partial<AuthUser>) => Promise<void>;
   searchUsers: (query: string) => Promise<AuthUser[]>;
   getUserById: (id: string) => Promise<AuthUser | null>;
+  completeOnboarding: () => Promise<void>;
 }
 
 const STORAGE_KEY = 'auth_user';
@@ -141,7 +144,8 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
         email: userData.email,
         occupation: userData.occupation || '',
         university: userData.university || '',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        hasCompletedOnboarding: false
       };
       
       users.push(newUser);
@@ -279,15 +283,47 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     }
   }, []);
 
+  const completeOnboarding = useCallback(async (): Promise<void> => {
+    try {
+      if (!user) return;
+      
+      const updatedUser = { ...user, hasCompletedOnboarding: true };
+      setUser(updatedUser);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+      
+      const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
+      
+      const userIndex = users.findIndex(u => u.id === user.id);
+      if (userIndex !== -1) {
+        users[userIndex] = updatedUser;
+        await AsyncStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+        console.log('Onboarding completed');
+      }
+    } catch (error) {
+      console.error('Complete onboarding error:', error);
+    }
+  }, [user]);
+
   return useMemo(() => ({
     user,
     isLoading,
     isAuthenticated: !!user,
+    hasCompletedOnboarding: user?.hasCompletedOnboarding || false,
     signIn,
     signUp,
     signOut,
     updateProfile,
     searchUsers,
-    getUserById
-  }), [user, isLoading, signIn, signUp, signOut, updateProfile, searchUsers, getUserById]);
+    getUserById,
+    completeOnboarding
+  }), [user, isLoading, signIn, signUp, signOut, updateProfile, searchUsers, getUserById, completeOnboarding]);
 });

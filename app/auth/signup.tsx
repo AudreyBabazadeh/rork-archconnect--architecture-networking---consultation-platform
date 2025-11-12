@@ -67,7 +67,7 @@ export default function SignUpScreen() {
       });
       
       if (success) {
-        router.replace('/(tabs)/browse');
+        router.replace('/onboarding/welcome');
       } else {
         Alert.alert('Error', 'Failed to create account. Please try again.');
       }

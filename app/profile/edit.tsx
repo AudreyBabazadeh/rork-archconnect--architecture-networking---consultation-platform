@@ -72,7 +72,7 @@ interface SectionState {
 }
 
 export default function EditProfileScreen() {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, completeOnboarding, hasCompletedOnboarding } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -171,8 +171,19 @@ export default function EditProfileScreen() {
     setIsLoading(true);
     try {
       await updateProfile(formData);
+      
+      if (!hasCompletedOnboarding) {
+        await completeOnboarding();
+      }
+      
       Alert.alert('Success', 'Profile updated successfully', [
-        { text: 'OK', onPress: () => router.back() }
+        { text: 'OK', onPress: () => {
+          if (!hasCompletedOnboarding) {
+            router.replace('/(tabs)/home');
+          } else {
+            router.back();
+          }
+        }}
       ]);
     } catch {
       Alert.alert('Error', 'Failed to update profile. Please try again.');

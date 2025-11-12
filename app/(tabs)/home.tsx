@@ -10,7 +10,7 @@ import {
   ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { TrendingUp, Users, BookOpen, MessageCircle } from 'lucide-react-native';
+import { TrendingUp, Users, BookOpen, MessageCircle, UserCircle, ArrowRight } from 'lucide-react-native';
 import { PostCard } from '@/components/PostCard';
 import { mockPosts } from '@/data/mockPosts';
 import { Post } from '@/types/user';
@@ -22,7 +22,7 @@ type FilterType = 'all' | 'trending' | 'students' | 'mentors' | 'professors';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, hasCompletedOnboarding } = useAuth();
   const { getTotalUnreadCount } = useMessaging();
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
@@ -100,6 +100,23 @@ export default function HomeScreen() {
     />
   );
 
+  const calculateProfileCompletion = () => {
+    if (!user) return 0;
+    let completed = 0;
+    let total = 5;
+
+    if (user.name) completed++;
+    if (user.bio) completed++;
+    if (user.specialties && user.specialties.length > 0) completed++;
+    if (user.portfolio && user.portfolio.length > 0) completed++;
+    if (user.location) completed++;
+
+    return Math.round((completed / total) * 100);
+  };
+
+  const profileCompletion = calculateProfileCompletion();
+  const showProfileReminder = !hasCompletedOnboarding || profileCompletion < 60;
+
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.headerTop}>
@@ -121,6 +138,27 @@ export default function HomeScreen() {
           )}
         </TouchableOpacity>
       </View>
+
+      {showProfileReminder && (
+        <View style={styles.profileReminderWrapper}>
+          <TouchableOpacity 
+            style={styles.profileReminderCard}
+            onPress={() => router.push('/profile/edit')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.profileReminderIcon}>
+              <UserCircle size={24} color={Colors.primary} strokeWidth={2} />
+            </View>
+            <View style={styles.profileReminderContent}>
+              <Text style={styles.profileReminderTitle}>Complete Your Profile</Text>
+              <Text style={styles.profileReminderText}>
+                {profileCompletion}% complete • Add more details to get discovered
+              </Text>
+            </View>
+            <ArrowRight size={20} color={Colors.textLight} />
+          </TouchableOpacity>
+        </View>
+      )}
       
       <ScrollView 
         horizontal 
@@ -268,5 +306,42 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 12,
     fontWeight: '600',
+  },
+  profileReminderWrapper: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+  },
+  profileReminderCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary + '08',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: Colors.primary + '20',
+  },
+  profileReminderIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  profileReminderContent: {
+    flex: 1,
+  },
+  profileReminderTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  profileReminderText: {
+    fontSize: 13,
+    color: Colors.textLight,
+    lineHeight: 18,
   },
 });

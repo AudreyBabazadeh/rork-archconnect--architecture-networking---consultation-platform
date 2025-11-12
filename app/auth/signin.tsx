@@ -21,7 +21,9 @@ export default function SignInScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
-  const { signIn } = useAuth();
+
+
+  const { signIn, hasCompletedOnboarding } = useAuth();
 
   const handleSignIn = async () => {
     if (!email || !password) {
@@ -33,7 +35,11 @@ export default function SignInScreen() {
     try {
       const success = await signIn(email, password);
       if (success) {
-        router.replace('/(tabs)/browse');
+        if (!hasCompletedOnboarding) {
+          router.replace('/onboarding/welcome');
+        } else {
+          router.replace('/(tabs)/home');
+        }
       } else {
         Alert.alert(
           'Account Not Found', 
