@@ -5,7 +5,7 @@ import { User } from '@/types/user';
 
 export interface AuthUser extends User {
   email: string;
-  userType: 'student' | 'professor';
+  occupation?: string;
   university?: string;
   specialization?: string;
   profileImage?: string;
@@ -20,7 +20,7 @@ interface AuthState {
 
 interface AuthActions {
   signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (userData: Partial<AuthUser> & { email: string; password: string; name: string; username: string; userType: 'student' | 'professor' }) => Promise<boolean>;
+  signUp: (userData: Partial<AuthUser> & { email: string; password: string; name: string; username: string }) => Promise<boolean>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<AuthUser>) => Promise<void>;
   searchUsers: (query: string) => Promise<AuthUser[]>;
@@ -93,7 +93,7 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     }
   }, []);
 
-  const signUp = useCallback(async (userData: Partial<AuthUser> & { email: string; password: string; name: string; username: string; userType: 'student' | 'professor' }): Promise<boolean> => {
+  const signUp = useCallback(async (userData: Partial<AuthUser> & { email: string; password: string; name: string; username: string }): Promise<boolean> => {
     try {
       setIsLoading(true);
       
@@ -123,7 +123,7 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
       
       const newUser: AuthUser = {
         // Base User properties
-        title: userData.userType === 'professor' ? 'Professor' : 'Student',
+        title: userData.occupation || '',
         avatar: userData.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
         specialties: userData.specialization ? [userData.specialization] : [],
         reviewCount: 0,
@@ -135,11 +135,11 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
         username: userData.username,
         location: userData.location || '',
         experience: userData.experience || '',
-        hourlyRate: userData.hourlyRate || (userData.userType === 'professor' ? 50 : 25),
+        hourlyRate: userData.hourlyRate || 25,
         rating: 0,
         bio: userData.bio || '',
         email: userData.email,
-        userType: userData.userType,
+        occupation: userData.occupation || '',
         university: userData.university || '',
         createdAt: new Date().toISOString()
       };

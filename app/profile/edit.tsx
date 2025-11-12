@@ -26,6 +26,7 @@ export default function EditProfileScreen() {
   const [formData, setFormData] = useState<any>({
     name: user?.name || '',
     bio: user?.bio || '',
+    occupation: user?.occupation || '',
     university: user?.university || '',
     specialization: user?.specialization || '',
     experience: user?.experience || '',
@@ -232,6 +233,17 @@ export default function EditProfileScreen() {
                 numberOfLines={4}
                 textAlignVertical="top"
                 testID="bio-input"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Occupation</Text>
+              <TextInput
+                style={styles.input}
+                value={formData.occupation}
+                onChangeText={(value) => updateFormData('occupation', value)}
+                placeholder="e.g., Architecture Student, Professor, Designer"
+                testID="occupation-input"
               />
             </View>
 

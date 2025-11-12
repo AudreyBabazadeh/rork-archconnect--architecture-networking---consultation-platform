@@ -22,7 +22,6 @@ export default function SignUpScreen() {
     email: '',
     password: '',
     confirmPassword: '',
-    userType: 'student' as 'student' | 'professor',
     university: '',
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -64,7 +63,6 @@ export default function SignUpScreen() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        userType: formData.userType,
         university: formData.university,
       });
       
@@ -169,45 +167,7 @@ export default function SignUpScreen() {
             />
           </View>
 
-          <View style={styles.userTypeContainer}>
-            <Text style={styles.userTypeLabel}>I am a:</Text>
-            <View style={styles.userTypeButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.userTypeButton,
-                  formData.userType === 'student' && styles.userTypeButtonActive,
-                ]}
-                onPress={() => updateFormData('userType', 'student')}
-                testID="student-type-button"
-              >
-                <Text
-                  style={[
-                    styles.userTypeButtonText,
-                    formData.userType === 'student' && styles.userTypeButtonTextActive,
-                  ]}
-                >
-                  Student
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.userTypeButton,
-                  formData.userType === 'professor' && styles.userTypeButtonActive,
-                ]}
-                onPress={() => updateFormData('userType', 'professor')}
-                testID="professor-type-button"
-              >
-                <Text
-                  style={[
-                    styles.userTypeButtonText,
-                    formData.userType === 'professor' && styles.userTypeButtonTextActive,
-                  ]}
-                >
-                  Professor
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+
 
           <View style={styles.inputContainer}>
             <Lock size={20} color={Colors.textLight} style={styles.inputIcon} />
@@ -343,41 +303,7 @@ const styles = StyleSheet.create({
     right: 16,
     padding: 4,
   },
-  userTypeContainer: {
-    marginBottom: 16,
-  },
-  userTypeLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 12,
-  },
-  userTypeButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  userTypeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    backgroundColor: Colors.white,
-    alignItems: 'center',
-  },
-  userTypeButtonActive: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
-  },
-  userTypeButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  userTypeButtonTextActive: {
-    color: Colors.white,
-  },
+
   signUpButton: {
     backgroundColor: Colors.primary,
     paddingVertical: 16,

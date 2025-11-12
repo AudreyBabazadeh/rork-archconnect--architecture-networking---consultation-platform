@@ -63,7 +63,7 @@ export default function ProfileScreen() {
           </View>
 
           <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.userTitle}>{user.userType === 'student' ? 'Architecture Student' : 'Architecture Professor'}</Text>
+          {user.occupation && <Text style={styles.userTitle}>{user.occupation}</Text>}
           
           {user.university && (
             <View style={styles.infoRow}>
