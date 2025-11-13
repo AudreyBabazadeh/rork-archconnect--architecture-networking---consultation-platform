@@ -10,22 +10,24 @@ import {
   ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { TrendingUp, Users, BookOpen, MessageCircle, UserCircle, ArrowRight } from 'lucide-react-native';
+import { Users, HelpCircle, MessageCircle, UserCircle, ArrowRight, Globe } from 'lucide-react-native';
 import { PostCard } from '@/components/PostCard';
 import { mockPosts } from '@/data/mockPosts';
 import { Post } from '@/types/user';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFollow } from '@/contexts/FollowContext';
 import { useMessaging } from '@/contexts/MessagingContext';
 
-type FilterType = 'all' | 'trending' | 'students' | 'mentors' | 'professors';
+type FilterType = 'following' | 'explore' | 'ask';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { user, hasCompletedOnboarding } = useAuth();
   const { getTotalUnreadCount } = useMessaging();
+  const { getFollowingList } = useFollow();
   const [refreshing, setRefreshing] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [activeFilter, setActiveFilter] = useState<FilterType>('following');
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
 
   const filteredPosts = useMemo(() => {
@@ -38,19 +40,42 @@ export default function HomeScreen() {
       likes: post.isLiked ? post.likes : (likedPosts.has(post.id) ? post.likes + 1 : post.likes)
     }));
 
+    const followingList = getFollowingList();
+
     switch (activeFilter) {
-      case 'trending':
-        return posts.sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments)).slice(0, 10);
-      case 'students':
-        return posts.filter(post => post.authorType === 'student');
-      case 'mentors':
-        return posts.filter(post => post.authorType === 'mentor');
-      case 'professors':
-        return posts.filter(post => post.authorType === 'professor');
+      case 'following':
+        // Show posts from users the person follows
+        const followingPosts = posts.filter(post => followingList.includes(post.authorId));
+        // If not following anyone yet, show a helpful empty state by returning empty array
+        return followingPosts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      
+      case 'explore':
+        // Personalized discovery feed - mix of trending and recent content
+        // Sort by engagement (likes + comments) with recency boost
+        return posts.sort((a, b) => {
+          const scoreA = (a.likes + a.comments * 2) / Math.max(1, (Date.now() - a.timestamp.getTime()) / (1000 * 60 * 60));
+          const scoreB = (b.likes + b.comments * 2) / Math.max(1, (Date.now() - b.timestamp.getTime()) / (1000 * 60 * 60));
+          return scoreB - scoreA;
+        });
+      
+      case 'ask':
+        // Q&A community posts - filter for help-needed tags or question-like content
+        return posts.filter(post => 
+          post.tags?.some(tag => 
+            tag.includes('help') || 
+            tag.includes('question') || 
+            tag.includes('thesis') ||
+            tag.includes('struggling')
+          ) || 
+          post.content.toLowerCase().includes('?') ||
+          post.content.toLowerCase().includes('help') ||
+          post.content.toLowerCase().includes('advice')
+        ).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      
       default:
         return posts.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     }
-  }, [activeFilter, likedPosts]);
+  }, [activeFilter, likedPosts, getFollowingList]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -84,11 +109,9 @@ export default function HomeScreen() {
   };
 
   const filters = [
-    { key: 'all' as FilterType, label: 'All', icon: null },
-    { key: 'trending' as FilterType, label: 'Trending', icon: TrendingUp },
-    { key: 'students' as FilterType, label: 'Students', icon: Users },
-    { key: 'mentors' as FilterType, label: 'Mentors', icon: BookOpen },
-    { key: 'professors' as FilterType, label: 'Professors', icon: BookOpen },
+    { key: 'following' as FilterType, label: 'Following', icon: Users },
+    { key: 'explore' as FilterType, label: 'Explore', icon: Globe },
+    { key: 'ask' as FilterType, label: 'Ask', icon: HelpCircle },
   ];
 
   const renderPost = ({ item }: { item: Post }) => (
@@ -193,6 +216,40 @@ export default function HomeScreen() {
     </View>
   );
 
+  const renderEmptyState = () => {
+    if (activeFilter === 'following' && getFollowingList().length === 0) {
+      return (
+        <View style={styles.emptyState}>
+          <Users size={48} color={Colors.textLight} strokeWidth={1.5} />
+          <Text style={styles.emptyStateTitle}>Not Following Anyone Yet</Text>
+          <Text style={styles.emptyStateText}>
+            Discover and follow mentors, students, and professionals to see their posts here.
+          </Text>
+          <TouchableOpacity 
+            style={styles.exploreButton}
+            onPress={() => setActiveFilter('explore')}
+          >
+            <Text style={styles.exploreButtonText}>Explore Feed</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    if (filteredPosts.length === 0) {
+      return (
+        <View style={styles.emptyState}>
+          <HelpCircle size={48} color={Colors.textLight} strokeWidth={1.5} />
+          <Text style={styles.emptyStateTitle}>No Posts Found</Text>
+          <Text style={styles.emptyStateText}>
+            Try switching to a different tab or check back later.
+          </Text>
+        </View>
+      );
+    }
+    
+    return null;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
@@ -200,6 +257,7 @@ export default function HomeScreen() {
         renderItem={renderPost}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={renderHeader}
+        ListEmptyComponent={renderEmptyState}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -343,5 +401,39 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textLight,
     lineHeight: 18,
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 32,
+    minHeight: 300,
+  },
+  emptyStateTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.text,
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptyStateText: {
+    fontSize: 15,
+    color: Colors.textLight,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  exploreButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  exploreButtonText: {
+    color: Colors.white,
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
