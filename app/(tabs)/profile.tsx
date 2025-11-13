@@ -61,7 +61,6 @@ export default function ProfileScreen() {
         }}
         type="profile"
       />
-
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         <View style={styles.heroSection}>
           <Image 
