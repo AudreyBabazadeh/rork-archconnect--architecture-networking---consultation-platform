@@ -210,7 +210,7 @@ export default function ProfileScreen() {
             
             <Text style={styles.mentorInvitationTitle}>Share Your Expertise</Text>
             <Text style={styles.mentorInvitationDescription}>
-              Join Archal&apos;s curated network of mentors. Guide students and professionals through their architectural journey while building your reputation in the community.
+              Join Archal&apos;s curated network of mentors. Guide students and professionals through their professional journey while building your reputation in the community.
             </Text>
 
             <View style={styles.mentorBenefitsList}>
