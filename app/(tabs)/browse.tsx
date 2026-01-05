@@ -196,7 +196,7 @@ export default function BrowseScreen() {
           <Users size={56} color={Colors.textLight} strokeWidth={1.5} />
           <Text style={styles.emptyTitle}>No results found</Text>
           <Text style={styles.emptyText}>
-            We couldn&apos;t find anyone matching &ldquo;{searchQuery}&rdquo;{"\n"}
+            We could not find anyone matching {searchQuery}{"\n"}
             Try a different search or adjust your filters.
           </Text>
           <TouchableOpacity 
