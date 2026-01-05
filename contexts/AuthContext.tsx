@@ -12,6 +12,9 @@ export interface AuthUser extends User {
   coverImage?: string;
   createdAt: string;
   hasCompletedOnboarding?: boolean;
+  mentorStatus?: 'not_applied' | 'pending' | 'approved' | 'not_interested';
+  mentorLevel?: 'emerging' | 'established' | 'expert' | 'master';
+  mentorApplicationDate?: string;
 }
 
 interface AuthState {
@@ -29,6 +32,8 @@ interface AuthActions {
   searchUsers: (query: string) => Promise<AuthUser[]>;
   getUserById: (id: string) => Promise<AuthUser | null>;
   completeOnboarding: () => Promise<void>;
+  applyForMentor: () => Promise<void>;
+  approveMentor: (userId: string, level: 'emerging' | 'established' | 'expert' | 'master') => Promise<void>;
 }
 
 const STORAGE_KEY = 'auth_user';
@@ -146,7 +151,8 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
         occupation: userData.occupation || '',
         university: userData.university || '',
         createdAt: new Date().toISOString(),
-        hasCompletedOnboarding: false
+        hasCompletedOnboarding: false,
+        mentorStatus: 'not_applied'
       };
       
       users.push(newUser);
@@ -314,6 +320,74 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     }
   }, [user]);
 
+  const applyForMentor = useCallback(async (): Promise<void> => {
+    try {
+      if (!user) return;
+      
+      const updatedUser = { 
+        ...user, 
+        mentorStatus: 'pending' as const,
+        mentorApplicationDate: new Date().toISOString()
+      };
+      setUser(updatedUser);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+      
+      const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
+      
+      const userIndex = users.findIndex(u => u.id === user.id);
+      if (userIndex !== -1) {
+        users[userIndex] = updatedUser;
+        await AsyncStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+        console.log('Mentor application submitted');
+      }
+    } catch (error) {
+      console.error('Apply for mentor error:', error);
+    }
+  }, [user]);
+
+  const approveMentor = useCallback(async (userId: string, level: 'emerging' | 'established' | 'expert' | 'master'): Promise<void> => {
+    try {
+      const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
+      
+      const userIndex = users.findIndex(u => u.id === userId);
+      if (userIndex !== -1) {
+        users[userIndex] = {
+          ...users[userIndex],
+          mentorStatus: 'approved' as const,
+          mentorLevel: level
+        };
+        await AsyncStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+        
+        if (user?.id === userId) {
+          const updatedUser = users[userIndex];
+          setUser(updatedUser);
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+        }
+        console.log('Mentor approved with level:', level);
+      }
+    } catch (error) {
+      console.error('Approve mentor error:', error);
+    }
+  }, [user]);
+
   return useMemo(() => ({
     user,
     isLoading,
@@ -325,6 +399,8 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     updateProfile,
     searchUsers,
     getUserById,
-    completeOnboarding
-  }), [user, isLoading, signIn, signUp, signOut, updateProfile, searchUsers, getUserById, completeOnboarding]);
+    completeOnboarding,
+    applyForMentor,
+    approveMentor
+  }), [user, isLoading, signIn, signUp, signOut, updateProfile, searchUsers, getUserById, completeOnboarding, applyForMentor, approveMentor]);
 });

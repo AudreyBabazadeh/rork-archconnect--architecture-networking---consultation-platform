@@ -12,6 +12,8 @@ import {
   Globe,
   Instagram,
   PlusCircle,
+  Lock,
+  Award,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -809,21 +811,77 @@ export default function EditProfileScreen() {
 
           <TouchableOpacity 
             style={styles.collapsibleSection}
-            onPress={() => toggleSection('preferences')}
-            activeOpacity={0.7}
+            onPress={() => {
+              if (user?.mentorStatus === 'approved') {
+                toggleSection('preferences');
+              }
+            }}
+            activeOpacity={user?.mentorStatus === 'approved' ? 0.7 : 1}
           >
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Session Preferences</Text>
-              {expandedSections.preferences ? (
-                <ChevronUp size={20} color={Colors.textLight} />
-              ) : (
-                <ChevronDown size={20} color={Colors.textLight} />
+              <View style={styles.sectionHeaderLeft}>
+                <Text style={[styles.sectionTitle, user?.mentorStatus !== 'approved' && styles.lockedSectionTitle]}>Session Preferences</Text>
+                {user?.mentorStatus !== 'approved' && (
+                  <Lock size={16} color={Colors.textLight} style={styles.lockIcon} />
+                )}
+              </View>
+              {user?.mentorStatus === 'approved' && (
+                expandedSections.preferences ? (
+                  <ChevronUp size={20} color={Colors.textLight} />
+                ) : (
+                  <ChevronDown size={20} color={Colors.textLight} />
+                )
               )}
             </View>
           </TouchableOpacity>
-          {expandedSections.preferences && (
+          {user?.mentorStatus !== 'approved' ? (
             <View style={styles.sectionContent}>
-              <Text style={styles.helpText}>All sessions on Arcall are video-based</Text>
+              <View style={styles.lockedFeatureCard}>
+                <Award size={32} color={Colors.primary} strokeWidth={1.5} />
+                <Text style={styles.lockedFeatureTitle}>Mentor Features</Text>
+                <Text style={styles.lockedFeatureDescription}>
+                  {user?.mentorStatus === 'pending' 
+                    ? 'Your mentor application is under review. Once approved, you\'ll be able to set your pricing and availability.'
+                    : user?.mentorStatus === 'not_interested'
+                    ? 'Apply to become a mentor to set pricing and offer sessions.'
+                    : 'Apply to become a mentor to unlock pricing and scheduling features.'}
+                </Text>
+                {user?.mentorStatus === 'pending' ? (
+                  <TouchableOpacity 
+                    style={styles.lockedFeatureButtonSecondary}
+                    onPress={() => router.push('/mentor/pending' as any)}
+                  >
+                    <Text style={styles.lockedFeatureButtonSecondaryText}>View Status</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity 
+                    style={styles.lockedFeatureButton}
+                    onPress={() => router.push('/mentor/apply' as any)}
+                  >
+                    <Text style={styles.lockedFeatureButtonText}>Apply to Become a Mentor</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          ) : expandedSections.preferences && (
+            <View style={styles.sectionContent}>
+              <Text style={styles.helpText}>All sessions on Archal are video-based</Text>
+              
+              {user?.mentorLevel && (
+                <View style={styles.mentorLevelCard}>
+                  <View style={styles.mentorLevelHeader}>
+                    <Award size={20} color={Colors.primary} strokeWidth={2} />
+                    <Text style={styles.mentorLevelTitle}>Mentor Level: {user.mentorLevel.charAt(0).toUpperCase() + user.mentorLevel.slice(1)}</Text>
+                  </View>
+                  <Text style={styles.mentorLevelDescription}>
+                    {user.mentorLevel === 'emerging' && 'Suggested rate: $25-$50/hour - Building your mentorship practice'}
+                    {user.mentorLevel === 'established' && 'Suggested rate: $50-$100/hour - Experienced professional with proven track record'}
+                    {user.mentorLevel === 'expert' && 'Suggested rate: $100-$200/hour - Industry expert with extensive experience'}
+                    {user.mentorLevel === 'master' && 'Suggested rate: $200+/hour - Distinguished professional and thought leader'}
+                  </Text>
+                </View>
+              )}
+
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Pricing Tier</Text>
                 <Text style={styles.helpText}>General pricing level for your sessions</Text>
@@ -1556,5 +1614,86 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: Colors.primary,
+  },
+  sectionHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  lockedSectionTitle: {
+    opacity: 0.5,
+  },
+  lockIcon: {
+    opacity: 0.5,
+  },
+  lockedFeatureCard: {
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: Colors.background,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  lockedFeatureTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.text,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  lockedFeatureDescription: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  lockedFeatureButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  lockedFeatureButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  lockedFeatureButtonSecondary: {
+    backgroundColor: Colors.background,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+  },
+  lockedFeatureButtonSecondaryText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  mentorLevelCard: {
+    backgroundColor: Colors.primaryLight + '10',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: Colors.primary + '20',
+  },
+  mentorLevelHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  mentorLevelTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.primary,
+  },
+  mentorLevelDescription: {
+    fontSize: 14,
+    color: Colors.text,
+    lineHeight: 20,
   },
 });

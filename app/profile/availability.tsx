@@ -1,4 +1,4 @@
-import { Clock, Calendar, ChevronDown, Plus, Check } from 'lucide-react-native';
+import { Clock, Calendar, ChevronDown, Plus, Check, Lock, Award } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -11,7 +11,7 @@ import {
   Modal,
   FlatList,
 } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { TopicManager } from '@/components/TopicManager';
@@ -246,6 +246,70 @@ export default function ManageAvailabilityScreen() {
           <Text style={styles.errorText}>Please sign in to manage availability</Text>
         </View>
       </SafeAreaView>
+    );
+  }
+
+  if (user.mentorStatus !== 'approved') {
+    return (
+      <>
+        <Stack.Screen 
+          options={{ 
+            title: 'Manage Availability',
+          }} 
+        />
+        <SafeAreaView style={styles.container}>
+          <ScrollView 
+            style={styles.content} 
+            contentContainerStyle={styles.lockedContentContainer}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.lockedStateCard}>
+              <View style={styles.lockedIconContainer}>
+                <Lock size={48} color={Colors.primary} strokeWidth={1.5} />
+              </View>
+              <Text style={styles.lockedStateTitle}>Mentor Features Locked</Text>
+              <Text style={styles.lockedStateDescription}>
+                {user.mentorStatus === 'pending'
+                  ? 'Your mentor application is currently under review. Once approved, you\'ll be able to set your availability and manage consultation topics.'
+                  : user.mentorStatus === 'not_interested'
+                  ? 'This feature is available to approved mentors. Apply to become a mentor to set your availability and offer consultations.'
+                  : 'Apply to become a mentor to unlock availability management and consultation scheduling features.'}
+              </Text>
+              
+              <View style={styles.lockedFeaturesList}>
+                <View style={styles.lockedFeatureItem}>
+                  <Award size={20} color={Colors.primary} strokeWidth={2} />
+                  <Text style={styles.lockedFeatureText}>Set consultation topics and pricing</Text>
+                </View>
+                <View style={styles.lockedFeatureItem}>
+                  <Calendar size={20} color={Colors.primary} strokeWidth={2} />
+                  <Text style={styles.lockedFeatureText}>Manage weekly availability schedule</Text>
+                </View>
+                <View style={styles.lockedFeatureItem}>
+                  <Clock size={20} color={Colors.primary} strokeWidth={2} />
+                  <Text style={styles.lockedFeatureText}>Configure booking preferences</Text>
+                </View>
+              </View>
+
+              {user.mentorStatus === 'pending' ? (
+                <TouchableOpacity 
+                  style={styles.lockedStateButtonSecondary}
+                  onPress={() => router.push('/mentor/pending' as any)}
+                >
+                  <Text style={styles.lockedStateButtonSecondaryText}>View Application Status</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity 
+                  style={styles.lockedStateButton}
+                  onPress={() => router.push('/mentor/apply' as any)}
+                >
+                  <Text style={styles.lockedStateButtonText}>Apply to Become a Mentor</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </>
     );
   }
 
@@ -674,5 +738,85 @@ const styles = StyleSheet.create({
   },
   headerRightContainer: {
     marginRight: 10,
+  },
+  lockedContentContainer: {
+    flexGrow: 1,
+    padding: 20,
+    justifyContent: 'center',
+  },
+  lockedStateCard: {
+    backgroundColor: Colors.white,
+    borderRadius: 16,
+    padding: 32,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  lockedIconContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: Colors.primaryLight + '20',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  lockedStateTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  lockedStateDescription: {
+    fontSize: 15,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  lockedFeaturesList: {
+    width: '100%',
+    gap: 16,
+    marginBottom: 32,
+  },
+  lockedFeatureItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+  },
+  lockedFeatureText: {
+    flex: 1,
+    fontSize: 14,
+    color: Colors.text,
+    lineHeight: 20,
+  },
+  lockedStateButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+  },
+  lockedStateButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  lockedStateButtonSecondary: {
+    backgroundColor: Colors.background,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+  lockedStateButtonSecondaryText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primary,
   },
 });

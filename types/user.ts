@@ -1,5 +1,7 @@
 export type LoyaltyBadge = 'silver' | 'gold';
 export type PricingTier = 'Free' | 'Moderate' | 'Premium' | 'Enterprise';
+export type MentorStatus = 'not_applied' | 'pending' | 'approved' | 'not_interested';
+export type MentorLevel = 'emerging' | 'established' | 'expert' | 'master';
 
 export interface User {
   id: string;
@@ -20,6 +22,9 @@ export interface User {
   isAvailable: boolean;
   topics?: Topic[];
   loyaltyBadge?: LoyaltyBadge;
+  mentorStatus?: MentorStatus;
+  mentorLevel?: MentorLevel;
+  mentorApplicationDate?: string;
 }
 
 export interface PortfolioItem {
