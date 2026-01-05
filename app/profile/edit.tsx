@@ -13,6 +13,8 @@ import {
   Instagram,
   PlusCircle,
   Award,
+  Briefcase,
+  GraduationCap,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -64,9 +66,9 @@ interface SectionState {
   basic: boolean;
   expertise: boolean;
   portfolio: boolean;
-  teaching: boolean;
+  experience: boolean;
+  education: boolean;
   links: boolean;
-  personalization: boolean;
 }
 
 export default function EditProfileScreen() {
@@ -80,9 +82,9 @@ export default function EditProfileScreen() {
     basic: true,
     expertise: false,
     portfolio: false,
-    teaching: false,
+    experience: false,
+    education: false,
     links: false,
-    personalization: false,
   });
 
   const [formData, setFormData] = useState<any>({
@@ -98,9 +100,11 @@ export default function EditProfileScreen() {
     coverImage: user?.coverImage || '',
     expertiseTags: user?.specialties || [],
     portfolioImages: [] as PortfolioImage[],
-    teachingFocus: '',
-    howITeach: '',
-    idealMentees: '',
+    experienceYears: '',
+    experienceDescription: '',
+    educationDegree: '',
+    educationInstitution: '',
+    educationYear: '',
     linkedIn: '',
     website: '',
     instagram: '',
@@ -686,59 +690,102 @@ export default function EditProfileScreen() {
 
           <TouchableOpacity 
             style={styles.collapsibleSection}
-            onPress={() => toggleSection('teaching')}
+            onPress={() => toggleSection('experience')}
             activeOpacity={0.7}
           >
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Teaching Focus</Text>
-              {expandedSections.teaching ? (
+              <View style={styles.sectionHeaderLeft}>
+                <Briefcase size={20} color={Colors.primary} />
+                <Text style={styles.sectionTitle}>Experience</Text>
+              </View>
+              {expandedSections.experience ? (
                 <ChevronUp size={20} color={Colors.textLight} />
               ) : (
                 <ChevronDown size={20} color={Colors.textLight} />
               )}
             </View>
           </TouchableOpacity>
-          {expandedSections.teaching && (
+          {expandedSections.experience && (
             <View style={styles.sectionContent}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>My Mentoring Approach</Text>
-                <Text style={styles.helpText}>How do you guide students? Be specific and personal</Text>
+                <Text style={styles.label}>Years of Experience</Text>
+                <Text style={styles.helpText}>How long have you been in the field?</Text>
                 <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={formData.teachingFocus}
-                  onChangeText={(value) => updateFormData('teachingFocus', value)}
-                  placeholder="e.g., I focus on iterative feedback through sketching sessions. I help students find their design voice by reviewing work-in-progress, not just final presentations..."
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
+                  style={styles.input}
+                  value={formData.experienceYears}
+                  onChangeText={(value) => updateFormData('experienceYears', value)}
+                  placeholder="e.g., 5 years"
+                  testID="experience-years-input"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Topics I&apos;m Passionate About</Text>
-                <Text style={styles.helpText}>What excites you most in architecture? What do you love teaching?</Text>
+                <Text style={styles.label}>Professional Background</Text>
+                <Text style={styles.helpText}>Share your journey, key projects, and roles</Text>
                 <TextInput
                   style={[styles.input, styles.textArea]}
-                  value={formData.howITeach}
-                  onChangeText={(value) => updateFormData('howITeach', value)}
-                  placeholder="e.g., Adaptive reuse, material experimentation, spatial narrative, parametric workflows, hand-drawing techniques, climate-responsive design..."
+                  value={formData.experienceDescription}
+                  onChangeText={(value) => updateFormData('experienceDescription', value)}
+                  placeholder="e.g., Worked on residential and commercial projects at XYZ Firm. Led design development for award-winning sustainable housing complex. Currently freelancing and teaching design studios..."
                   multiline
-                  numberOfLines={4}
+                  numberOfLines={6}
                   textAlignVertical="top"
+                  testID="experience-description-input"
+                />
+              </View>
+            </View>
+          )}
+
+          <TouchableOpacity 
+            style={styles.collapsibleSection}
+            onPress={() => toggleSection('education')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionHeaderLeft}>
+                <GraduationCap size={20} color={Colors.primary} />
+                <Text style={styles.sectionTitle}>Education</Text>
+              </View>
+              {expandedSections.education ? (
+                <ChevronUp size={20} color={Colors.textLight} />
+              ) : (
+                <ChevronDown size={20} color={Colors.textLight} />
+              )}
+            </View>
+          </TouchableOpacity>
+          {expandedSections.education && (
+            <View style={styles.sectionContent}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Degree</Text>
+                <TextInput
+                  style={styles.input}
+                  value={formData.educationDegree}
+                  onChangeText={(value) => updateFormData('educationDegree', value)}
+                  placeholder="e.g., Master of Architecture (M.Arch)"
+                  testID="education-degree-input"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>What Mentees Can Expect from Sessions</Text>
-                <Text style={styles.helpText}>Paint a picture: what does a typical session look like?</Text>
+                <Text style={styles.label}>Institution</Text>
                 <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={formData.idealMentees}
-                  onChangeText={(value) => updateFormData('idealMentees', value)}
-                  placeholder="e.g., Expect honest, constructive critique and actionable next steps. I ask questions to challenge your assumptions, share real project examples, and help you build confidence in presenting your ideas..."
-                  multiline
-                  numberOfLines={4}
-                  textAlignVertical="top"
+                  style={styles.input}
+                  value={formData.educationInstitution}
+                  onChangeText={(value) => updateFormData('educationInstitution', value)}
+                  placeholder="e.g., MIT School of Architecture"
+                  testID="education-institution-input"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Year</Text>
+                <TextInput
+                  style={styles.input}
+                  value={formData.educationYear}
+                  onChangeText={(value) => updateFormData('educationYear', value)}
+                  placeholder="e.g., 2019"
+                  keyboardType="numeric"
+                  testID="education-year-input"
                 />
               </View>
             </View>
@@ -887,26 +934,35 @@ export default function EditProfileScreen() {
                 </View>
               )}
 
-              {(formData.teachingFocus || formData.howITeach || formData.idealMentees) && (
+              {(formData.experienceYears || formData.experienceDescription) && (
                 <View style={styles.previewSection}>
-                  <Text style={styles.previewSectionTitle}>Mentorship Approach</Text>
-                  {formData.teachingFocus && (
+                  <Text style={styles.previewSectionTitle}>Experience</Text>
+                  {formData.experienceYears && (
                     <View style={styles.previewSubSection}>
-                      <Text style={styles.previewSubTitle}>My Mentoring Approach</Text>
-                      <Text style={styles.previewText}>{formData.teachingFocus}</Text>
+                      <Text style={styles.previewSubTitle}>Years of Experience</Text>
+                      <Text style={styles.previewText}>{formData.experienceYears}</Text>
                     </View>
                   )}
-                  {formData.howITeach && (
+                  {formData.experienceDescription && (
                     <View style={styles.previewSubSection}>
-                      <Text style={styles.previewSubTitle}>Topics I&apos;m Passionate About</Text>
-                      <Text style={styles.previewText}>{formData.howITeach}</Text>
+                      <Text style={styles.previewSubTitle}>Professional Background</Text>
+                      <Text style={styles.previewText}>{formData.experienceDescription}</Text>
                     </View>
                   )}
-                  {formData.idealMentees && (
-                    <View style={styles.previewSubSection}>
-                      <Text style={styles.previewSubTitle}>What Mentees Can Expect</Text>
-                      <Text style={styles.previewText}>{formData.idealMentees}</Text>
-                    </View>
+                </View>
+              )}
+
+              {(formData.educationDegree || formData.educationInstitution || formData.educationYear) && (
+                <View style={styles.previewSection}>
+                  <Text style={styles.previewSectionTitle}>Education</Text>
+                  {formData.educationDegree && (
+                    <Text style={styles.previewText}>{formData.educationDegree}</Text>
+                  )}
+                  {formData.educationInstitution && (
+                    <Text style={styles.previewText}>{formData.educationInstitution}</Text>
+                  )}
+                  {formData.educationYear && (
+                    <Text style={styles.previewText}>Graduated {formData.educationYear}</Text>
                   )}
                 </View>
               )}
