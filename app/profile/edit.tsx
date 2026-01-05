@@ -1160,36 +1160,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  progressBar: {
-    height: 4,
-    backgroundColor: Colors.border,
-    width: '100%',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: Colors.primary,
-    transition: 'width 0.3s ease',
-  },
-  progressTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  progressText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: Colors.text,
-  },
-  savedText: {
-    fontSize: 12,
-    color: Colors.primary,
-    fontWeight: '500',
-  },
+
   collapsibleSection: {
     backgroundColor: Colors.white,
     borderRadius: 12,
