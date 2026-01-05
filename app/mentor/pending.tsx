@@ -1,5 +1,5 @@
 import { router, Stack } from 'expo-router';
-import { Clock, CheckCircle, Sparkles, ArrowRight } from 'lucide-react-native';
+import { Clock, CheckCircle, Sparkles, ArrowRight, Award, Users, Heart } from 'lucide-react-native';
 import React from 'react';
 import {
   View,
@@ -18,18 +18,39 @@ export default function MentorPendingScreen() {
   const reviewItems = [
     {
       icon: CheckCircle,
-      title: 'Profile & Credentials',
-      description: 'Reviewing your professional background and experience',
+      title: 'Professional Background',
+      description: 'Understanding your unique experience and perspective',
+      status: 'active',
     },
     {
       icon: Sparkles,
-      title: 'Expertise Alignment',
-      description: 'Evaluating your areas of specialization',
+      title: 'Expertise & Vision',
+      description: 'Exploring how your knowledge aligns with student needs',
+      status: 'active',
     },
     {
-      icon: CheckCircle,
-      title: 'Community Fit',
-      description: 'Ensuring alignment with our mentorship values',
+      icon: Heart,
+      title: 'Mentorship Approach',
+      description: 'Considering your teaching style and values',
+      status: 'active',
+    },
+  ];
+
+  const networkHighlights = [
+    {
+      icon: Award,
+      title: 'Curated Excellence',
+      description: 'Join a selective network of industry-leading professionals',
+    },
+    {
+      icon: Users,
+      title: 'Meaningful Impact',
+      description: 'Guide students who are genuinely invested in their growth',
+    },
+    {
+      icon: Sparkles,
+      title: 'Personalized Support',
+      description: 'Receive dedicated resources to succeed as a mentor',
     },
   ];
 
@@ -52,9 +73,9 @@ export default function MentorPendingScreen() {
           <View style={styles.statusBadge}>
             <Clock size={32} color={Colors.primary} strokeWidth={1.5} />
           </View>
-          <Text style={styles.statusTitle}>Application Under Review</Text>
+          <Text style={styles.statusTitle}>You&apos;re Being Considered</Text>
           <Text style={styles.statusSubtitle}>
-            Your application to join the Archal mentor network is being carefully reviewed by our team
+            Thank you for your interest in joining Archal&apos;s mentor network. Our team is thoughtfully reviewing your application to ensure the best match for both you and our community.
           </Text>
         </View>
 
@@ -82,14 +103,17 @@ export default function MentorPendingScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>What Happens Next</Text>
+          <Text style={styles.sectionTitle}>Why This Matters</Text>
           <Text style={styles.sectionText}>
-            Our team is carefully evaluating your application to ensure the best fit for both you and our student community. This process helps us maintain the high quality of mentorship that Archal is known for.
+            We thoughtfully review each application to build a mentor network where expertise meets genuine passion for teaching. This careful selection process ensures meaningful connections and lasting impact for both mentors and students.
           </Text>
         </View>
 
         <View style={styles.reviewItemsContainer}>
-          <Text style={styles.reviewTitle}>Currently Reviewing</Text>
+          <Text style={styles.reviewTitle}>What We&apos;re Exploring</Text>
+          <Text style={styles.reviewSubtitle}>
+            Our team is getting to know your unique strengths and how they align with our community
+          </Text>
           {reviewItems.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -101,30 +125,51 @@ export default function MentorPendingScreen() {
                   <Text style={styles.reviewItemTitle}>{item.title}</Text>
                   <Text style={styles.reviewItemDescription}>{item.description}</Text>
                 </View>
+                <View style={styles.activeIndicator}>
+                  <View style={styles.pulsingDot} />
+                </View>
               </View>
             );
           })}
         </View>
 
-        <View style={styles.timelineSection}>
-          <Text style={styles.sectionTitle}>Typical Timeline</Text>
-          <View style={styles.timelineCard}>
-            <Text style={styles.timelineText}>
-              Most applications are reviewed within <Text style={styles.timelineHighlight}>3-5 business days</Text>. You will receive a notification once a decision has been made.
-            </Text>
-          </View>
+        <View style={styles.networkSection}>
+          <Text style={styles.sectionTitle}>What You&apos;re Joining</Text>
+          <Text style={styles.networkIntro}>
+            If approved, you&apos;ll become part of something special
+          </Text>
+          {networkHighlights.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <View key={index} style={styles.networkItem}>
+                <View style={styles.networkIconContainer}>
+                  <Icon size={20} color={Colors.primary} strokeWidth={2} />
+                </View>
+                <View style={styles.networkContent}>
+                  <Text style={styles.networkItemTitle}>{item.title}</Text>
+                  <Text style={styles.networkItemDescription}>{item.description}</Text>
+                </View>
+              </View>
+            );
+          })}
         </View>
 
         <View style={styles.whileWaitingSection}>
-          <Text style={styles.sectionTitle}>While You Wait</Text>
+          <Text style={styles.sectionTitle}>In The Meantime</Text>
           <View style={styles.suggestionCard}>
             <Sparkles size={24} color={Colors.primary} strokeWidth={1.5} />
             <View style={styles.suggestionContent}>
-              <Text style={styles.suggestionTitle}>Complete Your Profile</Text>
+              <Text style={styles.suggestionTitle}>Strengthen Your Application</Text>
               <Text style={styles.suggestionDescription}>
-                A complete profile increases your chances of approval. Consider adding portfolio pieces and refining your expertise areas.
+                Consider enriching your profile with portfolio work, detailed expertise areas, or insights about your mentorship philosophy. A complete profile helps us understand your unique value.
               </Text>
             </View>
+          </View>
+          
+          <View style={styles.notificationNote}>
+            <Text style={styles.notificationText}>
+              You&apos;ll receive a notification once our review is complete. Thank you for your patience as we ensure the right fit.
+            </Text>
           </View>
         </View>
 
@@ -251,12 +296,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: Colors.text,
-    marginBottom: 16,
+    marginBottom: 8,
     letterSpacing: -0.3,
+  },
+  reviewSubtitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 16,
+    lineHeight: 20,
   },
   reviewItem: {
     flexDirection: 'row',
-    marginBottom: 16,
+    alignItems: 'center',
+    marginBottom: 12,
     backgroundColor: Colors.surface,
     borderRadius: 12,
     padding: 16,
@@ -286,24 +338,56 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     lineHeight: 20,
   },
-  timelineSection: {
+  activeIndicator: {
+    marginLeft: 12,
+  },
+  pulsingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.primary,
+    opacity: 0.7,
+  },
+  networkSection: {
     marginBottom: 32,
   },
-  timelineCard: {
-    backgroundColor: Colors.primaryLight + '10',
+  networkIntro: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  networkItem: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    backgroundColor: Colors.primaryLight + '08',
     borderRadius: 12,
-    padding: 20,
+    padding: 16,
     borderWidth: 1,
-    borderColor: Colors.primary + '20',
+    borderColor: Colors.primary + '15',
   },
-  timelineText: {
+  networkIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  networkContent: {
+    flex: 1,
+  },
+  networkItemTitle: {
     fontSize: 15,
+    fontWeight: '600',
     color: Colors.text,
-    lineHeight: 22,
+    marginBottom: 4,
   },
-  timelineHighlight: {
-    fontWeight: '700',
-    color: Colors.primary,
+  networkItemDescription: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    lineHeight: 20,
   },
   whileWaitingSection: {
     marginBottom: 32,
@@ -330,6 +414,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
+  },
+  notificationNote: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  notificationText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    lineHeight: 20,
+    textAlign: 'center',
   },
   backButton: {
     flexDirection: 'row',
