@@ -573,7 +573,7 @@ export default function EducationScreen() {
                     style={styles.mediaActionButton}
                     onPress={addMediaImage}
                   >
-                    <Text style={styles.mediaActionButtonText}>📷 Add Image</Text>
+                    <Text style={styles.mediaActionButtonText}>Add Image</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.mediaActionButton}
