@@ -737,59 +737,21 @@ export default function EditProfileScreen() {
           )}
 
           <TouchableOpacity 
-            style={styles.collapsibleSection}
-            onPress={() => toggleSection('education')}
+            style={styles.navigationCard}
+            onPress={() => router.push('/profile/education')}
             activeOpacity={0.7}
           >
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionHeaderLeft}>
+            <View style={styles.navigationCardLeft}>
+              <View style={styles.navigationIconContainer}>
                 <GraduationCap size={20} color={Colors.primary} />
-                <Text style={styles.sectionTitle}>Education</Text>
               </View>
-              {expandedSections.education ? (
-                <ChevronUp size={20} color={Colors.textLight} />
-              ) : (
-                <ChevronDown size={20} color={Colors.textLight} />
-              )}
+              <View>
+                <Text style={styles.navigationCardTitle}>Education</Text>
+                <Text style={styles.navigationCardDescription}>Manage your academic background</Text>
+              </View>
             </View>
+            <ChevronDown size={20} color={Colors.textLight} style={{ transform: [{ rotate: '-90deg' }] }} />
           </TouchableOpacity>
-          {expandedSections.education && (
-            <View style={styles.sectionContent}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Degree</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.educationDegree}
-                  onChangeText={(value) => updateFormData('educationDegree', value)}
-                  placeholder="e.g., Master of Architecture (M.Arch)"
-                  testID="education-degree-input"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Institution</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.educationInstitution}
-                  onChangeText={(value) => updateFormData('educationInstitution', value)}
-                  placeholder="e.g., MIT School of Architecture"
-                  testID="education-institution-input"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Year</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.educationYear}
-                  onChangeText={(value) => updateFormData('educationYear', value)}
-                  placeholder="e.g., 2019"
-                  keyboardType="numeric"
-                  testID="education-year-input"
-                />
-              </View>
-            </View>
-          )}
 
           <TouchableOpacity 
             style={styles.collapsibleSection}
@@ -1665,5 +1627,42 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: Colors.white,
+  },
+  navigationCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  navigationCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  navigationIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navigationCardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  navigationCardDescription: {
+    fontSize: 13,
+    color: Colors.textLight,
   },
 });

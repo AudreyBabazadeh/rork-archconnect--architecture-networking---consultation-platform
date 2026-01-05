@@ -106,3 +106,24 @@ export interface Comment {
   likes: number;
   isLiked: boolean;
 }
+
+export interface Education {
+  id: string;
+  school: string;
+  degree: string;
+  fieldOfStudy: string;
+  startDate: string;
+  endDate: string;
+  grade?: string;
+  activities?: string;
+  description?: string;
+  skills: string[];
+  media: EducationMedia[];
+}
+
+export interface EducationMedia {
+  id: string;
+  type: 'image' | 'link';
+  url: string;
+  title?: string;
+}
