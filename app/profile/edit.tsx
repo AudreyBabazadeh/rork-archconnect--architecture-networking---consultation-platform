@@ -44,21 +44,21 @@ import { Experience, Education } from '@/types/user';
 
 
 const COMMON_EXPERTISE_TAGS = [
-  'Sustainable Design',
-  'Urban Planning',
-  'Portfolio Review',
-  'Residential Design',
-  'Commercial Design',
-  'Interior Architecture',
-  'Landscape Architecture',
-  'CAD/Revit',
-  'SketchUp',
-  '3D Visualization',
-  'Construction Documents',
-  'Thesis Guidance',
-  'Career Advice',
-  'Technical Drawing',
-  'Concept Development',
+  'Project Management',
+  'Strategic Planning',
+  'Research & Analysis',
+  'Creative Direction',
+  'Technical Writing',
+  'Data Analysis',
+  'Problem Solving',
+  'Leadership',
+  'Communication',
+  'Design Thinking',
+  'Public Speaking',
+  'Mentorship',
+  'Career Coaching',
+  'Team Collaboration',
+  'Critical Thinking',
 ];
 
 
@@ -884,7 +884,7 @@ export default function EditProfileScreen() {
                   style={styles.input}
                   value={formData.occupation}
                   onChangeText={(value) => updateFormData('occupation', value)}
-                  placeholder="e.g., Architecture Student, Professor, Designer"
+                  placeholder="e.g., Student, Professor, Professional"
                   testID="occupation-input"
                 />
               </View>
@@ -1444,7 +1444,7 @@ export default function EditProfileScreen() {
                   style={styles.input}
                   value={expFormData.title}
                   onChangeText={(value) => updateExpFormData('title', value)}
-                  placeholder="e.g., Architecture Intern"
+                  placeholder="e.g., Marketing Intern, Software Developer"
                   placeholderTextColor={Colors.textLight}
                 />
               </View>
@@ -1484,7 +1484,7 @@ export default function EditProfileScreen() {
                   style={styles.input}
                   value={expFormData.company}
                   onChangeText={(value) => updateExpFormData('company', value)}
-                  placeholder="e.g., Zaha Hadid Architects"
+                  placeholder="e.g., Google, McKinsey & Company"
                   placeholderTextColor={Colors.textLight}
                 />
               </View>
