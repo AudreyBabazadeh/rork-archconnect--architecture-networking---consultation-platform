@@ -16,6 +16,10 @@ import {
   Briefcase,
   GraduationCap,
   Calendar,
+  Trash2,
+  Edit2,
+  Link as LinkIcon,
+  MapPin,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -73,6 +77,16 @@ interface SectionState {
   links: boolean;
 }
 
+const EMPLOYMENT_TYPES = [
+  'Full-time',
+  'Part-time',
+  'Contract',
+  'Freelance',
+  'Internship',
+  'Apprenticeship',
+  'Seasonal',
+];
+
 export default function EditProfileScreen() {
   const { user, updateProfile, completeOnboarding, hasCompletedOnboarding } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -87,6 +101,25 @@ export default function EditProfileScreen() {
     experience: false,
     education: false,
     links: false,
+  });
+
+  const [experiences, setExperiences] = useState<Experience[]>((user as any)?.experiences || []);
+  const [showExpModal, setShowExpModal] = useState(false);
+  const [editingExpId, setEditingExpId] = useState<string | null>(null);
+  const [showExpSkillInput, setShowExpSkillInput] = useState(false);
+  const [expSkillInput, setExpSkillInput] = useState('');
+  const [isCurrentPosition, setIsCurrentPosition] = useState(false);
+
+  const [expFormData, setExpFormData] = useState<Omit<Experience, 'id'>>({
+    title: '',
+    employmentType: '',
+    company: '',
+    startDate: '',
+    endDate: '',
+    location: '',
+    description: '',
+    skills: [],
+    media: [],
   });
 
   const [formData, setFormData] = useState<any>({
@@ -363,6 +396,180 @@ export default function EditProfileScreen() {
         img.id === id ? { ...img, caption } : img
       )
     );
+  };
+
+  const resetExpForm = () => {
+    setExpFormData({
+      title: '',
+      employmentType: '',
+      company: '',
+      startDate: '',
+      endDate: '',
+      location: '',
+      description: '',
+      skills: [],
+      media: [],
+    });
+    setEditingExpId(null);
+    setExpSkillInput('');
+    setShowExpSkillInput(false);
+    setIsCurrentPosition(false);
+  };
+
+  const openAddExpModal = () => {
+    resetExpForm();
+    setShowExpModal(true);
+  };
+
+  const openEditExpModal = (experience: Experience) => {
+    setExpFormData({
+      title: experience.title,
+      employmentType: experience.employmentType,
+      company: experience.company,
+      startDate: experience.startDate,
+      endDate: experience.endDate,
+      location: experience.location,
+      description: experience.description || '',
+      skills: experience.skills,
+      media: experience.media,
+    });
+    setIsCurrentPosition(experience.endDate.toLowerCase() === 'present');
+    setEditingExpId(experience.id);
+    setShowExpModal(true);
+  };
+
+  const handleSaveExp = async () => {
+    if (!expFormData.title.trim() || !expFormData.company.trim() || !expFormData.employmentType.trim()) {
+      Alert.alert('Required Fields', 'Please fill in Title, Company, and Employment Type');
+      return;
+    }
+
+    const newExperience: Experience = {
+      id: editingExpId || `exp_${Date.now()}`,
+      ...expFormData,
+      endDate: isCurrentPosition ? 'Present' : expFormData.endDate,
+    };
+
+    let updatedExperiences: Experience[];
+    if (editingExpId) {
+      updatedExperiences = experiences.map(exp => 
+        exp.id === editingExpId ? newExperience : exp
+      );
+    } else {
+      updatedExperiences = [...experiences, newExperience];
+    }
+
+    setExperiences(updatedExperiences);
+    await updateProfile({ experiences: updatedExperiences } as any);
+    
+    setShowExpModal(false);
+    resetExpForm();
+  };
+
+  const handleDeleteExp = (id: string) => {
+    Alert.alert(
+      'Delete Experience',
+      'Are you sure you want to delete this experience entry?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const updatedExperiences = experiences.filter(exp => exp.id !== id);
+            setExperiences(updatedExperiences);
+            await updateProfile({ experiences: updatedExperiences } as any);
+          },
+        },
+      ]
+    );
+  };
+
+  const updateExpFormData = (key: keyof Omit<Experience, 'id'>, value: any) => {
+    setExpFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const addExpSkill = () => {
+    const trimmedSkill = expSkillInput.trim();
+    if (trimmedSkill && !expFormData.skills.includes(trimmedSkill)) {
+      updateExpFormData('skills', [...expFormData.skills, trimmedSkill]);
+      setExpSkillInput('');
+      setShowExpSkillInput(false);
+    }
+  };
+
+  const removeExpSkill = (skill: string) => {
+    updateExpFormData('skills', expFormData.skills.filter(s => s !== skill));
+  };
+
+  const addExpMediaLink = () => {
+    Alert.prompt(
+      'Add Link',
+      'Enter the URL',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Add',
+          onPress: (url?: string) => {
+            if (url?.trim()) {
+              Alert.prompt(
+                'Link Title',
+                'Enter a title for this link (optional)',
+                [
+                  { text: 'Skip', onPress: () => {
+                    const newMedia = {
+                      id: `media_${Date.now()}`,
+                      type: 'link' as const,
+                      url: url.trim(),
+                    };
+                    updateExpFormData('media', [...expFormData.media, newMedia]);
+                  }},
+                  {
+                    text: 'Add',
+                    onPress: (title?: string) => {
+                      const newMedia = {
+                        id: `media_${Date.now()}`,
+                        type: 'link' as const,
+                        url: url.trim(),
+                        title: title?.trim(),
+                      };
+                      updateExpFormData('media', [...expFormData.media, newMedia]);
+                    },
+                  },
+                ]
+              );
+            }
+          },
+        },
+      ],
+      'plain-text'
+    );
+  };
+
+  const addExpMediaImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const newMedia = {
+          id: `media_${Date.now()}`,
+          type: 'image' as const,
+          url: result.assets[0].uri,
+        };
+        updateExpFormData('media', [...expFormData.media, newMedia]);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to add image. Please try again.');
+    }
+  };
+
+  const removeExpMedia = (id: string) => {
+    updateExpFormData('media', expFormData.media.filter(m => m.id !== id));
   };
 
 
@@ -708,38 +915,103 @@ export default function EditProfileScreen() {
             <View style={styles.sectionContent}>
               <Text style={styles.helpText}>Showcase your professional journey and roles</Text>
               
-              {(user as any)?.experiences && (user as any).experiences.length > 0 ? (
+              {experiences.length > 0 && (
                 <View style={styles.itemsList}>
-                  {(user as any).experiences.map((exp: Experience) => (
-                    <View key={exp.id} style={styles.itemCard}>
-                      <View style={styles.itemHeader}>
-                        <View style={styles.itemIconContainer}>
-                          <Briefcase size={18} color={Colors.primary} />
+                  {experiences.map((exp: Experience) => (
+                    <View key={exp.id} style={styles.experienceCard}>
+                      <View style={styles.experienceHeader}>
+                        <View style={styles.experienceIconContainer}>
+                          <Briefcase size={20} color={Colors.primary} />
                         </View>
-                        <View style={styles.itemContent}>
-                          <Text style={styles.itemTitle}>{exp.title}</Text>
-                          <Text style={styles.itemSubtitle}>{exp.company}</Text>
-                          <View style={styles.itemMeta}>
-                            <Calendar size={12} color={Colors.textLight} />
-                            <Text style={styles.itemMetaText}>{exp.startDate} - {exp.endDate}</Text>
+                        <View style={styles.experienceHeaderContent}>
+                          <Text style={styles.experienceTitle}>{exp.title}</Text>
+                          <Text style={styles.experienceCompany}>{exp.company}</Text>
+                          <Text style={styles.experienceEmploymentType}>{exp.employmentType}</Text>
+                          <View style={styles.experienceMetaRow}>
+                            <View style={styles.experienceDateContainer}>
+                              <Calendar size={14} color={Colors.textLight} />
+                              <Text style={styles.experienceDate}>
+                                {exp.startDate} - {exp.endDate}
+                              </Text>
+                            </View>
+                            {exp.location && (
+                              <View style={styles.experienceLocationContainer}>
+                                <MapPin size={14} color={Colors.textLight} />
+                                <Text style={styles.experienceLocation}>{exp.location}</Text>
+                              </View>
+                            )}
                           </View>
                         </View>
+                      </View>
+
+                      {exp.description && (
+                        <View style={styles.experienceDetail}>
+                          <Text style={styles.detailLabel}>Description:</Text>
+                          <Text style={styles.detailValue}>{exp.description}</Text>
+                        </View>
+                      )}
+
+                      {exp.skills.length > 0 && (
+                        <View style={styles.experienceDetail}>
+                          <Text style={styles.detailLabel}>Skills:</Text>
+                          <View style={styles.skillsContainer}>
+                            {exp.skills.map((skill, index) => (
+                              <View key={index} style={styles.skillTag}>
+                                <Text style={styles.skillTagText}>{skill}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        </View>
+                      )}
+
+                      {exp.media.length > 0 && (
+                        <View style={styles.experienceDetail}>
+                          <Text style={styles.detailLabel}>Media ({exp.media.length}):</Text>
+                          <View style={styles.mediaPreview}>
+                            {exp.media.slice(0, 3).map((media) => (
+                              <View key={media.id} style={styles.mediaIcon}>
+                                {media.type === 'link' ? (
+                                  <LinkIcon size={16} color={Colors.primary} />
+                                ) : (
+                                  <View style={styles.imageIconPlaceholder}>
+                                    <Text style={styles.imageIconText}>📷</Text>
+                                  </View>
+                                )}
+                              </View>
+                            ))}
+                          </View>
+                        </View>
+                      )}
+
+                      <View style={styles.cardActions}>
+                        <TouchableOpacity
+                          style={styles.editButton}
+                          onPress={() => openEditExpModal(exp)}
+                        >
+                          <Edit2 size={18} color={Colors.primary} />
+                          <Text style={styles.editButtonText}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.deleteButton}
+                          onPress={() => handleDeleteExp(exp.id)}
+                        >
+                          <Trash2 size={18} color={Colors.error} />
+                          <Text style={styles.deleteButtonText}>Delete</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
                   ))}
                 </View>
-              ) : (
-                <View style={styles.emptyStateInline}>
-                  <Briefcase size={32} color={Colors.textLight} />
-                  <Text style={styles.emptyStateText}>No experience added yet</Text>
-                </View>
               )}
               
               <TouchableOpacity
-                style={styles.manageButton}
-                onPress={() => router.push('/profile/experience')}
+                style={styles.addItemButton}
+                onPress={openAddExpModal}
               >
-                <Text style={styles.manageButtonText}>Manage Experience</Text>
+                <Plus size={20} color={Colors.white} />
+                <Text style={styles.addItemButtonText}>
+                  {experiences.length === 0 ? 'Add Experience' : 'Add Another Experience'}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -879,6 +1151,260 @@ export default function EditProfileScreen() {
           <View style={{ height: 40 }} />
         </View>
         </ScrollView>
+
+        <Modal
+          visible={showExpModal}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setShowExpModal(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {editingExpId ? 'Edit Experience' : 'Add Experience'}
+              </Text>
+              <TouchableOpacity onPress={() => setShowExpModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Title *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={expFormData.title}
+                  onChangeText={(value) => updateExpFormData('title', value)}
+                  placeholder="e.g., Architecture Intern"
+                  placeholderTextColor={Colors.textLight}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Employment Type *</Text>
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.employmentTypesScroll}
+                >
+                  {EMPLOYMENT_TYPES.map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      style={[
+                        styles.employmentTypeChip,
+                        expFormData.employmentType === type && styles.employmentTypeChipSelected,
+                      ]}
+                      onPress={() => updateExpFormData('employmentType', type)}
+                    >
+                      <Text
+                        style={[
+                          styles.employmentTypeText,
+                          expFormData.employmentType === type && styles.employmentTypeTextSelected,
+                        ]}
+                      >
+                        {type}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Company / Organization *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={expFormData.company}
+                  onChangeText={(value) => updateExpFormData('company', value)}
+                  placeholder="e.g., Zaha Hadid Architects"
+                  placeholderTextColor={Colors.textLight}
+                />
+              </View>
+
+              <View style={styles.dateRow}>
+                <View style={styles.dateInput}>
+                  <Text style={styles.label}>Start Date *</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={expFormData.startDate}
+                    onChangeText={(value) => updateExpFormData('startDate', value)}
+                    placeholder="e.g., Jan 2020"
+                    placeholderTextColor={Colors.textLight}
+                  />
+                </View>
+                <View style={styles.dateInput}>
+                  <Text style={styles.label}>End Date *</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={isCurrentPosition ? 'Present' : expFormData.endDate}
+                    onChangeText={(value) => updateExpFormData('endDate', value)}
+                    placeholder="e.g., Dec 2022"
+                    placeholderTextColor={Colors.textLight}
+                    editable={!isCurrentPosition}
+                  />
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.checkboxContainer}
+                onPress={() => {
+                  setIsCurrentPosition(!isCurrentPosition);
+                  if (!isCurrentPosition) {
+                    updateExpFormData('endDate', 'Present');
+                  } else {
+                    updateExpFormData('endDate', '');
+                  }
+                }}
+              >
+                <View style={[styles.checkbox, isCurrentPosition && styles.checkboxChecked]}>
+                  {isCurrentPosition && <Check size={16} color={Colors.white} />}
+                </View>
+                <Text style={styles.checkboxLabel}>I currently work here</Text>
+              </TouchableOpacity>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Location *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={expFormData.location}
+                  onChangeText={(value) => updateExpFormData('location', value)}
+                  placeholder="e.g., London, UK"
+                  placeholderTextColor={Colors.textLight}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Description</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={expFormData.description}
+                  onChangeText={(value) => updateExpFormData('description', value)}
+                  placeholder="Describe your responsibilities, achievements, and impact..."
+                  placeholderTextColor={Colors.textLight}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Skills</Text>
+                <Text style={styles.helpText}>
+                  Add skills you used or developed in this role
+                </Text>
+                {expFormData.skills.length > 0 && (
+                  <View style={styles.selectedSkillsContainer}>
+                    {expFormData.skills.map((skill) => (
+                      <View key={skill} style={styles.selectedSkill}>
+                        <Text style={styles.selectedSkillText}>{skill}</Text>
+                        <TouchableOpacity
+                          onPress={() => removeExpSkill(skill)}
+                          style={styles.removeSkillButton}
+                        >
+                          <X size={14} color={Colors.white} />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                {showExpSkillInput ? (
+                  <View style={styles.customSkillInputContainer}>
+                    <TextInput
+                      style={styles.customSkillInput}
+                      value={expSkillInput}
+                      onChangeText={setExpSkillInput}
+                      placeholder="Enter skill..."
+                      placeholderTextColor={Colors.textLight}
+                      autoFocus
+                    />
+                    <View style={styles.customSkillActions}>
+                      <TouchableOpacity
+                        style={styles.customSkillButton}
+                        onPress={addExpSkill}
+                        disabled={!expSkillInput.trim()}
+                      >
+                        <Check size={18} color={Colors.white} />
+                        <Text style={styles.customSkillButtonText}>Add</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.customSkillButton, styles.cancelButton]}
+                        onPress={() => {
+                          setShowExpSkillInput(false);
+                          setExpSkillInput('');
+                        }}
+                      >
+                        <X size={18} color={Colors.text} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addSkillButton}
+                    onPress={() => setShowExpSkillInput(true)}
+                  >
+                    <PlusCircle size={20} color={Colors.primary} />
+                    <Text style={styles.addSkillButtonText}>Add Skill</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Media</Text>
+                <Text style={styles.helpText}>
+                  Add images or links to projects, presentations, or relevant resources
+                </Text>
+                {expFormData.media.length > 0 && (
+                  <View style={styles.mediaList}>
+                    {expFormData.media.map((media) => (
+                      <View key={media.id} style={styles.mediaItem}>
+                        <View style={styles.mediaItemContent}>
+                          {media.type === 'link' ? (
+                            <LinkIcon size={20} color={Colors.primary} />
+                          ) : (
+                            <Text style={styles.mediaTypeIcon}>📷</Text>
+                          )}
+                          <View style={styles.mediaItemText}>
+                            <Text style={styles.mediaItemTitle} numberOfLines={1}>
+                              {media.title || media.url}
+                            </Text>
+                            <Text style={styles.mediaItemType}>
+                              {media.type === 'link' ? 'Link' : 'Image'}
+                            </Text>
+                          </View>
+                        </View>
+                        <TouchableOpacity onPress={() => removeExpMedia(media.id)}>
+                          <Trash2 size={18} color={Colors.error} />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                <View style={styles.mediaActions}>
+                  <TouchableOpacity
+                    style={styles.mediaActionButton}
+                    onPress={addExpMediaImage}
+                  >
+                    <Text style={styles.mediaActionButtonText}>📷 Add Image</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.mediaActionButton}
+                    onPress={addExpMediaLink}
+                  >
+                    <LinkIcon size={18} color={Colors.primary} />
+                    <Text style={styles.mediaActionButtonText}>Add Link</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.saveModalButton} onPress={handleSaveExp}>
+                <Text style={styles.saveModalButtonText}>
+                  {editingExpId ? 'Update Experience' : 'Add Experience'}
+                </Text>
+              </TouchableOpacity>
+
+              <View style={{ height: 40 }} />
+            </ScrollView>
+          </View>
+        </Modal>
 
         <Modal
           visible={showPreview}
@@ -1779,6 +2305,408 @@ const styles = StyleSheet.create({
   manageButtonText: {
     fontSize: 14,
     fontWeight: '600',
+    color: Colors.white,
+  },
+  experienceCard: {
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  experienceHeader: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  experienceIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  experienceHeaderContent: {
+    flex: 1,
+  },
+  experienceTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 3,
+  },
+  experienceCompany: {
+    fontSize: 14,
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  experienceEmploymentType: {
+    fontSize: 13,
+    color: Colors.textLight,
+    marginBottom: 4,
+  },
+  experienceMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  experienceDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  experienceDate: {
+    fontSize: 12,
+    color: Colors.textLight,
+  },
+  experienceLocationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  experienceLocation: {
+    fontSize: 12,
+    color: Colors.textLight,
+  },
+  experienceDetail: {
+    marginBottom: 8,
+  },
+  detailLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  detailValue: {
+    fontSize: 13,
+    color: Colors.textLight,
+    lineHeight: 18,
+  },
+  skillsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 4,
+  },
+  skillTag: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: Colors.primary + '15',
+  },
+  skillTagText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '500',
+  },
+  mediaPreview: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 4,
+  },
+  mediaIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 6,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  imageIconPlaceholder: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageIconText: {
+    fontSize: 16,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  editButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: Colors.primary + '10',
+  },
+  editButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  deleteButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: Colors.error + '10',
+  },
+  deleteButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.error,
+  },
+  addItemButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    borderRadius: 10,
+    marginTop: 12,
+  },
+  addItemButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: Colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  modalContent: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  employmentTypesScroll: {
+    gap: 8,
+  },
+  employmentTypeChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.background,
+  },
+  employmentTypeChipSelected: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  employmentTypeText: {
+    fontSize: 14,
+    color: Colors.text,
+    fontWeight: '500',
+  },
+  employmentTypeTextSelected: {
+    color: Colors.white,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
+  },
+  dateInput: {
+    flex: 1,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 20,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    color: Colors.text,
+    fontWeight: '500',
+  },
+  selectedSkillsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  selectedSkill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: Colors.primary,
+  },
+  selectedSkillText: {
+    fontSize: 14,
+    color: Colors.white,
+    fontWeight: '500',
+  },
+  removeSkillButton: {
+    padding: 2,
+  },
+  customSkillInputContainer: {
+    padding: 16,
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+  customSkillInput: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: Colors.text,
+    backgroundColor: Colors.white,
+    marginBottom: 12,
+  },
+  customSkillActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  customSkillButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+  },
+  customSkillButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  addSkillButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: Colors.background,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    borderStyle: 'dashed',
+  },
+  addSkillButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  mediaList: {
+    marginBottom: 12,
+  },
+  mediaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: Colors.background,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  mediaItemContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginRight: 12,
+  },
+  mediaTypeIcon: {
+    fontSize: 20,
+  },
+  mediaItemText: {
+    flex: 1,
+  },
+  mediaItemTitle: {
+    fontSize: 14,
+    color: Colors.text,
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  mediaItemType: {
+    fontSize: 12,
+    color: Colors.textLight,
+  },
+  mediaActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  mediaActionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: Colors.primary + '10',
+    borderWidth: 1,
+    borderColor: Colors.primary + '30',
+  },
+  mediaActionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  saveModalButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  saveModalButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
     color: Colors.white,
   },
 });
