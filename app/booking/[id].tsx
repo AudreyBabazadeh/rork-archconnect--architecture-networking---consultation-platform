@@ -60,7 +60,7 @@ export default function BookingScreen() {
                 foundConsultant = {
                   id: cloudUser.id,
                   name: cloudUser.name,
-                  title: cloudUser.userType === 'professor' ? `Professor at ${cloudUser.university || 'University'}` : `${cloudUser.userType === 'student' ? 'Architecture Student' : 'Architecture Professional'}`,
+                  title: cloudUser.title || cloudUser.occupation || 'Architecture Professional',
                   university: cloudUser.university,
                   location: cloudUser.location || 'Location not specified',
                   avatar: cloudUser.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',

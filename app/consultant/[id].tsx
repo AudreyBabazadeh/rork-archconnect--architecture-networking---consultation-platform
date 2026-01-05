@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Linking, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
-import { Star, MapPin, MessageCircle, Calendar, UserPlus, UserMinus, Share2, ExternalLink, Linkedin, Globe, Instagram, Award, Briefcase, GraduationCap } from 'lucide-react-native';
+import { Star, MapPin, MessageCircle, Calendar, UserPlus, UserMinus, Share2, Linkedin, Globe, Instagram, Award, Briefcase, GraduationCap } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { mockUsers } from '@/data/mockUsers';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
@@ -44,7 +44,7 @@ export default function ConsultantProfile() {
                 foundConsultant = {
                   id: cloudUser.id,
                   name: cloudUser.name,
-                  title: cloudUser.userType === 'professor' ? `Professor at ${cloudUser.university || 'University'}` : `${cloudUser.userType === 'student' ? 'Architecture Student' : 'Architecture Professional'}`,
+                  title: cloudUser.title || cloudUser.occupation || 'Architecture Professional',
                   university: cloudUser.university,
                   location: cloudUser.location || 'Location not specified',
                   avatar: cloudUser.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',

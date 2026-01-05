@@ -31,7 +31,7 @@ export default function OnboardingWelcomeScreen() {
           <View style={styles.iconCircle}>
             <UserCircle size={80} color={Colors.primary} strokeWidth={1.5} />
             <View style={styles.sparkleIcon}>
-              <Sparkles size={28} color={Colors.accent} fill={Colors.accent} />
+              <Sparkles size={28} color={Colors.secondary} fill={Colors.secondary} />
             </View>
           </View>
         </View>
