@@ -1720,7 +1720,7 @@ export default function EditProfileScreen() {
                   style={styles.input}
                   value={eduFormData.fieldOfStudy}
                   onChangeText={(value) => updateEduFormData('fieldOfStudy', value)}
-                  placeholder="e.g., Architecture, Computer Science"
+                  placeholder="e.g., Business, Computer Science, Engineering"
                   placeholderTextColor={Colors.textLight}
                 />
               </View>

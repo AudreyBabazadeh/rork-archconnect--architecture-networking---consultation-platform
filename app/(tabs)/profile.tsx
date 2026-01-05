@@ -186,7 +186,7 @@ export default function ProfileScreen() {
             </View>
             <Text style={styles.emptyStateText}>
               Showcase your best projects and let your work speak for itself.{"\n"}
-              Upload images of designs, models, or completed buildings.
+              Upload images of designs, models, or completed projects.
             </Text>
             <TouchableOpacity 
               style={[styles.emptyStateButton, { backgroundColor: accentColor }]}

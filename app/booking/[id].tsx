@@ -60,16 +60,16 @@ export default function BookingScreen() {
                 foundConsultant = {
                   id: cloudUser.id,
                   name: cloudUser.name,
-                  title: cloudUser.title || cloudUser.occupation || 'Architecture Professional',
+                  title: cloudUser.title || cloudUser.occupation || 'Professional',
                   university: cloudUser.university,
                   location: cloudUser.location || 'Location not specified',
                   avatar: cloudUser.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-                  specialties: cloudUser.specialization ? [cloudUser.specialization] : ['General Architecture'],
+                  specialties: cloudUser.specialization ? [cloudUser.specialization] : ['General'],
                   experience: cloudUser.experience || '1 year',
                   hourlyRate: cloudUser.hourlyRate || 25,
                   rating: cloudUser.rating || 4.5,
                   reviewCount: (cloudUser as any).totalConsultations || 0,
-                  bio: cloudUser.bio || 'Architecture professional ready to help with your projects.',
+                  bio: cloudUser.bio || 'Professional ready to help with your projects.',
                   isAvailable: true,
                   topics: cloudUser.topics || defaultTopics
                 };
@@ -91,16 +91,16 @@ export default function BookingScreen() {
               foundConsultant = {
                 id: realUser.id,
                 name: realUser.name,
-                title: realUser.userType === 'professor' ? `Professor at ${realUser.university || 'University'}` : `${realUser.userType === 'student' ? 'Architecture Student' : 'Architecture Professional'}`,
+                title: realUser.userType === 'professor' ? `Professor at ${realUser.university || 'University'}` : `${realUser.userType === 'student' ? 'Student' : 'Professional'}`,
                 university: realUser.university,
                 location: realUser.location || 'Location not specified',
                 avatar: realUser.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-                specialties: realUser.specialization ? [realUser.specialization] : ['General Architecture'],
+                specialties: realUser.specialization ? [realUser.specialization] : ['General'],
                 experience: realUser.experience || '1 year',
                 hourlyRate: realUser.hourlyRate || 25,
                 rating: realUser.rating || 4.5,
                 reviewCount: realUser.totalConsultations || 0,
-                bio: realUser.bio || 'Architecture professional ready to help with your projects.',
+                bio: realUser.bio || 'Professional ready to help with your projects.',
                 isAvailable: true,
                 topics: realUser.topics || defaultTopics
               };

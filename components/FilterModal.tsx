@@ -20,10 +20,10 @@ export interface FilterOptions {
 }
 
 const specialtyOptions = [
-  'Sustainable Design', 'Urban Planning', 'Residential', 'Commercial',
-  'Digital Design', 'Parametric Architecture', 'Visualization',
-  'Historic Preservation', 'Cultural Architecture', 'Theory',
-  'Interior Design', 'Landscape Architecture', 'Construction'
+  'Project Management', 'Strategic Planning', 'Research', 'Business Development',
+  'Digital Design', 'Creative Direction', 'Data Analysis',
+  'Technology', 'Marketing', 'Consulting',
+  'Education', 'Healthcare', 'Finance'
 ];
 
 const experienceOptions = [

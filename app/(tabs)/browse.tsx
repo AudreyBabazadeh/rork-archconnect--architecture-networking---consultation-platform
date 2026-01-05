@@ -64,16 +64,16 @@ export default function BrowseScreen() {
           const convertedUsers = users.map((u: any) => ({
             id: u.id,
             name: u.name,
-            title: u.userType === 'professor' ? `Professor at ${u.university || 'University'}` : `${u.userType === 'student' ? 'Architecture Student' : 'Architecture Professional'}`,
+            title: u.userType === 'professor' ? `Professor at ${u.university || 'University'}` : `${u.userType === 'student' ? 'Student' : 'Professional'}`,
             university: u.university,
             location: u.location || 'Location not specified',
             avatar: u.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-            specialties: u.specialization ? [u.specialization] : ['General Architecture'],
+            specialties: u.specialization ? [u.specialization] : ['General'],
             experience: u.experience || '1 year',
             hourlyRate: u.hourlyRate || 25,
             rating: u.rating || 4.5,
             reviewCount: u.totalConsultations || 0,
-            bio: u.bio || 'Architecture professional ready to help with your projects.',
+            bio: u.bio || 'Professional ready to help with your projects.',
             isAvailable: true,
             portfolio: u.portfolio || []
           }));
@@ -106,16 +106,16 @@ export default function BrowseScreen() {
           .map((u: any) => ({
             id: u.id,
             name: u.name,
-            title: u.userType === 'professor' ? `Professor at ${u.university || 'University'}` : `${u.userType === 'student' ? 'Architecture Student' : 'Architecture Professional'}`,
+            title: u.userType === 'professor' ? `Professor at ${u.university || 'University'}` : `${u.userType === 'student' ? 'Student' : 'Professional'}`,
             university: u.university,
             location: u.location || 'Location not specified',
             avatar: u.profileImage || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
-            specialties: u.specialization ? [u.specialization] : ['General Architecture'],
+            specialties: u.specialization ? [u.specialization] : ['General'],
             experience: u.experience || '1 year',
             hourlyRate: u.hourlyRate || 25,
             rating: u.rating || 4.5,
             reviewCount: u.totalConsultations || 0,
-            bio: u.bio || 'Architecture professional ready to help with your projects.',
+            bio: u.bio || 'Professional ready to help with your projects.',
             isAvailable: true,
             portfolio: u.portfolio || []
           }));
