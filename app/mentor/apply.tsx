@@ -33,7 +33,7 @@ export default function MentorApplicationScreen() {
     {
       icon: Award,
       title: 'Curated Community',
-      description: 'Join a selective group of architecture professionals committed to excellence',
+      description: 'Join a selective group of professionals committed to excellence in their field',
     },
     {
       icon: CheckCircle,
@@ -67,7 +67,7 @@ export default function MentorApplicationScreen() {
           </View>
           <Text style={styles.title}>Join Archal&apos;s Mentor Network</Text>
           <Text style={styles.subtitle}>
-            Share your expertise with the next generation of architects and designers
+            Share your expertise with the next generation of professionals in your field
           </Text>
         </View>
 
@@ -142,7 +142,7 @@ export default function MentorApplicationScreen() {
             <View style={styles.requirementItem}>
               <CheckCircle size={20} color={Colors.primary} strokeWidth={2} />
               <Text style={styles.requirementText}>
-                Professional experience in architecture or design
+                Professional experience in your field
               </Text>
             </View>
             <View style={styles.requirementItem}>
