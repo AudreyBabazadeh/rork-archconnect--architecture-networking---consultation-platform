@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { StyleSheet, FlatList, SafeAreaView } from 'react-native';
+import { StyleSheet, FlatList, SafeAreaView, View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Users } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserCard } from '@/components/UserCard';
 import { SearchHeader } from '@/components/SearchHeader';
@@ -39,7 +40,7 @@ export default function BrowseScreen() {
             const cloudUsers = await searchUsers(''); // Empty query to get all users
             users = cloudUsers.filter((u: any) => u.id !== currentUser.id); // Exclude current user
             console.log('Loaded users from cloud:', users.length);
-          } catch (cloudError) {
+          } catch {
             console.log('Cloud search failed, trying local storage');
           }
         }
@@ -188,6 +189,48 @@ export default function BrowseScreen() {
     <UserCard user={item} onPress={() => handleUserPress(item)} />
   );
 
+  const renderEmptyState = () => {
+    if (searchQuery.trim()) {
+      return (
+        <View style={styles.emptyState}>
+          <Users size={56} color={Colors.textLight} strokeWidth={1.5} />
+          <Text style={styles.emptyTitle}>No results found</Text>
+          <Text style={styles.emptyText}>
+            We couldn&apos;t find anyone matching &ldquo;{searchQuery}&rdquo;{"\n"}
+            Try a different search or adjust your filters.
+          </Text>
+          <TouchableOpacity 
+            style={styles.clearFiltersButton}
+            onPress={() => {
+              setSearchQuery('');
+              setFilters({
+                specialties: [],
+                priceRange: [0, 200],
+                experience: [],
+                availability: null,
+                rating: 0,
+                userType: []
+              });
+            }}
+          >
+            <Text style={styles.clearFiltersText}>Clear Search & Filters</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.emptyState}>
+        <Users size={56} color={Colors.textLight} strokeWidth={1.5} />
+        <Text style={styles.emptyTitle}>Discover Your Community</Text>
+        <Text style={styles.emptyText}>
+          Connect with talented architects, professors, and students.{"\n"}
+          Start by exploring profiles or searching for expertise.
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
@@ -201,6 +244,7 @@ export default function BrowseScreen() {
             onFilterPress={handleFilterPress}
           />
         }
+        ListEmptyComponent={renderEmptyState}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
@@ -222,5 +266,38 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 20,
+  },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 80,
+    paddingHorizontal: 40,
+  },
+  emptyTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.text,
+    marginTop: 20,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: Colors.textLight,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  clearFiltersButton: {
+    marginTop: 24,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  clearFiltersText: {
+    color: Colors.white,
+    fontSize: 15,
+    fontWeight: '600',
   },
 });

@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Users } from 'lucide-react-native';
+import { ArrowLeft, Users, MessageCircle } from 'lucide-react-native';
 import { useMessaging, Conversation } from '@/contexts/MessagingContext';
 import { Colors } from '@/constants/colors';
 import CreateGroupModal from '@/components/CreateGroupModal';
@@ -184,10 +184,19 @@ export default function MessagesScreen() {
 
       {conversations.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyTitle}>No messages yet</Text>
+          <MessageCircle size={64} color={Colors.textLight} strokeWidth={1.5} />
+          <Text style={styles.emptyTitle}>Your inbox is quiet</Text>
           <Text style={styles.emptySubtitle}>
-            Start a conversation with a mentor or consultant
+            When you connect with mentors, students, or colleagues,{"\n"}
+            your conversations will appear here.
           </Text>
+          <TouchableOpacity 
+            style={styles.browseButton}
+            onPress={() => router.push('/(tabs)/browse')}
+          >
+            <Users size={18} color={Colors.white} />
+            <Text style={styles.browseButtonText}>Browse Profiles</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -251,19 +260,36 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 40,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: '700',
     color: Colors.text,
-    marginBottom: 8,
+    marginTop: 24,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 16,
     color: Colors.textLight,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
+    marginBottom: 32,
+  },
+  browseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 24,
+  },
+  browseButtonText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
   list: {
     flex: 1,

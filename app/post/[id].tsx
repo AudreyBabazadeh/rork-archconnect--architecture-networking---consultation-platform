@@ -55,6 +55,18 @@ export default function PostDetailScreen() {
     return mockPosts.find((p) => p.id === id);
   }, [id]);
 
+  const commentsWithLikes = useMemo(() => {
+    return comments.map((comment) => ({
+      ...comment,
+      isLiked: likedComments.has(comment.id),
+      likes: comment.isLiked
+        ? comment.likes
+        : likedComments.has(comment.id)
+        ? comment.likes + 1
+        : comment.likes,
+    }));
+  }, [comments, likedComments]);
+
   if (!post) {
     return (
       <>
@@ -126,18 +138,6 @@ export default function PostDetailScreen() {
   const handleLikePost = () => {
     setIsLiked(!isLiked);
   };
-
-  const commentsWithLikes = useMemo(() => {
-    return comments.map((comment) => ({
-      ...comment,
-      isLiked: likedComments.has(comment.id),
-      likes: comment.isLiked
-        ? comment.likes
-        : likedComments.has(comment.id)
-        ? comment.likes + 1
-        : comment.likes,
-    }));
-  }, [comments, likedComments]);
 
   return (
     <>
@@ -244,7 +244,16 @@ export default function PostDetailScreen() {
               Comments ({commentsWithLikes.length})
             </Text>
 
-            {commentsWithLikes.map((comment) => (
+            {commentsWithLikes.length === 0 ? (
+              <View style={styles.emptyComments}>
+                <MessageCircle size={48} color={Colors.textLight} strokeWidth={1.5} />
+                <Text style={styles.emptyCommentsTitle}>Start the conversation</Text>
+                <Text style={styles.emptyCommentsText}>
+                  Be the first to share your thoughts on this post.
+                </Text>
+              </View>
+            ) : (
+              commentsWithLikes.map((comment) => (
               <View key={comment.id} style={styles.commentItem}>
                 <Image source={{ uri: comment.authorAvatar }} style={styles.commentAvatar} />
                 <View style={styles.commentContent}>
@@ -277,7 +286,8 @@ export default function PostDetailScreen() {
                   </TouchableOpacity>
                 </View>
               </View>
-            ))}
+              ))
+            )}
           </View>
         </ScrollView>
 
@@ -534,5 +544,23 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     opacity: 0.5,
+  },
+  emptyComments: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 32,
+  },
+  emptyCommentsTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  emptyCommentsText: {
+    fontSize: 15,
+    color: Colors.textLight,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });

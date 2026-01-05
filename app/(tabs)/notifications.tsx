@@ -197,7 +197,7 @@ export default function NotificationsScreen() {
     try {
       await acceptBookingRequest(requestId);
       Alert.alert('Success', 'Booking request accepted! The student will be notified.');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to accept booking request. Please try again.');
     }
   };
@@ -206,7 +206,7 @@ export default function NotificationsScreen() {
     try {
       await declineBookingRequest(requestId);
       Alert.alert('Request Declined', 'The student has been notified.');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to decline booking request. Please try again.');
     }
   };
@@ -225,16 +225,24 @@ export default function NotificationsScreen() {
     if (requests.length === 0) {
       return (
         <View style={styles.emptyState}>
-          <Calendar size={48} color={Colors.textSecondary} />
+          <Calendar size={64} color={Colors.textLight} strokeWidth={1.5} />
           <Text style={styles.emptyTitle}>
-            {activeTab === 'received' ? 'No pending requests' : 'No accepted requests'}
+            {activeTab === 'received' ? 'No requests yet' : 'No upcoming sessions'}
           </Text>
           <Text style={styles.emptySubtitle}>
             {activeTab === 'received' 
-              ? 'New booking requests will appear here' 
-              : 'Accepted booking requests will appear here'
+              ? 'When someone books a session with you,\nyou will see their request here to review.' 
+              : 'Once you accept a booking request,\nit will appear here so you can prepare.'
             }
           </Text>
+          {activeTab === 'received' && (
+            <TouchableOpacity 
+              style={styles.emptyActionButton}
+              onPress={() => router.push('/profile/availability')}
+            >
+              <Text style={styles.emptyActionText}>Set Your Availability</Text>
+            </TouchableOpacity>
+          )}
         </View>
       );
     }
@@ -534,19 +542,32 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: 40,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginTop: 16,
-    marginBottom: 8,
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.text,
+    marginTop: 24,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: Colors.textLight,
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
+  },
+  emptyActionButton: {
+    marginTop: 28,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 24,
+  },
+  emptyActionText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

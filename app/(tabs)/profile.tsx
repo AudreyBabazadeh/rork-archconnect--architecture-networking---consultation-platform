@@ -125,7 +125,7 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {user.specialties && user.specialties.length > 0 && (
+        {user.specialties && user.specialties.length > 0 ? (
           <View style={styles.sectionCard}>
             <View style={styles.sectionHeader}>
               <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
@@ -141,9 +141,28 @@ export default function ProfileScreen() {
               ))}
             </View>
           </View>
+        ) : (
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
+                <Award size={20} color={accentColor} />
+              </View>
+              <Text style={styles.sectionTitle}>Expertise & Skills</Text>
+            </View>
+            <Text style={styles.emptyStateText}>
+              Add your areas of expertise to help others understand{"\n"}
+              what you specialize in and what you can offer.
+            </Text>
+            <TouchableOpacity 
+              style={[styles.emptyStateButton, { backgroundColor: accentColor }]}
+              onPress={() => router.push('/profile/edit')}
+            >
+              <Text style={styles.emptyStateButtonText}>Add Expertise</Text>
+            </TouchableOpacity>
+          </View>
         )}
 
-        {(user as any).portfolioImages && (user as any).portfolioImages.length > 0 && (
+        {(user as any).portfolioImages && (user as any).portfolioImages.length > 0 ? (
           <View style={styles.portfolioSection}>
             <View style={styles.sectionHeader}>
               <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
@@ -156,6 +175,25 @@ export default function ProfileScreen() {
               accentColor={accentColor}
               layout="grid"
             />
+          </View>
+        ) : (
+          <View style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <View style={[styles.sectionIconCircle, { backgroundColor: accentColor + '20' }]}>
+                <Briefcase size={20} color={accentColor} />
+              </View>
+              <Text style={styles.sectionTitle}>Featured Work</Text>
+            </View>
+            <Text style={styles.emptyStateText}>
+              Showcase your best projects and let your work speak for itself.{"\n"}
+              Upload images of designs, models, or completed buildings.
+            </Text>
+            <TouchableOpacity 
+              style={[styles.emptyStateButton, { backgroundColor: accentColor }]}
+              onPress={() => router.push('/profile/edit')}
+            >
+              <Text style={styles.emptyStateButtonText}>Add Portfolio</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -699,5 +737,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.textLight,
     textAlign: 'center',
+  },
+  emptyStateText: {
+    fontSize: 15,
+    color: Colors.textLight,
+    lineHeight: 22,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  emptyStateButton: {
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  emptyStateButtonText: {
+    color: Colors.white,
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
