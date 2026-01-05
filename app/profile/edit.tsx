@@ -13,8 +13,6 @@ import {
   Instagram,
   PlusCircle,
   Award,
-  Briefcase,
-  GraduationCap,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -66,8 +64,7 @@ interface SectionState {
   basic: boolean;
   expertise: boolean;
   portfolio: boolean;
-  experience: boolean;
-  education: boolean;
+
   links: boolean;
 }
 
@@ -82,8 +79,6 @@ export default function EditProfileScreen() {
     basic: true,
     expertise: false,
     portfolio: false,
-    experience: false,
-    education: false,
     links: false,
   });
 
@@ -690,84 +685,24 @@ export default function EditProfileScreen() {
 
           <TouchableOpacity 
             style={styles.collapsibleSection}
-            onPress={() => toggleSection('experience')}
-            activeOpacity={0.7}
-          >
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionHeaderLeft}>
-                <Briefcase size={20} color={Colors.primary} />
-                <Text style={styles.sectionTitle}>Experience</Text>
-              </View>
-              {expandedSections.experience ? (
-                <ChevronUp size={20} color={Colors.textLight} />
-              ) : (
-                <ChevronDown size={20} color={Colors.textLight} />
-              )}
-            </View>
-          </TouchableOpacity>
-          {expandedSections.experience && (
-            <View style={styles.sectionContent}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Years of Experience</Text>
-                <Text style={styles.helpText}>How long have you been in the field?</Text>
-                <TextInput
-                  style={styles.input}
-                  value={formData.experienceYears}
-                  onChangeText={(value) => updateFormData('experienceYears', value)}
-                  placeholder="e.g., 5 years"
-                  testID="experience-years-input"
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Professional Background</Text>
-                <Text style={styles.helpText}>Share your journey, key projects, and roles</Text>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  value={formData.experienceDescription}
-                  onChangeText={(value) => updateFormData('experienceDescription', value)}
-                  placeholder="e.g., Worked on residential and commercial projects at XYZ Firm. Led design development for award-winning sustainable housing complex. Currently freelancing and teaching design studios..."
-                  multiline
-                  numberOfLines={6}
-                  textAlignVertical="top"
-                  testID="experience-description-input"
-                />
-              </View>
-            </View>
-          )}
-
-          <TouchableOpacity 
-            style={styles.navigationCard}
             onPress={() => router.push('/profile/experience')}
             activeOpacity={0.7}
           >
-            <View style={styles.navigationCardLeft}>
-              <View style={styles.navigationIconContainer}>
-                <Briefcase size={20} color={Colors.primary} />
-              </View>
-              <View>
-                <Text style={styles.navigationCardTitle}>Experience</Text>
-                <Text style={styles.navigationCardDescription}>Manage your work history</Text>
-              </View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Experience</Text>
+              <ChevronDown size={20} color={Colors.textLight} style={{ transform: [{ rotate: '-90deg' }] }} />
             </View>
-            <ChevronDown size={20} color={Colors.textLight} style={{ transform: [{ rotate: '-90deg' }] }} />
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={styles.navigationCard}
+            style={styles.collapsibleSection}
             onPress={() => router.push('/profile/education')}
             activeOpacity={0.7}
           >
-            <View style={styles.navigationCardLeft}>
-              <View style={styles.navigationIconContainer}>
-                <GraduationCap size={20} color={Colors.primary} />
-              </View>
-              <View>
-                <Text style={styles.navigationCardTitle}>Education</Text>
-                <Text style={styles.navigationCardDescription}>Manage your academic background</Text>
-              </View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Education</Text>
+              <ChevronDown size={20} color={Colors.textLight} style={{ transform: [{ rotate: '-90deg' }] }} />
             </View>
-            <ChevronDown size={20} color={Colors.textLight} style={{ transform: [{ rotate: '-90deg' }] }} />
           </TouchableOpacity>
 
           <TouchableOpacity 
