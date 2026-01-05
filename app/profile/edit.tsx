@@ -13,6 +13,9 @@ import {
   Instagram,
   PlusCircle,
   Award,
+  Briefcase,
+  GraduationCap,
+  Calendar,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -33,6 +36,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/contexts/AuthContext';
+import { Experience, Education } from '@/types/user';
 
 
 const COMMON_EXPERTISE_TAGS = [
@@ -64,7 +68,8 @@ interface SectionState {
   basic: boolean;
   expertise: boolean;
   portfolio: boolean;
-
+  experience: boolean;
+  education: boolean;
   links: boolean;
 }
 
@@ -79,6 +84,8 @@ export default function EditProfileScreen() {
     basic: true,
     expertise: false,
     portfolio: false,
+    experience: false,
+    education: false,
     links: false,
   });
 
@@ -685,25 +692,111 @@ export default function EditProfileScreen() {
 
           <TouchableOpacity 
             style={styles.collapsibleSection}
-            onPress={() => router.push('/profile/experience')}
+            onPress={() => toggleSection('experience')}
             activeOpacity={0.7}
           >
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Experience</Text>
-              <ChevronDown size={20} color={Colors.textLight} style={{ transform: [{ rotate: '-90deg' }] }} />
+              {expandedSections.experience ? (
+                <ChevronUp size={20} color={Colors.textLight} />
+              ) : (
+                <ChevronDown size={20} color={Colors.textLight} />
+              )}
             </View>
           </TouchableOpacity>
+          {expandedSections.experience && (
+            <View style={styles.sectionContent}>
+              <Text style={styles.helpText}>Showcase your professional journey and roles</Text>
+              
+              {(user as any)?.experiences && (user as any).experiences.length > 0 ? (
+                <View style={styles.itemsList}>
+                  {(user as any).experiences.map((exp: Experience) => (
+                    <View key={exp.id} style={styles.itemCard}>
+                      <View style={styles.itemHeader}>
+                        <View style={styles.itemIconContainer}>
+                          <Briefcase size={18} color={Colors.primary} />
+                        </View>
+                        <View style={styles.itemContent}>
+                          <Text style={styles.itemTitle}>{exp.title}</Text>
+                          <Text style={styles.itemSubtitle}>{exp.company}</Text>
+                          <View style={styles.itemMeta}>
+                            <Calendar size={12} color={Colors.textLight} />
+                            <Text style={styles.itemMetaText}>{exp.startDate} - {exp.endDate}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <View style={styles.emptyStateInline}>
+                  <Briefcase size={32} color={Colors.textLight} />
+                  <Text style={styles.emptyStateText}>No experience added yet</Text>
+                </View>
+              )}
+              
+              <TouchableOpacity
+                style={styles.manageButton}
+                onPress={() => router.push('/profile/experience')}
+              >
+                <Text style={styles.manageButtonText}>Manage Experience</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <TouchableOpacity 
             style={styles.collapsibleSection}
-            onPress={() => router.push('/profile/education')}
+            onPress={() => toggleSection('education')}
             activeOpacity={0.7}
           >
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Education</Text>
-              <ChevronDown size={20} color={Colors.textLight} style={{ transform: [{ rotate: '-90deg' }] }} />
+              {expandedSections.education ? (
+                <ChevronUp size={20} color={Colors.textLight} />
+              ) : (
+                <ChevronDown size={20} color={Colors.textLight} />
+              )}
             </View>
           </TouchableOpacity>
+          {expandedSections.education && (
+            <View style={styles.sectionContent}>
+              <Text style={styles.helpText}>Share your academic background and qualifications</Text>
+              
+              {(user as any)?.educations && (user as any).educations.length > 0 ? (
+                <View style={styles.itemsList}>
+                  {(user as any).educations.map((edu: Education) => (
+                    <View key={edu.id} style={styles.itemCard}>
+                      <View style={styles.itemHeader}>
+                        <View style={styles.itemIconContainer}>
+                          <GraduationCap size={18} color={Colors.primary} />
+                        </View>
+                        <View style={styles.itemContent}>
+                          <Text style={styles.itemTitle}>{edu.school}</Text>
+                          <Text style={styles.itemSubtitle}>{edu.degree} - {edu.fieldOfStudy}</Text>
+                          <View style={styles.itemMeta}>
+                            <Calendar size={12} color={Colors.textLight} />
+                            <Text style={styles.itemMetaText}>{edu.startDate} - {edu.endDate}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <View style={styles.emptyStateInline}>
+                  <GraduationCap size={32} color={Colors.textLight} />
+                  <Text style={styles.emptyStateText}>No education added yet</Text>
+                </View>
+              )}
+              
+              <TouchableOpacity
+                style={styles.manageButton}
+                onPress={() => router.push('/profile/education')}
+              >
+                <Text style={styles.manageButtonText}>Manage Education</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <TouchableOpacity 
             style={styles.collapsibleSection}
@@ -1616,5 +1709,76 @@ const styles = StyleSheet.create({
   navigationCardDescription: {
     fontSize: 13,
     color: Colors.textLight,
+  },
+  itemsList: {
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  itemCard: {
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  itemHeader: {
+    flexDirection: 'row',
+  },
+  itemIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.primary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  itemContent: {
+    flex: 1,
+  },
+  itemTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  itemSubtitle: {
+    fontSize: 13,
+    color: Colors.textLight,
+    marginBottom: 4,
+  },
+  itemMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  itemMetaText: {
+    fontSize: 12,
+    color: Colors.textLight,
+  },
+  emptyStateInline: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    backgroundColor: Colors.background,
+    borderRadius: 12,
+    marginTop: 12,
+    marginBottom: 16,
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: Colors.textLight,
+    marginTop: 8,
+  },
+  manageButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  manageButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
   },
 });
