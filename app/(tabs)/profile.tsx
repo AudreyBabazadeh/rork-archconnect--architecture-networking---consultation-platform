@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
-import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon, Linkedin, Globe, Instagram, MessageCircle } from 'lucide-react-native';
+import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon, Linkedin, Globe, Instagram, MessageCircle, Sparkles, Clock, CheckCircle, ArrowRight } from 'lucide-react-native';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
@@ -194,6 +194,125 @@ export default function ProfileScreen() {
             >
               <Text style={styles.emptyStateButtonText}>Add Portfolio</Text>
             </TouchableOpacity>
+          </View>
+        )}
+
+        {user.mentorStatus === 'not_applied' && (
+          <View style={styles.mentorInvitationCard}>
+            <View style={styles.mentorInvitationHeader}>
+              <View style={styles.mentorInvitationIconContainer}>
+                <Sparkles size={32} color={Colors.secondary} strokeWidth={1.5} />
+              </View>
+              <View style={styles.mentorInvitationBadge}>
+                <Text style={styles.mentorInvitationBadgeText}>Invitation Only</Text>
+              </View>
+            </View>
+            
+            <Text style={styles.mentorInvitationTitle}>Share Your Expertise</Text>
+            <Text style={styles.mentorInvitationDescription}>
+              Join Archal&apos;s curated network of mentors. Guide students and professionals through their architectural journey while building your reputation in the community.
+            </Text>
+
+            <View style={styles.mentorBenefitsList}>
+              <View style={styles.mentorBenefitItem}>
+                <CheckCircle size={18} color={Colors.primary} strokeWidth={2} />
+                <Text style={styles.mentorBenefitText}>Set your own rates and schedule</Text>
+              </View>
+              <View style={styles.mentorBenefitItem}>
+                <CheckCircle size={18} color={Colors.primary} strokeWidth={2} />
+                <Text style={styles.mentorBenefitText}>Build your professional network</Text>
+              </View>
+              <View style={styles.mentorBenefitItem}>
+                <CheckCircle size={18} color={Colors.primary} strokeWidth={2} />
+                <Text style={styles.mentorBenefitText}>Get recognized as an expert</Text>
+              </View>
+            </View>
+
+            <TouchableOpacity 
+              style={styles.mentorApplyButton}
+              onPress={() => router.push('/mentor/apply' as any)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.mentorApplyButtonText}>Apply to Become a Mentor</Text>
+              <ArrowRight size={20} color={Colors.white} strokeWidth={2.5} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {user.mentorStatus === 'pending' && (
+          <View style={styles.mentorStatusCard}>
+            <View style={styles.mentorStatusHeader}>
+              <View style={styles.mentorStatusIconContainer}>
+                <Clock size={28} color={accentColor} strokeWidth={1.5} />
+              </View>
+              <View style={styles.mentorStatusBadge}>
+                <View style={styles.mentorStatusDot} />
+                <Text style={styles.mentorStatusBadgeText}>Under Review</Text>
+              </View>
+            </View>
+            
+            <Text style={styles.mentorStatusTitle}>Application in Progress</Text>
+            <Text style={styles.mentorStatusDescription}>
+              Your mentor application is being carefully reviewed by our team. We&apos;re evaluating your profile, experience, and alignment with Archal&apos;s mentorship standards.
+            </Text>
+
+            <View style={styles.mentorTimelineInfo}>
+              <Text style={styles.mentorTimelineText}>
+                Most applications are reviewed within <Text style={styles.mentorTimelineHighlight}>3-5 business days</Text>
+              </Text>
+            </View>
+
+            <TouchableOpacity 
+              style={styles.mentorStatusButton}
+              onPress={() => router.push('/mentor/pending' as any)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.mentorStatusButtonText}>View Application Status</Text>
+              <ArrowRight size={18} color={accentColor} strokeWidth={2.5} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {user.mentorStatus === 'approved' && user.mentorLevel && (
+          <View style={styles.mentorApprovedCard}>
+            <View style={styles.mentorApprovedHeader}>
+              <View style={styles.mentorApprovedIconContainer}>
+                <Award size={28} color={Colors.secondary} strokeWidth={1.5} />
+              </View>
+              <View style={styles.mentorApprovedBadge}>
+                <Text style={styles.mentorApprovedBadgeText}>Active Mentor</Text>
+              </View>
+            </View>
+            
+            <Text style={styles.mentorApprovedTitle}>
+              {user.mentorLevel.charAt(0).toUpperCase() + user.mentorLevel.slice(1)} Mentor
+            </Text>
+            <Text style={styles.mentorApprovedDescription}>
+              {user.mentorLevel === 'emerging' && 'Welcome to the mentor network. You\'re building your mentorship practice and making an impact.'}
+              {user.mentorLevel === 'established' && 'You\'re an established mentor with proven experience. Students trust your guidance.'}
+              {user.mentorLevel === 'expert' && 'You\'re recognized as an industry expert. Your mentorship is highly valued.'}
+              {user.mentorLevel === 'master' && 'You\'re a distinguished professional and thought leader. Your expertise shapes the field.'}
+            </Text>
+
+            <View style={styles.mentorLevelIndicator}>
+              <View style={styles.mentorLevelBar}>
+                <View style={[
+                  styles.mentorLevelProgress,
+                  {
+                    width: user.mentorLevel === 'emerging' ? '25%' :
+                           user.mentorLevel === 'established' ? '50%' :
+                           user.mentorLevel === 'expert' ? '75%' : '100%',
+                    backgroundColor: Colors.secondary
+                  }
+                ]} />
+              </View>
+              <View style={styles.mentorLevelLabels}>
+                <Text style={[styles.mentorLevelLabel, user.mentorLevel === 'emerging' && styles.mentorLevelLabelActive]}>Emerging</Text>
+                <Text style={[styles.mentorLevelLabel, user.mentorLevel === 'established' && styles.mentorLevelLabelActive]}>Established</Text>
+                <Text style={[styles.mentorLevelLabel, user.mentorLevel === 'expert' && styles.mentorLevelLabelActive]}>Expert</Text>
+                <Text style={[styles.mentorLevelLabel, user.mentorLevel === 'master' && styles.mentorLevelLabelActive]}>Master</Text>
+              </View>
+            </View>
           </View>
         )}
 
@@ -755,5 +874,270 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 15,
     fontWeight: '600',
+  },
+  mentorInvitationCard: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 20,
+    padding: 28,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 6,
+    borderWidth: 2,
+    borderColor: Colors.secondary + '20',
+  },
+  mentorInvitationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  mentorInvitationIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: Colors.secondary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mentorInvitationBadge: {
+    backgroundColor: Colors.secondary + '15',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.secondary + '30',
+  },
+  mentorInvitationBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.secondary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  mentorInvitationTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: Colors.text,
+    marginBottom: 12,
+    letterSpacing: -0.5,
+  },
+  mentorInvitationDescription: {
+    fontSize: 15,
+    color: Colors.textSecondary,
+    lineHeight: 23,
+    marginBottom: 24,
+  },
+  mentorBenefitsList: {
+    gap: 14,
+    marginBottom: 28,
+  },
+  mentorBenefitItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  mentorBenefitText: {
+    fontSize: 15,
+    color: Colors.text,
+    fontWeight: '500',
+    flex: 1,
+  },
+  mentorApplyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    borderRadius: 14,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  mentorApplyButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.white,
+  },
+  mentorStatusCard: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 20,
+    padding: 28,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.primary + '10',
+  },
+  mentorStatusHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  mentorStatusIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.primary + '10',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mentorStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: Colors.primary + '10',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  mentorStatusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.primary,
+  },
+  mentorStatusBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.primary,
+  },
+  mentorStatusTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: Colors.text,
+    marginBottom: 12,
+    letterSpacing: -0.5,
+  },
+  mentorStatusDescription: {
+    fontSize: 15,
+    color: Colors.textSecondary,
+    lineHeight: 23,
+    marginBottom: 20,
+  },
+  mentorTimelineInfo: {
+    backgroundColor: Colors.background,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  mentorTimelineText: {
+    fontSize: 14,
+    color: Colors.text,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  mentorTimelineHighlight: {
+    fontWeight: '700',
+    color: Colors.primary,
+  },
+  mentorStatusButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+  mentorStatusButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.primary,
+  },
+  mentorApprovedCard: {
+    backgroundColor: Colors.white,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 20,
+    padding: 28,
+    shadowColor: Colors.secondary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 6,
+    borderWidth: 2,
+    borderColor: Colors.secondary + '20',
+  },
+  mentorApprovedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  mentorApprovedIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.secondary + '15',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mentorApprovedBadge: {
+    backgroundColor: Colors.secondary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  mentorApprovedBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.white,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  mentorApprovedTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: Colors.text,
+    marginBottom: 12,
+    letterSpacing: -0.5,
+  },
+  mentorApprovedDescription: {
+    fontSize: 15,
+    color: Colors.textSecondary,
+    lineHeight: 23,
+    marginBottom: 24,
+  },
+  mentorLevelIndicator: {
+    marginTop: 4,
+  },
+  mentorLevelBar: {
+    height: 8,
+    backgroundColor: Colors.border,
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  mentorLevelProgress: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  mentorLevelLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  mentorLevelLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.textLight,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  mentorLevelLabelActive: {
+    color: Colors.secondary,
+    fontWeight: '800',
   },
 });
