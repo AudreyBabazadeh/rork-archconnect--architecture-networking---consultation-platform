@@ -12,8 +12,6 @@ import {
   Globe,
   Instagram,
   PlusCircle,
-  Lock,
-  Award,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -55,8 +53,6 @@ const COMMON_EXPERTISE_TAGS = [
 ];
 
 
-const PRICING_TIERS = ['Free', 'Moderate', 'Premium', 'Enterprise'];
-
 interface PortfolioImage {
   id: string;
   uri: string;
@@ -69,7 +65,6 @@ interface SectionState {
   portfolio: boolean;
   teaching: boolean;
   links: boolean;
-  preferences: boolean;
   personalization: boolean;
 }
 
@@ -86,7 +81,6 @@ export default function EditProfileScreen() {
     portfolio: false,
     teaching: false,
     links: false,
-    preferences: false,
     personalization: false,
   });
 
@@ -809,107 +803,6 @@ export default function EditProfileScreen() {
             </View>
           )}
 
-          <TouchableOpacity 
-            style={styles.collapsibleSection}
-            onPress={() => {
-              if (user?.mentorStatus === 'approved') {
-                toggleSection('preferences');
-              }
-            }}
-            activeOpacity={user?.mentorStatus === 'approved' ? 0.7 : 1}
-          >
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionHeaderLeft}>
-                <Text style={[styles.sectionTitle, user?.mentorStatus !== 'approved' && styles.lockedSectionTitle]}>Session Preferences</Text>
-                {user?.mentorStatus !== 'approved' && (
-                  <Lock size={16} color={Colors.textLight} style={styles.lockIcon} />
-                )}
-              </View>
-              {user?.mentorStatus === 'approved' && (
-                expandedSections.preferences ? (
-                  <ChevronUp size={20} color={Colors.textLight} />
-                ) : (
-                  <ChevronDown size={20} color={Colors.textLight} />
-                )
-              )}
-            </View>
-          </TouchableOpacity>
-          {user?.mentorStatus !== 'approved' ? (
-            <View style={styles.sectionContent}>
-              <View style={styles.lockedFeatureCard}>
-                <Award size={32} color={Colors.primary} strokeWidth={1.5} />
-                <Text style={styles.lockedFeatureTitle}>Mentor Features</Text>
-                <Text style={styles.lockedFeatureDescription}>
-                  {user?.mentorStatus === 'pending' 
-                    ? 'Your mentor application is under review. Once approved, you\'ll be able to set your pricing and availability.'
-                    : user?.mentorStatus === 'not_interested'
-                    ? 'Apply to become a mentor to set pricing and offer sessions.'
-                    : 'Apply to become a mentor to unlock pricing and scheduling features.'}
-                </Text>
-                {user?.mentorStatus === 'pending' ? (
-                  <TouchableOpacity 
-                    style={styles.lockedFeatureButtonSecondary}
-                    onPress={() => router.push('/mentor/pending' as any)}
-                  >
-                    <Text style={styles.lockedFeatureButtonSecondaryText}>View Status</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity 
-                    style={styles.lockedFeatureButton}
-                    onPress={() => router.push('/mentor/apply' as any)}
-                  >
-                    <Text style={styles.lockedFeatureButtonText}>Apply to Become a Mentor</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          ) : expandedSections.preferences && (
-            <View style={styles.sectionContent}>
-              <Text style={styles.helpText}>All sessions on Archal are video-based</Text>
-              
-              {user?.mentorLevel && (
-                <View style={styles.mentorLevelCard}>
-                  <View style={styles.mentorLevelHeader}>
-                    <Award size={20} color={Colors.primary} strokeWidth={2} />
-                    <Text style={styles.mentorLevelTitle}>Mentor Level: {user.mentorLevel.charAt(0).toUpperCase() + user.mentorLevel.slice(1)}</Text>
-                  </View>
-                  <Text style={styles.mentorLevelDescription}>
-                    {user.mentorLevel === 'emerging' && 'Suggested rate: $25-$50/hour - Building your mentorship practice'}
-                    {user.mentorLevel === 'established' && 'Suggested rate: $50-$100/hour - Experienced professional with proven track record'}
-                    {user.mentorLevel === 'expert' && 'Suggested rate: $100-$200/hour - Industry expert with extensive experience'}
-                    {user.mentorLevel === 'master' && 'Suggested rate: $200+/hour - Distinguished professional and thought leader'}
-                  </Text>
-                </View>
-              )}
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Pricing Tier</Text>
-                <Text style={styles.helpText}>General pricing level for your sessions</Text>
-                <View style={styles.durationContainer}>
-                  {PRICING_TIERS.map((tier) => (
-                    <TouchableOpacity
-                      key={tier}
-                      style={[
-                        styles.tierButton,
-                        formData.pricingTier === tier && styles.durationButtonSelected,
-                      ]}
-                      onPress={() => updateFormData('pricingTier', tier)}
-                    >
-                      <Text
-                        style={[
-                          styles.durationButtonText,
-                          formData.pricingTier === tier && styles.durationButtonTextSelected,
-                        ]}
-                      >
-                        {tier}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            </View>
-          )}
-
           <TouchableOpacity
             style={styles.previewButton}
             onPress={() => setShowPreview(true)}
@@ -1004,16 +897,6 @@ export default function EditProfileScreen() {
                       <Text style={styles.previewText}>{formData.idealMentees}</Text>
                     </View>
                   )}
-                </View>
-              )}
-
-              {formData.pricingTier && (
-                <View style={styles.previewSection}>
-                  <Text style={styles.previewSectionTitle}>Session Preferences</Text>
-                  <View style={styles.previewPreferenceRow}>
-                    <Text style={styles.previewPreferenceLabel}>Pricing Tier:</Text>
-                    <Text style={styles.previewPreferenceValue}>{formData.pricingTier}</Text>
-                  </View>
                 </View>
               )}
 
