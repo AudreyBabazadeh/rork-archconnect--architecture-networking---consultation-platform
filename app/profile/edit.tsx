@@ -110,6 +110,13 @@ export default function EditProfileScreen() {
   const [expSkillInput, setExpSkillInput] = useState('');
   const [isCurrentPosition, setIsCurrentPosition] = useState(false);
 
+  const [educations, setEducations] = useState<Education[]>((user as any)?.educations || []);
+  const [showEduModal, setShowEduModal] = useState(false);
+  const [editingEduId, setEditingEduId] = useState<string | null>(null);
+  const [showEduSkillInput, setShowEduSkillInput] = useState(false);
+  const [eduSkillInput, setEduSkillInput] = useState('');
+  const [isCurrentlyStudying, setIsCurrentlyStudying] = useState(false);
+
   const [expFormData, setExpFormData] = useState<Omit<Experience, 'id'>>({
     title: '',
     employmentType: '',
@@ -117,6 +124,19 @@ export default function EditProfileScreen() {
     startDate: '',
     endDate: '',
     location: '',
+    description: '',
+    skills: [],
+    media: [],
+  });
+
+  const [eduFormData, setEduFormData] = useState<Omit<Education, 'id'>>({
+    school: '',
+    degree: '',
+    fieldOfStudy: '',
+    startDate: '',
+    endDate: '',
+    grade: '',
+    activities: '',
     description: '',
     skills: [],
     media: [],
@@ -570,6 +590,182 @@ export default function EditProfileScreen() {
 
   const removeExpMedia = (id: string) => {
     updateExpFormData('media', expFormData.media.filter(m => m.id !== id));
+  };
+
+  const resetEduForm = () => {
+    setEduFormData({
+      school: '',
+      degree: '',
+      fieldOfStudy: '',
+      startDate: '',
+      endDate: '',
+      grade: '',
+      activities: '',
+      description: '',
+      skills: [],
+      media: [],
+    });
+    setEditingEduId(null);
+    setEduSkillInput('');
+    setShowEduSkillInput(false);
+    setIsCurrentlyStudying(false);
+  };
+
+  const openAddEduModal = () => {
+    resetEduForm();
+    setShowEduModal(true);
+  };
+
+  const openEditEduModal = (education: Education) => {
+    setEduFormData({
+      school: education.school,
+      degree: education.degree,
+      fieldOfStudy: education.fieldOfStudy,
+      startDate: education.startDate,
+      endDate: education.endDate,
+      grade: education.grade || '',
+      activities: education.activities || '',
+      description: education.description || '',
+      skills: education.skills,
+      media: education.media,
+    });
+    setIsCurrentlyStudying(education.endDate.toLowerCase() === 'present');
+    setEditingEduId(education.id);
+    setShowEduModal(true);
+  };
+
+  const handleSaveEdu = async () => {
+    if (!eduFormData.school.trim() || !eduFormData.degree.trim() || !eduFormData.fieldOfStudy.trim()) {
+      Alert.alert('Required Fields', 'Please fill in School, Degree, and Field of Study');
+      return;
+    }
+
+    const newEducation: Education = {
+      id: editingEduId || `edu_${Date.now()}`,
+      ...eduFormData,
+      endDate: isCurrentlyStudying ? 'Present' : eduFormData.endDate,
+    };
+
+    let updatedEducations: Education[];
+    if (editingEduId) {
+      updatedEducations = educations.map(edu => 
+        edu.id === editingEduId ? newEducation : edu
+      );
+    } else {
+      updatedEducations = [...educations, newEducation];
+    }
+
+    setEducations(updatedEducations);
+    await updateProfile({ educations: updatedEducations } as any);
+    
+    setShowEduModal(false);
+    resetEduForm();
+  };
+
+  const handleDeleteEdu = (id: string) => {
+    Alert.alert(
+      'Delete Education',
+      'Are you sure you want to delete this education entry?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const updatedEducations = educations.filter(edu => edu.id !== id);
+            setEducations(updatedEducations);
+            await updateProfile({ educations: updatedEducations } as any);
+          },
+        },
+      ]
+    );
+  };
+
+  const updateEduFormData = (key: keyof Omit<Education, 'id'>, value: any) => {
+    setEduFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const addEduSkill = () => {
+    const trimmedSkill = eduSkillInput.trim();
+    if (trimmedSkill && !eduFormData.skills.includes(trimmedSkill)) {
+      updateEduFormData('skills', [...eduFormData.skills, trimmedSkill]);
+      setEduSkillInput('');
+      setShowEduSkillInput(false);
+    }
+  };
+
+  const removeEduSkill = (skill: string) => {
+    updateEduFormData('skills', eduFormData.skills.filter(s => s !== skill));
+  };
+
+  const addEduMediaLink = () => {
+    Alert.prompt(
+      'Add Link',
+      'Enter the URL',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Add',
+          onPress: (url?: string) => {
+            if (url?.trim()) {
+              Alert.prompt(
+                'Link Title',
+                'Enter a title for this link (optional)',
+                [
+                  { text: 'Skip', onPress: () => {
+                    const newMedia = {
+                      id: `media_${Date.now()}`,
+                      type: 'link' as const,
+                      url: url.trim(),
+                    };
+                    updateEduFormData('media', [...eduFormData.media, newMedia]);
+                  }},
+                  {
+                    text: 'Add',
+                    onPress: (title?: string) => {
+                      const newMedia = {
+                        id: `media_${Date.now()}`,
+                        type: 'link' as const,
+                        url: url.trim(),
+                        title: title?.trim(),
+                      };
+                      updateEduFormData('media', [...eduFormData.media, newMedia]);
+                    },
+                  },
+                ]
+              );
+            }
+          },
+        },
+      ],
+      'plain-text'
+    );
+  };
+
+  const addEduMediaImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const newMedia = {
+          id: `media_${Date.now()}`,
+          type: 'image' as const,
+          url: result.assets[0].uri,
+        };
+        updateEduFormData('media', [...eduFormData.media, newMedia]);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Alert.alert('Error', 'Failed to add image. Please try again.');
+    }
+  };
+
+  const removeEduMedia = (id: string) => {
+    updateEduFormData('media', eduFormData.media.filter(m => m.id !== id));
   };
 
 
@@ -1034,38 +1230,111 @@ export default function EditProfileScreen() {
             <View style={styles.sectionContent}>
               <Text style={styles.helpText}>Share your academic background and qualifications</Text>
               
-              {(user as any)?.educations && (user as any).educations.length > 0 ? (
+              {educations.length > 0 && (
                 <View style={styles.itemsList}>
-                  {(user as any).educations.map((edu: Education) => (
-                    <View key={edu.id} style={styles.itemCard}>
-                      <View style={styles.itemHeader}>
-                        <View style={styles.itemIconContainer}>
-                          <GraduationCap size={18} color={Colors.primary} />
+                  {educations.map((edu: Education) => (
+                    <View key={edu.id} style={styles.experienceCard}>
+                      <View style={styles.experienceHeader}>
+                        <View style={styles.experienceIconContainer}>
+                          <GraduationCap size={20} color={Colors.primary} />
                         </View>
-                        <View style={styles.itemContent}>
-                          <Text style={styles.itemTitle}>{edu.school}</Text>
-                          <Text style={styles.itemSubtitle}>{edu.degree} - {edu.fieldOfStudy}</Text>
-                          <View style={styles.itemMeta}>
-                            <Calendar size={12} color={Colors.textLight} />
-                            <Text style={styles.itemMetaText}>{edu.startDate} - {edu.endDate}</Text>
+                        <View style={styles.experienceHeaderContent}>
+                          <Text style={styles.experienceTitle}>{edu.school}</Text>
+                          <Text style={styles.experienceCompany}>{edu.degree}</Text>
+                          <Text style={styles.experienceEmploymentType}>{edu.fieldOfStudy}</Text>
+                          <View style={styles.experienceMetaRow}>
+                            <View style={styles.experienceDateContainer}>
+                              <Calendar size={14} color={Colors.textLight} />
+                              <Text style={styles.experienceDate}>
+                                {edu.startDate} - {edu.endDate}
+                              </Text>
+                            </View>
                           </View>
                         </View>
+                      </View>
+
+                      {edu.grade && (
+                        <View style={styles.experienceDetail}>
+                          <Text style={styles.detailLabel}>Grade:</Text>
+                          <Text style={styles.detailValue}>{edu.grade}</Text>
+                        </View>
+                      )}
+
+                      {edu.activities && (
+                        <View style={styles.experienceDetail}>
+                          <Text style={styles.detailLabel}>Activities & Societies:</Text>
+                          <Text style={styles.detailValue}>{edu.activities}</Text>
+                        </View>
+                      )}
+
+                      {edu.description && (
+                        <View style={styles.experienceDetail}>
+                          <Text style={styles.detailLabel}>Description:</Text>
+                          <Text style={styles.detailValue}>{edu.description}</Text>
+                        </View>
+                      )}
+
+                      {edu.skills.length > 0 && (
+                        <View style={styles.experienceDetail}>
+                          <Text style={styles.detailLabel}>Skills:</Text>
+                          <View style={styles.skillsContainer}>
+                            {edu.skills.map((skill, index) => (
+                              <View key={index} style={styles.skillTag}>
+                                <Text style={styles.skillTagText}>{skill}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        </View>
+                      )}
+
+                      {edu.media.length > 0 && (
+                        <View style={styles.experienceDetail}>
+                          <Text style={styles.detailLabel}>Media ({edu.media.length}):</Text>
+                          <View style={styles.mediaPreview}>
+                            {edu.media.slice(0, 3).map((media) => (
+                              <View key={media.id} style={styles.mediaIcon}>
+                                {media.type === 'link' ? (
+                                  <LinkIcon size={16} color={Colors.primary} />
+                                ) : (
+                                  <View style={styles.imageIconPlaceholder}>
+                                    <Text style={styles.imageIconText}>📷</Text>
+                                  </View>
+                                )}
+                              </View>
+                            ))}
+                          </View>
+                        </View>
+                      )}
+
+                      <View style={styles.cardActions}>
+                        <TouchableOpacity
+                          style={styles.editButton}
+                          onPress={() => openEditEduModal(edu)}
+                        >
+                          <Edit2 size={18} color={Colors.primary} />
+                          <Text style={styles.editButtonText}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.deleteButton}
+                          onPress={() => handleDeleteEdu(edu.id)}
+                        >
+                          <Trash2 size={18} color={Colors.error} />
+                          <Text style={styles.deleteButtonText}>Delete</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
                   ))}
                 </View>
-              ) : (
-                <View style={styles.emptyStateInline}>
-                  <GraduationCap size={32} color={Colors.textLight} />
-                  <Text style={styles.emptyStateText}>No education added yet</Text>
-                </View>
               )}
               
               <TouchableOpacity
-                style={styles.manageButton}
-                onPress={() => router.push('/profile/education')}
+                style={styles.addItemButton}
+                onPress={openAddEduModal}
               >
-                <Text style={styles.manageButtonText}>Manage Education</Text>
+                <Plus size={20} color={Colors.white} />
+                <Text style={styles.addItemButtonText}>
+                  {educations.length === 0 ? 'Add Education' : 'Add Another Education'}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -1398,6 +1667,256 @@ export default function EditProfileScreen() {
               <TouchableOpacity style={styles.saveModalButton} onPress={handleSaveExp}>
                 <Text style={styles.saveModalButtonText}>
                   {editingExpId ? 'Update Experience' : 'Add Experience'}
+                </Text>
+              </TouchableOpacity>
+
+              <View style={{ height: 40 }} />
+            </ScrollView>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={showEduModal}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setShowEduModal(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {editingEduId ? 'Edit Education' : 'Add Education'}
+              </Text>
+              <TouchableOpacity onPress={() => setShowEduModal(false)}>
+                <X size={24} color={Colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>School / Institution *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={eduFormData.school}
+                  onChangeText={(value) => updateEduFormData('school', value)}
+                  placeholder="e.g., Harvard University"
+                  placeholderTextColor={Colors.textLight}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Degree *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={eduFormData.degree}
+                  onChangeText={(value) => updateEduFormData('degree', value)}
+                  placeholder="e.g., Bachelor's, Master's, PhD"
+                  placeholderTextColor={Colors.textLight}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Field of Study *</Text>
+                <TextInput
+                  style={styles.input}
+                  value={eduFormData.fieldOfStudy}
+                  onChangeText={(value) => updateEduFormData('fieldOfStudy', value)}
+                  placeholder="e.g., Architecture, Computer Science"
+                  placeholderTextColor={Colors.textLight}
+                />
+              </View>
+
+              <View style={styles.dateRow}>
+                <View style={styles.dateInput}>
+                  <Text style={styles.label}>Start Date *</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={eduFormData.startDate}
+                    onChangeText={(value) => updateEduFormData('startDate', value)}
+                    placeholder="e.g., Sep 2018"
+                    placeholderTextColor={Colors.textLight}
+                  />
+                </View>
+                <View style={styles.dateInput}>
+                  <Text style={styles.label}>End Date *</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={isCurrentlyStudying ? 'Present' : eduFormData.endDate}
+                    onChangeText={(value) => updateEduFormData('endDate', value)}
+                    placeholder="e.g., May 2022"
+                    placeholderTextColor={Colors.textLight}
+                    editable={!isCurrentlyStudying}
+                  />
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.checkboxContainer}
+                onPress={() => {
+                  setIsCurrentlyStudying(!isCurrentlyStudying);
+                  if (!isCurrentlyStudying) {
+                    updateEduFormData('endDate', 'Present');
+                  } else {
+                    updateEduFormData('endDate', '');
+                  }
+                }}
+              >
+                <View style={[styles.checkbox, isCurrentlyStudying && styles.checkboxChecked]}>
+                  {isCurrentlyStudying && <Check size={16} color={Colors.white} />}
+                </View>
+                <Text style={styles.checkboxLabel}>I currently study here</Text>
+              </TouchableOpacity>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Grade / GPA</Text>
+                <TextInput
+                  style={styles.input}
+                  value={eduFormData.grade}
+                  onChangeText={(value) => updateEduFormData('grade', value)}
+                  placeholder="e.g., 3.8/4.0, First Class Honours"
+                  placeholderTextColor={Colors.textLight}
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Activities & Societies</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={eduFormData.activities}
+                  onChangeText={(value) => updateEduFormData('activities', value)}
+                  placeholder="Clubs, sports, student organizations..."
+                  placeholderTextColor={Colors.textLight}
+                  multiline
+                  numberOfLines={3}
+                  textAlignVertical="top"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Description</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={eduFormData.description}
+                  onChangeText={(value) => updateEduFormData('description', value)}
+                  placeholder="Key achievements, projects, research..."
+                  placeholderTextColor={Colors.textLight}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Skills</Text>
+                <Text style={styles.helpText}>
+                  Add skills you developed during your education
+                </Text>
+                {eduFormData.skills.length > 0 && (
+                  <View style={styles.selectedSkillsContainer}>
+                    {eduFormData.skills.map((skill) => (
+                      <View key={skill} style={styles.selectedSkill}>
+                        <Text style={styles.selectedSkillText}>{skill}</Text>
+                        <TouchableOpacity
+                          onPress={() => removeEduSkill(skill)}
+                          style={styles.removeSkillButton}
+                        >
+                          <X size={14} color={Colors.white} />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                {showEduSkillInput ? (
+                  <View style={styles.customSkillInputContainer}>
+                    <TextInput
+                      style={styles.customSkillInput}
+                      value={eduSkillInput}
+                      onChangeText={setEduSkillInput}
+                      placeholder="Enter skill..."
+                      placeholderTextColor={Colors.textLight}
+                      autoFocus
+                    />
+                    <View style={styles.customSkillActions}>
+                      <TouchableOpacity
+                        style={styles.customSkillButton}
+                        onPress={addEduSkill}
+                        disabled={!eduSkillInput.trim()}
+                      >
+                        <Check size={18} color={Colors.white} />
+                        <Text style={styles.customSkillButtonText}>Add</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.customSkillButton, styles.cancelButton]}
+                        onPress={() => {
+                          setShowEduSkillInput(false);
+                          setEduSkillInput('');
+                        }}
+                      >
+                        <X size={18} color={Colors.text} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.addSkillButton}
+                    onPress={() => setShowEduSkillInput(true)}
+                  >
+                    <PlusCircle size={20} color={Colors.primary} />
+                    <Text style={styles.addSkillButtonText}>Add Skill</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Media</Text>
+                <Text style={styles.helpText}>
+                  Add images or links to projects, thesis, certificates, or relevant resources
+                </Text>
+                {eduFormData.media.length > 0 && (
+                  <View style={styles.mediaList}>
+                    {eduFormData.media.map((media) => (
+                      <View key={media.id} style={styles.mediaItem}>
+                        <View style={styles.mediaItemContent}>
+                          {media.type === 'link' ? (
+                            <LinkIcon size={20} color={Colors.primary} />
+                          ) : (
+                            <Text style={styles.mediaTypeIcon}>📷</Text>
+                          )}
+                          <View style={styles.mediaItemText}>
+                            <Text style={styles.mediaItemTitle} numberOfLines={1}>
+                              {media.title || media.url}
+                            </Text>
+                            <Text style={styles.mediaItemType}>
+                              {media.type === 'link' ? 'Link' : 'Image'}
+                            </Text>
+                          </View>
+                        </View>
+                        <TouchableOpacity onPress={() => removeEduMedia(media.id)}>
+                          <Trash2 size={18} color={Colors.error} />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                <View style={styles.mediaActions}>
+                  <TouchableOpacity
+                    style={styles.mediaActionButton}
+                    onPress={addEduMediaImage}
+                  >
+                    <Text style={styles.mediaActionButtonText}>📷 Add Image</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.mediaActionButton}
+                    onPress={addEduMediaLink}
+                  >
+                    <LinkIcon size={18} color={Colors.primary} />
+                    <Text style={styles.mediaActionButtonText}>Add Link</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.saveModalButton} onPress={handleSaveEdu}>
+                <Text style={styles.saveModalButtonText}>
+                  {editingEduId ? 'Update Education' : 'Add Education'}
                 </Text>
               </TouchableOpacity>
 
