@@ -738,6 +738,23 @@ export default function EditProfileScreen() {
 
           <TouchableOpacity 
             style={styles.navigationCard}
+            onPress={() => router.push('/profile/experience')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.navigationCardLeft}>
+              <View style={styles.navigationIconContainer}>
+                <Briefcase size={20} color={Colors.primary} />
+              </View>
+              <View>
+                <Text style={styles.navigationCardTitle}>Experience</Text>
+                <Text style={styles.navigationCardDescription}>Manage your work history</Text>
+              </View>
+            </View>
+            <ChevronDown size={20} color={Colors.textLight} style={{ transform: [{ rotate: '-90deg' }] }} />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.navigationCard}
             onPress={() => router.push('/profile/education')}
             activeOpacity={0.7}
           >

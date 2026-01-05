@@ -127,3 +127,23 @@ export interface EducationMedia {
   url: string;
   title?: string;
 }
+
+export interface Experience {
+  id: string;
+  title: string;
+  employmentType: string;
+  company: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  description?: string;
+  skills: string[];
+  media: ExperienceMedia[];
+}
+
+export interface ExperienceMedia {
+  id: string;
+  type: 'image' | 'link';
+  url: string;
+  title?: string;
+}
