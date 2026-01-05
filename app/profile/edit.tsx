@@ -13,7 +13,7 @@ import {
   Instagram,
   PlusCircle,
 } from 'lucide-react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -74,9 +74,7 @@ interface SectionState {
 export default function EditProfileScreen() {
   const { user, updateProfile, completeOnboarding, hasCompletedOnboarding } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [customTagInput, setCustomTagInput] = useState('');
   const [showCustomTagInput, setShowCustomTagInput] = useState(false);
   
@@ -116,51 +114,7 @@ export default function EditProfileScreen() {
   });
 
 
-  const calculateProgress = useCallback(() => {
-    let completed = 0;
-    let total = 7;
 
-    if (formData.name?.trim()) completed++;
-    if (formData.bio?.trim()) completed++;
-    if (formData.expertiseTags?.length > 0) completed++;
-    if (formData.portfolioImages?.length > 0) completed++;
-    if (formData.teachingFocus?.trim()) completed++;
-    if (formData.linkedIn?.trim() || formData.website?.trim()) completed++;
-
-    return Math.round((completed / total) * 100);
-  }, [
-    formData.name,
-    formData.bio,
-    formData.expertiseTags,
-    formData.portfolioImages,
-    formData.teachingFocus,
-    formData.linkedIn,
-    formData.website,
-  ]);
-
-  const autoSave = useCallback(async () => {
-    if (!user) return;
-    
-    setIsSaving(true);
-    try {
-      await updateProfile(formData);
-      setLastSaved(new Date());
-    } catch (error) {
-      console.error('Auto-save error:', error);
-    } finally {
-      setTimeout(() => setIsSaving(false), 500);
-    }
-  }, [formData, user, updateProfile]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (user && formData.name?.trim()) {
-        autoSave();
-      }
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [formData, autoSave, user]);
 
   const handleSave = async () => {
     if (!formData.name?.trim()) {
@@ -459,22 +413,6 @@ export default function EditProfileScreen() {
         }} 
       />
       <View style={styles.container}>
-        <View style={styles.progressBar}>
-          <View 
-            style={[
-              styles.progressFill, 
-              { width: `${calculateProgress()}%` }
-            ]} 
-          />
-        </View>
-        <View style={styles.progressTextContainer}>
-          <Text style={styles.progressText}>Profile {calculateProgress()}% complete</Text>
-          {isSaving && <ActivityIndicator size="small" color={Colors.primary} />}
-          {!isSaving && lastSaved && (
-            <Text style={styles.savedText}>Saved</Text>
-          )}
-        </View>
-
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.coverImageContainer}>
           <Image
@@ -633,7 +571,7 @@ export default function EditProfileScreen() {
                 <View style={styles.selectedTagsSection}>
                   <Text style={styles.selectedTagsLabel}>Your Selected Expertise:</Text>
                   <View style={styles.tagsContainer}>
-                    {formData.expertiseTags.map((tag) => (
+                    {formData.expertiseTags.map((tag: string) => (
                       <View key={tag} style={styles.selectedTag}>
                         <Text style={styles.selectedTagText}>{tag}</Text>
                         <TouchableOpacity
@@ -780,7 +718,7 @@ export default function EditProfileScreen() {
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Topics I'm Passionate About</Text>
+                <Text style={styles.label}>Topics I&apos;m Passionate About</Text>
                 <Text style={styles.helpText}>What excites you most in architecture? What do you love teaching?</Text>
                 <TextInput
                   style={[styles.input, styles.textArea]}
@@ -998,7 +936,7 @@ export default function EditProfileScreen() {
                   )}
                   {formData.howITeach && (
                     <View style={styles.previewSubSection}>
-                      <Text style={styles.previewSubTitle}>Topics I'm Passionate About</Text>
+                      <Text style={styles.previewSubTitle}>Topics I&apos;m Passionate About</Text>
                       <Text style={styles.previewText}>{formData.howITeach}</Text>
                     </View>
                   )}
