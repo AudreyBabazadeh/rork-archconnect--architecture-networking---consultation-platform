@@ -12,6 +12,7 @@ import {
   Globe,
   Instagram,
   PlusCircle,
+  Award,
 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -811,6 +812,16 @@ export default function EditProfileScreen() {
             <Text style={styles.previewButtonText}>Preview Profile</Text>
           </TouchableOpacity>
 
+          {(!user.mentorStatus || user.mentorStatus === 'not_applied') && (
+            <TouchableOpacity
+              style={styles.mentorApplicationButton}
+              onPress={() => router.push('/mentor/apply')}
+            >
+              <Award size={20} color={Colors.white} />
+              <Text style={styles.mentorApplicationButtonText}>Become a Mentor</Text>
+            </TouchableOpacity>
+          )}
+
           <View style={{ height: 40 }} />
         </View>
         </ScrollView>
@@ -1578,5 +1589,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text,
     lineHeight: 20,
+  },
+  mentorApplicationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginTop: 8,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  mentorApplicationButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.white,
   },
 });
