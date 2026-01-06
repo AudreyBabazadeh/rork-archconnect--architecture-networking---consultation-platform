@@ -55,6 +55,7 @@ export default function TabLayout() {
           options={{
             title: '',
             tabBarIcon: ({ color, size }) => <Bell size={24} color={color} />,
+            tabBarShowLabel: false,
           }}
         />
         <Tabs.Screen
