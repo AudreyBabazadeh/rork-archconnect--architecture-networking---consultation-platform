@@ -12,6 +12,7 @@ export default function TabLayout() {
           tabBarActiveTintColor: Colors.primary,
           tabBarInactiveTintColor: Colors.textLight,
           headerShown: false,
+          tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: Colors.white,
             borderTopWidth: 1,
@@ -19,11 +20,6 @@ export default function TabLayout() {
             paddingTop: 12,
             paddingBottom: 28,
             height: 85,
-          },
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '500',
-            marginTop: 4,
           },
         }}
       >
@@ -53,9 +49,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="notifications"
           options={{
-            title: '',
             tabBarIcon: ({ color, size }) => <Bell size={24} color={color} />,
-            tabBarShowLabel: false,
           }}
         />
         <Tabs.Screen
