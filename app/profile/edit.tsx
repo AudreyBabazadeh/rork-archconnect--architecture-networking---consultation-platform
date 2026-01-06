@@ -2099,7 +2099,7 @@ const styles = StyleSheet.create({
   },
   changeCoverButton: {
     position: 'absolute',
-    bottom: 16,
+    bottom: 130,
     right: 16,
     flexDirection: 'row',
     alignItems: 'center',
