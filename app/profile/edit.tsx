@@ -831,8 +831,8 @@ export default function EditProfileScreen() {
             onPress={showCoverImagePickerOptions}
             testID="change-cover-button"
           >
-            <Camera size={16} color={Colors.white} />
-            <Text style={styles.changeCoverText}>Change Cover</Text>
+            <Camera size={18} color={Colors.white} />
+            <Text style={styles.changeCoverText}>Edit Cover</Text>
           </TouchableOpacity>
         </View>
         
@@ -2103,20 +2103,22 @@ const styles = StyleSheet.create({
     right: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: Colors.white,
   },
   changeCoverText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: Colors.white,
   },
   profileImageContainer: {
