@@ -138,7 +138,7 @@ export default function HomeScreen() {
   };
 
   const profileCompletion = calculateProfileCompletion();
-  const showProfileReminder = (!hasCompletedOnboarding || profileCompletion < 60) && !user?.hasDismissedProfileReminder;
+  const showProfileReminder = !hasCompletedOnboarding && !user?.hasDismissedProfileReminder;
 
   const renderHeader = () => (
     <View style={styles.header}>
