@@ -127,6 +127,36 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        <View style={styles.statsCard}>
+          <View style={styles.statsGrid}>
+            <TouchableOpacity 
+              style={styles.statBox}
+              onPress={() => router.push('/profile/followers')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.statNumber, { color: accentColor }]}>{getFollowerCount()}</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </TouchableOpacity>
+            <View style={styles.statDividerVertical} />
+            <TouchableOpacity 
+              style={styles.statBox}
+              onPress={() => router.push('/profile/following')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.statNumber, { color: accentColor }]}>{getFollowingCount()}</Text>
+              <Text style={styles.statLabel}>Following</Text>
+            </TouchableOpacity>
+            <View style={styles.statDividerVertical} />
+            <View style={styles.statBox}>
+              <View style={styles.ratingRow}>
+                <Star size={18} color={Colors.secondary} fill={Colors.secondary} />
+                <Text style={[styles.statNumber, { color: accentColor }]}>{user.rating || 0}</Text>
+              </View>
+              <Text style={styles.statLabel}>Rating</Text>
+            </View>
+          </View>
+        </View>
+
         {user.specialties && user.specialties.length > 0 ? (
           <View style={styles.sectionCard}>
             <View style={styles.sectionHeader}>
@@ -346,36 +376,6 @@ export default function ProfileScreen() {
             )}
           </View>
         )}
-
-        <View style={styles.statsCard}>
-          <View style={styles.statsGrid}>
-            <TouchableOpacity 
-              style={styles.statBox}
-              onPress={() => router.push('/profile/followers')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.statNumber, { color: accentColor }]}>{getFollowerCount()}</Text>
-              <Text style={styles.statLabel}>Followers</Text>
-            </TouchableOpacity>
-            <View style={styles.statDividerVertical} />
-            <TouchableOpacity 
-              style={styles.statBox}
-              onPress={() => router.push('/profile/following')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.statNumber, { color: accentColor }]}>{getFollowingCount()}</Text>
-              <Text style={styles.statLabel}>Following</Text>
-            </TouchableOpacity>
-            <View style={styles.statDividerVertical} />
-            <View style={styles.statBox}>
-              <View style={styles.ratingRow}>
-                <Star size={18} color={Colors.secondary} fill={Colors.secondary} />
-                <Text style={[styles.statNumber, { color: accentColor }]}>{user.rating || 0}</Text>
-              </View>
-              <Text style={styles.statLabel}>Rating</Text>
-            </View>
-          </View>
-        </View>
 
         {(user as any).sessionTypes && (user as any).sessionTypes.length > 0 && (
           <View style={styles.sectionCard}>
