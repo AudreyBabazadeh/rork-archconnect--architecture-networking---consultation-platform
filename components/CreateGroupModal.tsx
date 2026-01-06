@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,6 +13,8 @@ import {
 import { X, Check } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { mockUsers } from '@/data/mockUsers';
+import { useMessaging } from '@/contexts/MessagingContext';
+import { useFollow } from '@/contexts/FollowContext';
 
 interface CreateGroupModalProps {
   visible: boolean;
@@ -28,17 +30,60 @@ export default function CreateGroupModal({
   const [groupName, setGroupName] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchingByUsername, setIsSearchingByUsername] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  
+  const { conversations } = useMessaging();
+  const { getFollowingList } = useFollow();
 
   const availableUsers = mockUsers.filter((u) => u.id !== '1');
   
+  const suggestedUsers = useMemo(() => {
+    const interactionMap = new Map<string, number>();
+    
+    conversations.forEach(conv => {
+      if (!conv.isGroup) {
+        const count = conv.messages.length;
+        interactionMap.set(conv.participantId, count);
+      } else if (conv.participants) {
+        conv.participants.forEach(p => {
+          const current = interactionMap.get(p.id) || 0;
+          interactionMap.set(p.id, current + 1);
+        });
+      }
+    });
+    
+    const followingIds = getFollowingList();
+    
+    const usersWithScores = availableUsers.map(user => {
+      const interactionScore = interactionMap.get(user.id) || 0;
+      const followingScore = followingIds.includes(user.id) ? 100 : 0;
+      return {
+        user,
+        score: interactionScore + followingScore,
+      };
+    });
+    
+    return usersWithScores
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8)
+      .map(item => item.user);
+  }, [conversations, getFollowingList, availableUsers]);
+  
   const normalizedQuery = searchQuery.startsWith('@') ? searchQuery.slice(1).toLowerCase() : searchQuery.toLowerCase();
-  const filteredUsers = availableUsers.filter((user) => {
-    if (searchQuery.startsWith('@')) {
-      return user.username.toLowerCase().includes(normalizedQuery);
+  const isSearchingWithAt = searchQuery.startsWith('@');
+  
+  const filteredUsers = useMemo(() => {
+    if (isSearchingWithAt && normalizedQuery === '') {
+      return suggestedUsers;
     }
-    return user.name.toLowerCase().includes(normalizedQuery) || user.username.toLowerCase().includes(normalizedQuery);
-  });
+    
+    return availableUsers.filter((user) => {
+      if (isSearchingWithAt) {
+        return user.username.toLowerCase().includes(normalizedQuery);
+      }
+      return user.name.toLowerCase().includes(normalizedQuery) || user.username.toLowerCase().includes(normalizedQuery);
+    });
+  }, [normalizedQuery, isSearchingWithAt, availableUsers, suggestedUsers]);
 
   const toggleUserSelection = (userId: string) => {
     setSelectedUsers((prev) =>
@@ -131,12 +176,61 @@ export default function CreateGroupModal({
             <TextInput
               style={styles.input}
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={(text) => {
+                setSearchQuery(text);
+                setShowSuggestions(text.startsWith('@') && text.length === 1);
+              }}
               placeholder="Search by name or @username"
               placeholderTextColor={Colors.textLight}
               autoCapitalize="none"
               autoCorrect={false}
+              onFocus={() => {
+                if (searchQuery === '@') {
+                  setShowSuggestions(true);
+                }
+              }}
+              onBlur={() => {
+                setTimeout(() => setShowSuggestions(false), 200);
+              }}
             />
+            {showSuggestions && isSearchingWithAt && normalizedQuery === '' && (
+              <View style={styles.suggestionsDropdown}>
+                <Text style={styles.suggestionsHeader}>Suggested</Text>
+                <ScrollView 
+                  style={styles.suggestionsList}
+                  keyboardShouldPersistTaps="handled"
+                >
+                  {suggestedUsers.map((user) => {
+                    const isSelected = selectedUsers.includes(user.id);
+                    return (
+                      <TouchableOpacity
+                        key={user.id}
+                        style={styles.suggestionItem}
+                        onPress={() => {
+                          toggleUserSelection(user.id);
+                          setSearchQuery('');
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        <Image
+                          source={{ uri: user.avatar }}
+                          style={styles.suggestionAvatar}
+                        />
+                        <View style={styles.suggestionInfo}>
+                          <Text style={styles.suggestionName}>{user.name}</Text>
+                          <Text style={styles.suggestionUsername}>@{user.username}</Text>
+                        </View>
+                        {isSelected && (
+                          <View style={styles.selectedIndicator}>
+                            <Check size={14} color={Colors.primary} />
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
           </View>
 
           <FlatList
@@ -356,5 +450,70 @@ const styles = StyleSheet.create({
   },
   createButtonTextDisabled: {
     color: Colors.textLight,
+  },
+  suggestionsDropdown: {
+    position: 'absolute',
+    top: 70,
+    left: 0,
+    right: 0,
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    maxHeight: 300,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 1000,
+  },
+  suggestionsHeader: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textLight,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  suggestionsList: {
+    maxHeight: 250,
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  suggestionAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 12,
+  },
+  suggestionInfo: {
+    flex: 1,
+  },
+  suggestionName: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: Colors.text,
+    marginBottom: 2,
+  },
+  suggestionUsername: {
+    fontSize: 13,
+    color: Colors.primary,
+  },
+  selectedIndicator: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
