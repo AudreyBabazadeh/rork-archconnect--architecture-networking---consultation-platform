@@ -179,8 +179,6 @@ export default function BookingScreen() {
   }
 
   const totalPrice = selectedTopic?.price || (showCustomTopic ? consultant.hourlyRate || 50 : 0);
-  const platformFee = totalPrice * 0.05; // 5% platform fee
-  const finalPrice = totalPrice + platformFee;
 
   const handleBooking = async () => {
     if (!selectedDate || !selectedTime) {
@@ -222,7 +220,7 @@ export default function BookingScreen() {
         date: selectedDate,
         time: formatTimeTo24Hour(selectedTime),
         description: description,
-        amount: finalPrice,
+        amount: totalPrice,
       });
 
       Alert.alert(
@@ -407,13 +405,9 @@ export default function BookingScreen() {
             <Text style={styles.priceLabel}>Session ({selectedTopic?.duration || 60} min)</Text>
             <Text style={styles.priceValue}>${totalPrice.toFixed(2)}</Text>
           </View>
-          <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>Platform fee (5%)</Text>
-            <Text style={styles.priceValue}>${platformFee.toFixed(2)}</Text>
-          </View>
           <View style={[styles.priceRow, styles.totalRow]}>
             <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>${finalPrice.toFixed(2)}</Text>
+            <Text style={styles.totalValue}>${totalPrice.toFixed(2)}</Text>
           </View>
         </View>
       </ScrollView>
