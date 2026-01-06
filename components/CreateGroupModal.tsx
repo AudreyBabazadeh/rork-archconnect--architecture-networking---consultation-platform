@@ -9,6 +9,8 @@ import {
   FlatList,
   Image,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { X, Check } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
@@ -121,7 +123,10 @@ export default function CreateGroupModal({
       transparent={true}
       onRequestClose={handleClose}
     >
-      <View style={styles.modalOverlay}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.modalOverlay}
+      >
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Create Group Chat</Text>
@@ -291,7 +296,7 @@ export default function CreateGroupModal({
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
