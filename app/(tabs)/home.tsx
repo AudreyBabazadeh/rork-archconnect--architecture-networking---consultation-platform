@@ -10,7 +10,7 @@ import {
   ScrollView
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Users, HelpCircle, MessageCircle, UserCircle, ArrowRight, Globe } from 'lucide-react-native';
+import { Users, HelpCircle, MessageCircle, UserCircle, ArrowRight, Globe, X } from 'lucide-react-native';
 import { PostCard } from '@/components/PostCard';
 import { mockPosts } from '@/data/mockPosts';
 import { Post } from '@/types/user';
@@ -23,7 +23,7 @@ type FilterType = 'following' | 'explore' | 'ask';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { user, hasCompletedOnboarding } = useAuth();
+  const { user, hasCompletedOnboarding, dismissProfileReminder } = useAuth();
   const { getTotalUnreadCount } = useMessaging();
   const { getFollowingList } = useFollow();
   const [refreshing, setRefreshing] = useState(false);
@@ -138,7 +138,7 @@ export default function HomeScreen() {
   };
 
   const profileCompletion = calculateProfileCompletion();
-  const showProfileReminder = !hasCompletedOnboarding || profileCompletion < 60;
+  const showProfileReminder = (!hasCompletedOnboarding || profileCompletion < 60) && !user?.hasDismissedProfileReminder;
 
   const renderHeader = () => (
     <View style={styles.header}>
@@ -179,6 +179,13 @@ export default function HomeScreen() {
               </Text>
             </View>
             <ArrowRight size={20} color={Colors.textLight} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.dismissButton}
+            onPress={dismissProfileReminder}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <X size={18} color={Colors.textLight} />
           </TouchableOpacity>
         </View>
       )}
@@ -366,9 +373,22 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   profileReminderWrapper: {
+    position: 'relative',
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 8,
+  },
+  dismissButton: {
+    position: 'absolute',
+    top: 12,
+    right: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
   },
   profileReminderCard: {
     flexDirection: 'row',

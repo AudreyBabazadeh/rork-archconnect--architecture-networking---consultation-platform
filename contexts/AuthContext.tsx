@@ -12,6 +12,7 @@ export interface AuthUser extends User {
   coverImage?: string;
   createdAt: string;
   hasCompletedOnboarding?: boolean;
+  hasDismissedProfileReminder?: boolean;
   mentorStatus?: 'not_applied' | 'pending' | 'approved' | 'not_interested';
   mentorLevel?: 'emerging' | 'established' | 'expert' | 'master';
   mentorApplicationDate?: string;
@@ -32,6 +33,7 @@ interface AuthActions {
   searchUsers: (query: string) => Promise<AuthUser[]>;
   getUserById: (id: string) => Promise<AuthUser | null>;
   completeOnboarding: () => Promise<void>;
+  dismissProfileReminder: () => Promise<void>;
   applyForMentor: () => Promise<void>;
   approveMentor: (userId: string, level: 'emerging' | 'established' | 'expert' | 'master') => Promise<void>;
 }
@@ -320,6 +322,36 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     }
   }, [user]);
 
+  const dismissProfileReminder = useCallback(async (): Promise<void> => {
+    try {
+      if (!user) return;
+      
+      const updatedUser = { ...user, hasDismissedProfileReminder: true };
+      setUser(updatedUser);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+      
+      const storedUsers = await AsyncStorage.getItem(USERS_STORAGE_KEY);
+      let users: AuthUser[] = [];
+      if (storedUsers && storedUsers !== 'ok' && storedUsers !== 'null') {
+        try {
+          users = JSON.parse(storedUsers);
+        } catch {
+          console.log('Error parsing users, resetting...');
+          await AsyncStorage.removeItem(USERS_STORAGE_KEY);
+        }
+      }
+      
+      const userIndex = users.findIndex(u => u.id === user.id);
+      if (userIndex !== -1) {
+        users[userIndex] = updatedUser;
+        await AsyncStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+        console.log('Profile reminder dismissed');
+      }
+    } catch (error) {
+      console.error('Dismiss profile reminder error:', error);
+    }
+  }, [user]);
+
   const applyForMentor = useCallback(async (): Promise<void> => {
     try {
       if (!user) return;
@@ -400,7 +432,8 @@ export const [AuthProvider, useAuth] = createContextHook((): AuthState & AuthAct
     searchUsers,
     getUserById,
     completeOnboarding,
+    dismissProfileReminder,
     applyForMentor,
     approveMentor
-  }), [user, isLoading, signIn, signUp, signOut, updateProfile, searchUsers, getUserById, completeOnboarding, applyForMentor, approveMentor]);
+  }), [user, isLoading, signIn, signUp, signOut, updateProfile, searchUsers, getUserById, completeOnboarding, dismissProfileReminder, applyForMentor, approveMentor]);
 });
