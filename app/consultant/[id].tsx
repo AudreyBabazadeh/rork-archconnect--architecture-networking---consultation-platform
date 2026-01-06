@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMessaging } from '@/contexts/MessagingContext';
 import { useFollow } from '@/contexts/FollowContext';
 import { ShareModal } from '@/components/ShareModal';
+import { AllReviewsModal } from '@/components/AllReviewsModal';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -24,6 +25,7 @@ export default function ConsultantProfile() {
   const [consultant, setConsultant] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shareModalVisible, setShareModalVisible] = useState(false);
+  const [allReviewsVisible, setAllReviewsVisible] = useState(false);
   
   // Load consultant data from cloud, local storage, and mock users
   useEffect(() => {
@@ -287,7 +289,11 @@ export default function ConsultantProfile() {
           </View>
         </View>
 
-        <View style={styles.statsCard}>
+        <TouchableOpacity 
+          style={styles.statsCard}
+          onPress={() => setAllReviewsVisible(true)}
+          activeOpacity={0.7}
+        >
           <View style={styles.statsGrid}>
             <View style={styles.statBox}>
               <View style={styles.ratingRow}>
@@ -307,7 +313,8 @@ export default function ConsultantProfile() {
               <Text style={styles.statLabel}>Experience</Text>
             </View>
           </View>
-        </View>
+          <Text style={styles.tapToViewText}>Tap to view all reviews</Text>
+        </TouchableOpacity>
 
         {consultant.specialties && consultant.specialties.length > 0 && (
           <View style={styles.sectionCard}>
@@ -414,6 +421,13 @@ export default function ConsultantProfile() {
           message: `${consultant.name}${consultant.title ? ` - ${consultant.title}` : ''}${consultant.bio ? `\n${consultant.bio}` : ''}\n\nConnect with them!`,
         }}
         type="profile"
+      />
+
+      <AllReviewsModal
+        visible={allReviewsVisible}
+        onClose={() => setAllReviewsVisible(false)}
+        consultantId={consultant.id}
+        consultantName={consultant.name}
       />
 
       <View style={styles.bottomActions}>
@@ -825,5 +839,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
     fontWeight: '500',
+  },
+  tapToViewText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 12,
   },
 });
