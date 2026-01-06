@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, SafeAreaView, Alert } from 'react-native';
-import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon, Linkedin, Globe, Instagram, MessageCircle, Sparkles, Clock, CheckCircle, ArrowRight } from 'lucide-react-native';
+import { Edit3, Star, MapPin, Briefcase, GraduationCap, LogOut, Award, Share as ShareIcon, Linkedin, Globe, Instagram, MessageCircle, Sparkles, Clock, CheckCircle, ArrowRight, ImageIcon } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { ReviewsComponent } from '@/components/ReviewsComponent';
 import { router } from 'expo-router';
 import { Colors } from '@/constants/colors';
@@ -11,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, updateProfile } = useAuth();
   const { getFollowingCount, getFollowerCount } = useFollow();
   const [shareModalVisible, setShareModalVisible] = useState(false);
 
@@ -35,6 +36,25 @@ export default function ProfileScreen() {
 
   const handleShare = () => {
     setShareModalVisible(true);
+  };
+
+  const handleChangeCoverImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        await updateProfile({ coverImage: result.assets[0].uri });
+        Alert.alert('Success', 'Cover image updated successfully!');
+      }
+    } catch (error) {
+      console.error('Error picking cover image:', error);
+      Alert.alert('Error', 'Failed to update cover image. Please try again.');
+    }
   };
 
   if (!user) {
@@ -73,6 +93,9 @@ export default function ProfileScreen() {
             style={styles.coverGradient}
           />
           <View style={styles.heroActions}>
+            <TouchableOpacity style={styles.heroButton} onPress={handleChangeCoverImage}>
+              <ImageIcon size={20} color={Colors.white} />
+            </TouchableOpacity>
             <TouchableOpacity style={styles.heroButton} onPress={handleShare}>
               <ShareIcon size={20} color={Colors.white} />
             </TouchableOpacity>
