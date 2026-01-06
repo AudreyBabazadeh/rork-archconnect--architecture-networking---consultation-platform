@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Star } from 'lucide-react-native';
+import { Star, Plus } from 'lucide-react-native';
 import { Colors } from '@/constants/colors';
 import { ReviewDetailModal } from './ReviewDetailModal';
+import { AddReviewModal } from './AddReviewModal';
+import { useReview } from '@/contexts/ReviewContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Review {
   id: string;
@@ -14,41 +17,24 @@ interface Review {
 }
 
 interface ReviewsComponentProps {
-  reviews: Review[];
-  averageRating: number;
-  totalReviews: number;
+  consultantId: string;
+  consultantName: string;
 }
 
-const mockReviews: Review[] = [
-  {
-    id: '1',
-    clientName: 'Alex M.',
-    rating: 5,
-    comment: 'Excellent guidance on my thesis project. Sarah provided detailed feedback and helped me refine my design approach.',
-    date: '2 weeks ago',
-    consultationType: 'Portfolio Review'
-  },
-  {
-    id: '2',
-    clientName: 'Jordan K.',
-    rating: 5,
-    comment: 'Very knowledgeable about sustainable design principles. The consultation was well worth the investment.',
-    date: '1 month ago',
-    consultationType: 'Project Consultation'
-  },
-  {
-    id: '3',
-    clientName: 'Sam L.',
-    rating: 4,
-    comment: 'Great insights into urban planning concepts. Would definitely book another session.',
-    date: '2 months ago',
-    consultationType: 'Career Advice'
-  }
-];
 
-export function ReviewsComponent({ reviews = mockReviews, averageRating, totalReviews }: ReviewsComponentProps) {
+
+export function ReviewsComponent({ consultantId, consultantName }: ReviewsComponentProps) {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [addReviewModalVisible, setAddReviewModalVisible] = useState(false);
+  const { getReviewsForConsultant, canUserReview, getAverageRating, getTotalReviews } = useReview();
+  const { user } = useAuth();
+
+  const reviews = getReviewsForConsultant(consultantId);
+  const averageRating = getAverageRating(consultantId);
+  const totalReviews = getTotalReviews(consultantId);
+  const userCanReview = user ? canUserReview(consultantId) : false;
+  const isOwnProfile = user?.id === consultantId;
 
   const handleReviewPress = (review: Review) => {
     setSelectedReview(review);
@@ -108,10 +94,21 @@ export function ReviewsComponent({ reviews = mockReviews, averageRating, totalRe
           <View style={styles.starsContainer}>
             {renderStars(Math.round(averageRating))}
           </View>
-          <Text style={styles.totalReviews}>{totalReviews} reviews</Text>
+          <Text style={styles.totalReviews}>{totalReviews} {totalReviews === 1 ? 'review' : 'reviews'}</Text>
         </View>
-        {renderRatingDistribution()}
+        {reviews.length > 0 && renderRatingDistribution()}
       </View>
+
+      {!isOwnProfile && userCanReview && (
+        <TouchableOpacity
+          style={styles.addReviewButton}
+          onPress={() => setAddReviewModalVisible(true)}
+          activeOpacity={0.7}
+        >
+          <Plus size={20} color={Colors.white} strokeWidth={2.5} />
+          <Text style={styles.addReviewButtonText}>Write a Review</Text>
+        </TouchableOpacity>
+      )}
 
       <ScrollView style={styles.reviewsList} showsVerticalScrollIndicator={false}>
         {reviews.map((review) => (
@@ -143,6 +140,13 @@ export function ReviewsComponent({ reviews = mockReviews, averageRating, totalRe
         visible={modalVisible}
         review={selectedReview}
         onClose={handleCloseModal}
+      />
+
+      <AddReviewModal
+        visible={addReviewModalVisible}
+        consultantId={consultantId}
+        consultantName={consultantName}
+        onClose={() => setAddReviewModalVisible(false)}
       />
     </View>
   );
@@ -260,5 +264,27 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: '600',
     marginTop: 8,
+  },
+  addReviewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  addReviewButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.white,
   },
 });

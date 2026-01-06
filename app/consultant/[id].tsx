@@ -398,9 +398,8 @@ export default function ConsultantProfile() {
             <Text style={styles.sectionTitle}>Reviews</Text>
           </View>
           <ReviewsComponent 
-            reviews={[]} 
-            averageRating={consultant.rating} 
-            totalReviews={consultant.reviewCount} 
+            consultantId={consultant.id}
+            consultantName={consultant.name}
           />
         </View>
 

@@ -449,9 +449,8 @@ export default function ProfileScreen() {
               <Text style={styles.sectionTitle}>Reviews</Text>
             </View>
             <ReviewsComponent 
-              reviews={[]} 
-              averageRating={user.rating} 
-              totalReviews={(user as any).totalConsultations || 0} 
+              consultantId={user.id}
+              consultantName={user.name}
             />
           </View>
         )}
