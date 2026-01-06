@@ -9,11 +9,13 @@ import { useFollow } from '@/contexts/FollowContext';
 import { ShareModal } from '@/components/ShareModal';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PortfolioGallery } from '@/components/PortfolioGallery';
+import { AllReviewsModal } from '@/components/AllReviewsModal';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const { getFollowingCount, getFollowerCount } = useFollow();
   const [shareModalVisible, setShareModalVisible] = useState(false);
+  const [allReviewsModalVisible, setAllReviewsModalVisible] = useState(false);
 
   const handleSignOut = () => {
     Alert.alert(
@@ -62,6 +64,12 @@ export default function ProfileScreen() {
           message: `${user.name}${user.occupation ? ` - ${user.occupation}` : ''}${user.bio ? `\n${user.bio}` : ''}\n\nConnect with them!`,
         }}
         type="profile"
+      />
+      <AllReviewsModal
+        visible={allReviewsModalVisible}
+        onClose={() => setAllReviewsModalVisible(false)}
+        consultantId={user.id}
+        consultantName={user.name}
       />
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         <View style={styles.heroSection}>
@@ -147,13 +155,17 @@ export default function ProfileScreen() {
               <Text style={styles.statLabel}>Following</Text>
             </TouchableOpacity>
             <View style={styles.statDividerVertical} />
-            <View style={styles.statBox}>
+            <TouchableOpacity 
+              style={styles.statBox}
+              onPress={() => setAllReviewsModalVisible(true)}
+              activeOpacity={0.7}
+            >
               <View style={styles.ratingRow}>
                 <Star size={18} color={Colors.secondary} fill={Colors.secondary} />
                 <Text style={[styles.statNumber, { color: accentColor }]}>{user.rating || 0}</Text>
               </View>
               <Text style={styles.statLabel}>Rating</Text>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 

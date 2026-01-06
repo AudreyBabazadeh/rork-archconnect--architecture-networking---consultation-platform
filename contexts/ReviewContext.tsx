@@ -46,6 +46,76 @@ export function ReviewProvider({ children }: { children: React.ReactNode }) {
             console.error('Error parsing reviews, clearing storage:', parseError);
             await AsyncStorage.removeItem('reviews');
           }
+        } else if (user) {
+          const demoReviews: Review[] = [
+            {
+              id: 'demo1',
+              consultantId: user.id,
+              clientId: 'client1',
+              clientName: 'Sarah Johnson',
+              rating: 5,
+              comment: 'Absolutely outstanding experience! The guidance I received was incredibly insightful and tailored to my specific needs. The session was well-structured, and I walked away with actionable strategies that I could implement immediately. Highly recommend!',
+              date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+              consultationType: '1-on-1 Consultation',
+              sessionId: 'session1'
+            },
+            {
+              id: 'demo2',
+              consultantId: user.id,
+              clientId: 'client2',
+              clientName: 'Michael Chen',
+              rating: 5,
+              comment: 'One of the best mentorship sessions I\'ve ever had. Clear communication, expert knowledge, and genuine care for my success. The advice was practical and immediately applicable to my situation.',
+              date: new Date(Date.now() - 22 * 24 * 60 * 60 * 1000).toISOString(),
+              consultationType: 'Career Coaching',
+              sessionId: 'session2'
+            },
+            {
+              id: 'demo3',
+              consultantId: user.id,
+              clientId: 'client3',
+              clientName: 'Emily Rodriguez',
+              rating: 4,
+              comment: 'Great session overall! Very knowledgeable and patient. The only reason for 4 stars instead of 5 is that I wish we had a bit more time to dive deeper into some topics, but what we covered was excellent.',
+              date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+              consultationType: 'Portfolio Review',
+              sessionId: 'session3'
+            },
+            {
+              id: 'demo4',
+              consultantId: user.id,
+              clientId: 'client4',
+              clientName: 'David Kim',
+              rating: 5,
+              comment: 'Exceeded my expectations! The session was incredibly valuable and helped me gain clarity on my career path. The personalized feedback was exactly what I needed.',
+              date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
+              consultationType: 'Strategy Session',
+              sessionId: 'session4'
+            },
+            {
+              id: 'demo5',
+              consultantId: user.id,
+              clientId: 'client5',
+              clientName: 'Jessica Park',
+              rating: 5,
+              comment: 'Incredible mentor! Very supportive and provided actionable insights that made a real difference in my work. Would definitely book again.',
+              date: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+              consultationType: '1-on-1 Consultation',
+              sessionId: 'session5'
+            },
+            {
+              id: 'demo6',
+              consultantId: user.id,
+              clientId: 'client6',
+              clientName: 'Alex Thompson',
+              rating: 4,
+              comment: 'Really helpful session! Got some great advice on navigating my career transition. Looking forward to implementing these strategies.',
+              date: new Date(Date.now() - 75 * 24 * 60 * 60 * 1000).toISOString(),
+              consultationType: 'Career Coaching',
+              sessionId: 'session6'
+            },
+          ];
+          setReviews(demoReviews);
         }
       } catch (error) {
         console.error('Error loading reviews:', error);
@@ -53,7 +123,7 @@ export function ReviewProvider({ children }: { children: React.ReactNode }) {
     };
     
     loadReviews();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (reviews.length > 0 || reviews.length === 0) {
